@@ -179,12 +179,17 @@ int main(int argc, char** argv )
 #define vOpen(img, times) cvMorphologyEx( img, img, NULL, NULL, CV_MOP_OPEN, times );//去除白色小区域
 #define vClose(img, times) cvMorphologyEx( img, img, NULL, NULL, CV_MOP_CLOSE, times );//去除黑色小区域
 
+
+#define vFullScreen(win_name) \
+	cvSetWindowProperty(win_name, CV_WND_PROP_FULLSCREEN, 1);
+	
 struct VideoInput
 {
 	int _fps;
 
 	CvCapture* _capture;
 	
+	IplImage* _raw;
 	int _cam_idx;
 	Size _size;
 	Size _half_size;
@@ -357,7 +362,6 @@ struct vBackCodeBook
 	//!!!!never release the returned image
 	IplImage* getForeground(IplImage* image);
 
-
 	void release();
 };
 
@@ -371,3 +375,25 @@ void vPolyLine(IplImage* dst, vector<Point>& pts, CvScalar clr=CV_RGB(255,255,25
 
 CvScalar vDefaultColor(int idx);
 void vGetPerspectiveMatrix(CvMat*& warp_matrix, cv::Point2f xsrcQuad[4], cv::Point2f xdstQuad[4]);
+
+
+
+void vDrawDelaunay( CvSubdiv2D* subdiv,IplImage* src,IplImage * dst, bool drawLine = true );
+void vDrawVoroni( CvSubdiv2D * subdiv, IplImage * src, IplImage * dst, bool drawLine = true );
+
+
+
+struct Delaunay
+{
+	Delaunay();
+	void init(int w, int h);
+	void insert(float x, float y);
+	void clear();
+	void build();
+
+	void drawDelaunay( IplImage* src,IplImage * dst, bool drawLine = true );
+	void drawVoroni( IplImage* src,IplImage * dst, bool drawLine = true );
+
+	CvMemStorage* storage;
+	CvSubdiv2D* subdiv;
+};

@@ -447,7 +447,7 @@ IplImage* VideoInput::get_frame()
 
 void VideoInput::_post_init()
 {
-	IplImage* _raw = get_frame();
+	_raw = get_frame();
 
 	_fps = cvGetCaptureProperty(_capture, CV_CAP_PROP_FPS);
 	if (_fps == 0)
@@ -680,5 +680,211 @@ void vPolyLine(IplImage* dst, vector<Point>& pts, CvScalar clr, int thick)
 			cvLine(dst, pts[k], pts[k+1], clr, thick);
 		}
 		cvLine(dst, pts[k], pts[0], clr, thick);
+	}
+}
+
+static void draw_edge( IplImage* img, CvSubdiv2DEdge edge, CvScalar color )
+{
+	CvSubdiv2DPoint* org_pt = cvSubdiv2DEdgeOrg(edge);
+	CvSubdiv2DPoint* dst_pt = cvSubdiv2DEdgeDst(edge);
+
+	if( org_pt && dst_pt )
+	{
+		CvPoint2D32f org = org_pt->pt;
+		CvPoint2D32f dst = dst_pt->pt;
+
+		CvPoint iorg = cvPoint( cvRound( org.x ), cvRound( org.y ));
+		CvPoint idst = cvPoint( cvRound( dst.x ), cvRound( dst.y ));
+
+		cvLine( img, iorg, idst, color, 1, CV_AA, 0 );
+	}
+}
+
+
+static void draw_facet( CvSubdiv2D * subdiv, IplImage * dst, IplImage * src, CvSubdiv2DEdge edge, bool drawLine )
+{
+	CvSubdiv2DEdge e = edge;
+	int i, count = 0;
+	vector<CvPoint> buf;
+
+	// count number of edges in facet 
+	do
+	{
+		count++;
+		e = cvSubdiv2DGetEdge( e, CV_NEXT_AROUND_LEFT );
+	}
+	while( e != edge && count < subdiv->quad_edges * 4 );
+
+	// gather points
+	e = edge;
+	for( i = 0; i < count; i++ )
+	{
+		CvSubdiv2DPoint *pt = cvSubdiv2DEdgeOrg( e );
+
+		if( !pt )
+			break;
+		assert( fabs( pt->pt.x ) < 10000 && fabs( pt->pt.y ) < 10000 );		
+		buf.push_back(cvPoint( cvRound( pt->pt.x ), cvRound( pt->pt.y )));
+
+		e = cvSubdiv2DGetEdge( e, CV_NEXT_AROUND_LEFT );		
+	}
+
+	if( i == count )
+	{
+		CvSubdiv2DPoint *pt = cvSubdiv2DEdgeDst( cvSubdiv2DRotateEdge( edge, 1 ));
+		if (!pt) 
+			pt = cvSubdiv2DEdgeOrg( cvSubdiv2DRotateEdge( edge, 0 ));
+		CvPoint ip = cvPoint( cvRound( pt->pt.x ), cvRound( pt->pt.y ));
+		CvScalar color = {{0,0,0,0}};
+
+		//printf("count = %d, (%d,%d)\n", ip.x, ip.y );
+
+		if( 0 <= ip.x && ip.x < src->width && 0 <= ip.y && ip.y < src->height )
+		{
+			uchar *ptr = (uchar*)(src->imageData + ip.y * src->widthStep + ip.x * 3);
+			color = CV_RGB( ptr[2], ptr[1], ptr[0] );
+		}
+
+		cvFillConvexPoly( dst, &buf[0], count, color );
+
+		if (drawLine)
+		{
+			for (i = 1;i<count;i++)
+			{
+				cvDrawLine(dst, buf[i], buf[i-1], CV_RGB(30,30,30),1);
+			}
+		}
+	} 
+}
+
+
+
+
+void vDrawDelaunay( CvSubdiv2D* subdiv,IplImage* src,IplImage * dst , bool drawLine)
+{
+	int i, total = subdiv->edges->total;
+
+	cvCalcSubdivVoronoi2D( subdiv );
+
+	for( i = 0; i < total; i++ )
+	{
+		CvQuadEdge2D *edge = (CvQuadEdge2D *) cvGetSetElem( subdiv->edges, i );
+
+		if( edge && CV_IS_SET_ELEM( edge ))
+		{
+			CvSubdiv2DEdge e = (CvSubdiv2DEdge) edge;
+
+			//	draw_edge( src, (CvSubdiv2DEdge)edge + 1, CV_RGB(0,0,0) );//voroni edge
+			//	draw_edge( src, (CvSubdiv2DEdge)edge, CV_RGB(0,0,0) );//delaunay edge
+
+			//e itslef
+			draw_facet( subdiv, dst, src, cvSubdiv2DRotateEdge( e, 0 ), drawLine);
+			//reversed e
+			draw_facet( subdiv, dst, src, cvSubdiv2DRotateEdge( e, 2 ), drawLine);
+		}
+	}
+}
+
+void vDrawVoroni( CvSubdiv2D * subdiv, IplImage * src, IplImage * dst, bool drawLine )
+{
+	int i, total = subdiv->edges->total;
+
+	cvCalcSubdivVoronoi2D( subdiv );
+
+	//icvSet( dst, 255 );
+	for( i = 0; i < total; i++ )
+	{
+		CvQuadEdge2D *edge = (CvQuadEdge2D *) cvGetSetElem( subdiv->edges, i );
+
+		if( edge && CV_IS_SET_ELEM( edge ))
+		{
+			CvSubdiv2DEdge e = (CvSubdiv2DEdge) edge;
+
+			// left
+			draw_facet( subdiv, dst, src, cvSubdiv2DRotateEdge( e, 1 ), drawLine);
+			// right
+			draw_facet( subdiv, dst, src, cvSubdiv2DRotateEdge( e, 3 ), drawLine);
+		}
+	}
+}
+
+
+
+Delaunay::Delaunay()
+{
+	storage = cvCreateMemStorage();
+	subdiv  = NULL;
+}
+
+void Delaunay::init(int w, int h)
+{
+	CvRect rect = cvRect(0, 0, w, h);
+
+	subdiv = cvCreateSubdivDelaunay2D(rect, storage);
+}
+
+void Delaunay::insert(float x, float y)
+{
+	Point2f pt(x,y);
+	cvSubdivDelaunay2DInsert(subdiv, pt);
+}
+
+void Delaunay::clear()
+{
+	cvClearMemStorage(storage);
+}
+
+void Delaunay::build()
+{
+	cvCalcSubdivVoronoi2D( subdiv );
+}
+ 
+
+void Delaunay::drawDelaunay( IplImage* src,IplImage * dst , bool drawLine)
+{
+	int i, total = subdiv->edges->total;
+
+	cvCalcSubdivVoronoi2D( subdiv );
+
+	for( i = 0; i < total; i++ )
+	{
+		CvQuadEdge2D *edge = (CvQuadEdge2D *) cvGetSetElem( subdiv->edges, i );
+
+		if( edge && CV_IS_SET_ELEM( edge ))
+		{
+			CvSubdiv2DEdge e = (CvSubdiv2DEdge) edge;
+
+			//	draw_edge( src, (CvSubdiv2DEdge)edge + 1, CV_RGB(0,0,0) );//voroni edge
+			//	draw_edge( src, (CvSubdiv2DEdge)edge, CV_RGB(0,0,0) );//delaunay edge
+
+			//e itslef
+			draw_facet( subdiv, dst, src, cvSubdiv2DRotateEdge( e, 0 ), drawLine);
+			//reversed e
+			draw_facet( subdiv, dst, src, cvSubdiv2DRotateEdge( e, 2 ), drawLine);
+		}
+	}
+}
+
+
+void Delaunay::drawVoroni( IplImage * src, IplImage * dst, bool drawLine )
+{
+	int i, total = subdiv->edges->total;
+
+	cvCalcSubdivVoronoi2D( subdiv );
+
+	//icvSet( dst, 255 );
+	for( i = 0; i < total; i++ )
+	{
+		CvQuadEdge2D *edge = (CvQuadEdge2D *) cvGetSetElem( subdiv->edges, i );
+
+		if( edge && CV_IS_SET_ELEM( edge ))
+		{
+			CvSubdiv2DEdge e = (CvSubdiv2DEdge) edge;
+
+			// left
+			draw_facet( subdiv, dst, src, cvSubdiv2DRotateEdge( e, 1 ), drawLine);
+			// right
+			draw_facet( subdiv, dst, src, cvSubdiv2DRotateEdge( e, 3 ), drawLine);
+		}
 	}
 }

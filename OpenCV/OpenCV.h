@@ -383,10 +383,10 @@ void vDrawVoroni( CvSubdiv2D * subdiv, IplImage * src, IplImage * dst, bool draw
 
 
 
-struct Delaunay
+struct Subdiv
 {
-	Delaunay();
-	void init(int w, int h);
+	Subdiv(int w, int h);
+
 	void insert(float x, float y);
 	void clear();
 	void build();
@@ -394,6 +394,7 @@ struct Delaunay
 	void drawDelaunay( IplImage* src,IplImage * dst, bool drawLine = true );
 	void drawVoroni( IplImage* src,IplImage * dst, bool drawLine = true );
 
+	CvRect rect;
 	CvMemStorage* storage;
 	CvSubdiv2D* subdiv;
 };

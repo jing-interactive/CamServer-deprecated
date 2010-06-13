@@ -810,41 +810,38 @@ void vDrawVoroni( CvSubdiv2D * subdiv, IplImage * src, IplImage * dst, bool draw
 
 
 
-Delaunay::Delaunay()
+Subdiv::Subdiv(int w, int h)
 {
 	storage = cvCreateMemStorage();
-	subdiv  = NULL;
-}
-
-void Delaunay::init(int w, int h)
-{
-	CvRect rect = cvRect(0, 0, w, h);
+	rect = cvRect(0, 0, w, h);
 
 	subdiv = cvCreateSubdivDelaunay2D(rect, storage);
 }
 
-void Delaunay::insert(float x, float y)
+void Subdiv::insert(float x, float y)
 {
 	Point2f pt(x,y);
 	cvSubdivDelaunay2DInsert(subdiv, pt);
 }
 
-void Delaunay::clear()
+void Subdiv::clear()
 {
 	cvClearMemStorage(storage);
+
+	subdiv = cvCreateSubdivDelaunay2D(rect, storage);
 }
 
-void Delaunay::build()
+void Subdiv::build()
 {
 	cvCalcSubdivVoronoi2D( subdiv );
 }
  
 
-void Delaunay::drawDelaunay( IplImage* src,IplImage * dst , bool drawLine)
+void Subdiv::drawDelaunay( IplImage* src,IplImage * dst , bool drawLine)
 {
 	int i, total = subdiv->edges->total;
 
-	cvCalcSubdivVoronoi2D( subdiv );
+	build();
 
 	for( i = 0; i < total; i++ )
 	{
@@ -866,11 +863,11 @@ void Delaunay::drawDelaunay( IplImage* src,IplImage * dst , bool drawLine)
 }
 
 
-void Delaunay::drawVoroni( IplImage * src, IplImage * dst, bool drawLine )
+void Subdiv::drawVoroni( IplImage * src, IplImage * dst, bool drawLine )
 {
 	int i, total = subdiv->edges->total;
 
-	cvCalcSubdivVoronoi2D( subdiv );
+	build();
 
 	//icvSet( dst, 255 );
 	for( i = 0; i < total; i++ )

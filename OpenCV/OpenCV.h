@@ -4,6 +4,7 @@
 
 #pragma warning( disable: 4244 )
 #pragma warning( disable: 4996 )
+#pragma warning( disable: 4819 )
 
 #include <cv.h>
 #include <highgui.h>
@@ -178,7 +179,8 @@ int main(int argc, char** argv )
 #define vAutoThresh(gray, max_value) cvAdaptiveThreshold(gray, gray, max_value)
 #define vOpen(img, times) cvMorphologyEx( img, img, NULL, NULL, CV_MOP_OPEN, times );//去除白色小区域
 #define vClose(img, times) cvMorphologyEx( img, img, NULL, NULL, CV_MOP_CLOSE, times );//去除黑色小区域
-
+#define vDilate(img, times) cvMorphologyEx( img, img, NULL, NULL, CV_MOP_DILATE, times );
+#define vErode(img, times) cvMorphologyEx( img, img, NULL, NULL, CV_MOP_ERODE, times );
 
 #define vFullScreen(win_name) \
 	cvSetWindowProperty(win_name, CV_WND_PROP_FULLSCREEN, 1);
@@ -186,10 +188,11 @@ int main(int argc, char** argv )
 struct VideoInput
 {
 	int _fps;
+	bool _isImage;
 
 	CvCapture* _capture;
 	
-	IplImage* _raw;
+	IplImage* _frame;
 	int _cam_idx;
 	Size _size;
 	Size _half_size;
@@ -197,11 +200,11 @@ struct VideoInput
 	int _codec;
 
 	VideoInput();
+
 	bool init(int cam_idx);
-
 	bool init(char* video_file);
-
 	bool init(int argc, char** argv);
+
 	void wait(int t);
 
 	IplImage* get_frame();
@@ -398,3 +401,18 @@ struct Subdiv
 	CvMemStorage* storage;
 	CvSubdiv2D* subdiv;
 };
+
+void on_default(int );
+
+//亮度变换，nPercent为正时变亮，负则变暗 
+int ContrastAdjust(const IplImage* srcImg,
+				   IplImage* dstImg,
+				   float nPercent);
+
+//对比度变换，brightness小于1降低对比度，大于1增强对比度
+int BrightnessAdjust(const IplImage* srcImg,
+					 IplImage* dstImg,
+					 float brightness);
+
+void convertRGBtoHSV(const IplImage *imageRGB, IplImage *imageHSV);
+void convertHSVtoRGB(const IplImage *imageHSV, IplImage *imageRGB);

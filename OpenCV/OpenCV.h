@@ -9,14 +9,13 @@
 #include <cv.h>
 #include <highgui.h>
 #include <cvaux.h>
-
-using namespace cv;
-
 #include <stdio.h>
 #include <stdarg.h>
 #include <time.h>
- 
 #include <vector>
+
+using namespace cv;
+using std::vector;
 
 //CV_FOURCC('P','I','M','1')    = MPEG-1 codec
 //CV_FOURCC('M','J','P','G')    = motion-jpeg codec (does not work well)
@@ -27,26 +26,25 @@ using namespace cv;
 //CV_FOURCC('I', '2', '6', '3') = H263I codec
 //CV_FOURCC('F', 'L', 'V', '1') = FLV1 codec
 
-using std::vector;
- 
+
 template<class T> class Image
 {
-  private:
-  IplImage* imgp;
-  public:
-  Image(IplImage* img=0) {imgp=img;}
-  ~Image(){imgp=0;}
-  void operator=(IplImage* img) {imgp=img;}
-  inline T* operator[](const int rowIndx) {
-    return ((T *)(imgp->imageData + rowIndx*imgp->widthStep));}
+private:
+	IplImage* imgp;
+public:
+	Image(IplImage* img=0) {imgp=img;}
+	~Image(){imgp=0;}
+	void operator=(IplImage* img) {imgp=img;}
+	inline T* operator[](const int rowIndx) {
+		return ((T *)(imgp->imageData + rowIndx*imgp->widthStep));}
 };
 
 typedef struct{
-  unsigned char b,g,r;
+	unsigned char b,g,r;
 } RgbPixel;
 
 typedef struct{
-  float b,g,r;
+	float b,g,r;
 } RgbPixelFloat;
 
 typedef Image<RgbPixel>       RgbImage;
@@ -113,15 +111,15 @@ struct vBlob
 inline CvScalar random_color()
 {
 	static CvRNG   rng = cvRNG((unsigned)-1);
-    int icolor = cvRandInt(&rng);
-    return CV_RGB(icolor&255, (icolor>>8)&255, (icolor>>16)&255);
+	int icolor = cvRandInt(&rng);
+	return CV_RGB(icolor&255, (icolor>>8)&255, (icolor>>16)&255);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 //For connected components:
 #define CVCONTOUR_APPROX_LEVEL  2   // Approx.threshold - the bigger it is, the simpler is the boundary 
- 
+
 // This cleans up the forground segmentation mask derived from calls to cvBackCodeBookDiff
 //
 // mask			Is a grayscale (8 bit depth) "raw" mask image which will be cleaned up
@@ -152,23 +150,23 @@ VideoInput video_input;
 
 int main(int argc, char** argv )
 {	
-	if (video_input.init(argc,argv))
-	{
-		while (true)
-		{
-			IplImage* raw = video_input.get_frame(); 
-			if (!raw)
-				break;
-			cvFlip(raw, 0, 1);
+if (video_input.init(argc,argv))
+{
+while (true)
+{
+IplImage* raw = video_input.get_frame(); 
+if (!raw)
+break;
+cvFlip(raw, 0, 1);
 
-			show_image(raw);
-			int key = cvWaitKey(1);
-			if (key == VK_ESCAPE)
-				break;
-		}
-	}
+show_image(raw);
+int key = cvWaitKey(1);
+if (key == VK_ESCAPE)
+break;
+}
+}
 
-	return 0;
+return 0;
 }
 */
 
@@ -184,14 +182,21 @@ int main(int argc, char** argv )
 
 #define vFullScreen(win_name) \
 	cvSetWindowProperty(win_name, CV_WND_PROP_FULLSCREEN, 1);
-	
+
 struct VideoInput
 {
 	int _fps;
-	bool _isImage;
+
+	enum e_InputType
+	{
+		From_Image = 0,
+		From_Video,
+		From_Camera,
+		From_Count,
+	}_InputType;
 
 	CvCapture* _capture;
-	
+
 	IplImage* _frame;
 	int _cam_idx;
 	Size _size;
@@ -258,7 +263,7 @@ struct IBackGround
 			cvReleaseBGStatModel(&bg_model);
 	}
 };
- 
+
 
 struct vBackFGDStat: public IBackGround
 {
@@ -322,20 +327,20 @@ struct vBackColorDiff: public IBackGround
 		cvZero(grayDiff);
 		for(int y=0;y<h;y++) 
 			for(int x=0;x<w;x++) 
-				{
-					uchar* pixel = &((uchar*)(image->imageData + step*y))[x*3];
-					uchar* pixel2 = &((uchar*)(colorBg->imageData + step*y))[x*3];
-					uchar* p = &((uchar*)(grayDiff->imageData + step2*y))[x];
+			{
+				uchar* pixel = &((uchar*)(image->imageData + step*y))[x*3];
+				uchar* pixel2 = &((uchar*)(colorBg->imageData + step*y))[x*3];
+				uchar* p = &((uchar*)(grayDiff->imageData + step2*y))[x];
 
-					uchar r = pixel[0] - pixel2[0];
-					uchar g = pixel[1] - pixel2[1];
-					uchar b = pixel[2] - pixel2[2];
+				uchar r = pixel[0] - pixel2[0];
+				uchar g = pixel[1] - pixel2[1];
+				uchar b = pixel[2] - pixel2[2];
 
-					if ((r*r+g*g+b*b) > thresh*thresh)						
-						*p = 255;
-					else
-						*p = 0;
-				}
+				if ((r*r+g*g+b*b) > thresh*thresh)						
+					*p = 255;
+				else
+					*p = 0;
+			}
 	}
 	IplImage* getForeground(){
 		return grayDiff;
@@ -349,7 +354,7 @@ struct vBackCodeBook
 {
 	CvBGCodeBookModel* model;
 	Ptr<IplImage> yuvImage;
-    Ptr<IplImage> ImaskCodeBook;
+	Ptr<IplImage> ImaskCodeBook;
 	Ptr<IplImage> ImaskCodeBookCC;
 	bool isLearning;
 
@@ -416,3 +421,11 @@ int BrightnessAdjust(const IplImage* srcImg,
 
 void convertRGBtoHSV(const IplImage *imageRGB, IplImage *imageHSV);
 void convertHSVtoRGB(const IplImage *imageHSV, IplImage *imageRGB);
+
+#define cv_try_begin() try{
+
+#define cv_try_end() 	}\
+	catch (cv::Exception& ex)\
+{\
+	printf("[cv::Exception] %s\n", ex.what());\
+}

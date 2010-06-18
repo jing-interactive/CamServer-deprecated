@@ -391,8 +391,9 @@ vector<vBlob>  update_mhi( IplImage* silh, IplImage* dst )
 VideoInput::VideoInput()
 {
 	_fps = 0;
-	_capture = NULL;
-	_isImage = false;
+	_capture = NULL; 
+	_frame = NULL;
+	_InputType = From_Count;
 }
 
 bool VideoInput::init(int cam_idx)
@@ -401,11 +402,13 @@ bool VideoInput::init(int cam_idx)
 
 	if( !_capture )
 	{
-		printf("Could not initialize capturing camera #%d...\n", cam_idx);
+		printf("Could not initialize camera #%d.\n", cam_idx);
 		return false;
 	}
 	else
 	{
+		_InputType = From_Camera;
+		printf("Loaded from camera #%d.\n", cam_idx);
 		_post_init();
 		return true;
 	}
@@ -413,18 +416,25 @@ bool VideoInput::init(int cam_idx)
 
 bool VideoInput::init(char* video_file)
 {
-	_capture = cvCaptureFromAVI(video_file);
-	if( !_capture )
-	{		
-		_frame = cvLoadImage(video_file);
-		if (!_frame)
+	_frame = cvLoadImage(video_file);
+
+	if (_frame)
+	{
+		printf("Loaded from image %s.\n", video_file);
+		_InputType = From_Image;
+	}
+	else
+	{
+		_capture = cvCaptureFromAVI(video_file);
+		if( _capture )
 		{
-			printf("Could not open file %s...\n", video_file);
-			return false;
+			printf("Loaded from video %s.\n", video_file);
+			_InputType = From_Video;
 		}
 		else
 		{
-			_isImage = true;
+			printf("Could not open file %s.\n", video_file);
+			return false;
 		}
 	}
 		
@@ -444,7 +454,7 @@ bool VideoInput::init(int argc, char** argv)
 
 void VideoInput::wait(int t)
 {
-	if (!_isImage)
+	if (_InputType == From_Image)
 		return;
 	for (int i=0;i<t;i++)
 		cvQueryFrame(_capture);
@@ -452,14 +462,14 @@ void VideoInput::wait(int t)
 
 IplImage* VideoInput::get_frame()
 {
-	if (!_isImage)
-		_frame = cvQueryFrame(_capture);;
+	if (_InputType != From_Image)
+		_frame = cvQueryFrame(_capture);
 	return _frame;
 }
 
 void VideoInput::_post_init()
 {
-	if (!_isImage)
+	if (_InputType != From_Image)
 	{
 		_frame = get_frame();
 		_fps = cvGetCaptureProperty(_capture, CV_CAP_PROP_FPS);
@@ -481,8 +491,8 @@ VideoInput::~VideoInput()
 {
 	if (_capture != NULL)
 		cvReleaseCapture( &_capture );
-	if (_frame != NULL)
-		cvReleaseImage(&_frame);
+//	if (_frame != NULL)
+//		cvReleaseImage(&_frame);
 }
 
 

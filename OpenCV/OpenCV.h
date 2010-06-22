@@ -429,3 +429,6 @@ void convertHSVtoRGB(const IplImage *imageHSV, IplImage *imageRGB);
 {\
 	printf("[cv::Exception] %s\n", ex.what());\
 }
+
+
+#define vAddWeighted(src, alpha, dst) cvAddWeighted(src, alpha, dst, 1-alpha, 0, dst);

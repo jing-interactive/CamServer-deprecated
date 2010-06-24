@@ -4,6 +4,8 @@
 
 #pragma warning( disable: 4244 )
 #pragma warning( disable: 4996 )
+#pragma warning( disable: 4305 )
+#pragma warning( disable: 4018 )
 #pragma warning( disable: 4819 )
 
 #include <cv.h>
@@ -399,12 +401,15 @@ struct Subdiv
 	void clear();
 	void build();
 
+	void getTriangles();
 	void drawDelaunay( IplImage* src,IplImage * dst, bool drawLine = true );
 	void drawVoroni( IplImage* src,IplImage * dst, bool drawLine = true );
 
 	CvRect rect;
 	CvMemStorage* storage;
-	CvSubdiv2D* subdiv;
+	CvSubdiv2D* subdiv; 
+	
+	CvRect rect;
 };
 
 void on_default(int );
@@ -431,4 +436,4 @@ void convertHSVtoRGB(const IplImage *imageHSV, IplImage *imageRGB);
 }
 
 
-#define vAddWeighted(src, alpha, dst) cvAddWeighted(src, alpha, dst, 1-alpha, 0, dst);
+#define vAddWeighted(src, alpha, dst) cvAddWeighted(src, alpha, dst, 1-alpha, 0, dst);>>>>>>> .r12

@@ -744,6 +744,7 @@ static void draw_facet( CvSubdiv2D * subdiv, IplImage * dst, IplImage * src, CvS
 
 	// gather points
 	e = edge;
+	assert(count == 3);
 	for( i = 0; i < count; i++ )
 	{
 		CvSubdiv2DPoint *pt = cvSubdiv2DEdgeOrg( e );
@@ -854,7 +855,6 @@ void Subdiv::insert(float x, float y)
 void Subdiv::clear()
 {
 	cvClearMemStorage(storage);
-
 	subdiv = cvCreateSubdivDelaunay2D(rect, storage);
 }
 

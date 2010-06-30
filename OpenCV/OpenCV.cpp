@@ -65,6 +65,9 @@ CvScalar vDefaultColor(int idx){ return default_colors[idx%sizeOfColors];}
 
 void HaarDetection::detect_object( IplImage* img, vector<CvRect>& regions)
 {
+	if (!cascade)
+		return;
+
 	double scale = 1.5;
 	regions.clear();
 

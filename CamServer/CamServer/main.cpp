@@ -32,7 +32,7 @@ CvMat* warp_matrix = NULL;
 #define PARAM_BLUR1 80
 #define PARAM_BLUR2 7
 #define PARAM_NOISE 3
-#define PARAM_MINAREA 100
+#define PARAM_MINAREA 1000
 
 int paramFlipX = 0;
 int paramFlipY = 0;
@@ -293,7 +293,7 @@ int WINAPI WinMain(
 		
 		HaarDetection haar;
 		if (face_track)
-			haar.init("haarcascade_frontalface_alt.xml");
+			haar.init("../media/haarcascade_frontalface_alt.xml");
 		vector<CvRect> face_rects;
 
 		while (true)
@@ -400,7 +400,8 @@ int WINAPI WinMain(
 			cvCopyImage(grayBuffer, fore);
 			timer.profileFunction("vHighPass");
 
-			vFindBlobs(grayBuffer, blobs, paramNoise, hull_mode, (paramMinArea+1)/(1000.0f));
+//			vOpen(grayBuffer, paramNoise);
+			vFindBlobs(grayBuffer, blobs, paramMinArea, hull_mode);
 			timer.profileFunction("vFindBlobs");
 
 			UINT n = blobs.size();

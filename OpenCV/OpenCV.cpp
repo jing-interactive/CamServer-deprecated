@@ -168,87 +168,106 @@ void feature_out(IplImage* img, IplImage* mask, int thresh)
 #define CV_CVX_WHITE	CV_RGB(0xff,0xff,0xff)
 #define CV_CVX_BLACK	CV_RGB(0x00,0x00,0x00)
 
-void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int morph_itr, bool poly1_hull0, float areaScale)
-{
-	static CvMemStorage*	mem_storage	= NULL; 	
-	
-	//CLEAN UP RAW MASK
-	if (morph_itr > 0)
-	{
-		vOpen( src, morph_itr );
-		vClose( src, morph_itr );
-	}
+static int qsort_carea_compare( const void* _a, const void* _b) {
+	int out = 0;
+	// pointers, ugh.... sorry about this
+	CvSeq* a = *((CvSeq **)_a);
+	CvSeq* b = *((CvSeq **)_b);
+	// use opencv to calc size, then sort based on size
+	float areaa = fabs(cvContourArea(a, CV_WHOLE_SEQ));
+	float areab = fabs(cvContourArea(b, CV_WHOLE_SEQ));
+	// note, based on the -1 / 1 flip
+	// we sort biggest to smallest, not smallest to biggest
+	if( areaa > areab ) { out = -1; }
+	else {                out =  1; }
+	return out;
+}
 
-	//FIND CONTOURS AROUND ONLY BIGGER REGIONS
+bool qsort_area_compare(const CvSeq* a, const CvSeq* b)
+{
+	float areaa = fabs(cvContourArea(a, CV_WHOLE_SEQ));
+	float areab = fabs(cvContourArea(b, CV_WHOLE_SEQ));
+	return areaa < areab;
+}
+
+void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea, bool convexHull)
+{
+	static CvMemStorage*	mem_storage	= NULL; 
+
 	if( mem_storage==NULL ) mem_storage = cvCreateMemStorage(0);
 	else cvClearMemStorage(mem_storage);
+
 	blobs.clear();
-	
-	double minArea = src->height * src->width*areaScale;  //calculate area threshold
+	 
+	CvSeq* contour_list = 0;
+	cvFindContours(src,mem_storage,&contour_list, sizeof(CvContour),
+		CV_RETR_LIST,CV_CHAIN_APPROX_SIMPLE);
 
-	CvSeq* first_contour = 0;
-	cvFindContours(src,mem_storage,&first_contour, sizeof(CvContour),CV_RETR_CCOMP,CV_CHAIN_APPROX_SIMPLE);	
+	std::vector<CvSeq*> pBlobList;
 
-	for (CvSeq* d = first_contour; d != NULL; d=d->h_next)
+	// put the contours from the linked list, into an array for sorting
+	for (CvSeq* ptr = contour_list; ptr != NULL; ptr=ptr->h_next)
 	{
-		bool isHole = false;
-		CvSeq* c = d;
-		while (c != NULL)
+		float area = fabs( cvContourArea(ptr, CV_WHOLE_SEQ) );
+		if( (area > minArea) /*&& (area < maxArea)*/ ) {
+			pBlobList.push_back(ptr);
+		}
+	}
+
+	// sort the pointers based on size
+	int nBlobs = pBlobList.size();	
+	//if( nBlobs > 0 ) {
+	//	qsort( (void*)pBlobList[0], nBlobs, sizeof(CvSeq*), qsort_carea_compare);
+	//}
+	std::sort(pBlobList.begin(), pBlobList.end(), qsort_area_compare);
+
+	for (int i=0;i<nBlobs;i++)
+	{
+		CvSeq* contour = pBlobList[i];
+		CvSeq* approx = NULL;
+		if(convexHull) //Polygonal approximation of the segmentation
+			approx = cvApproxPoly(contour,sizeof(CvContour),mem_storage,CV_POLY_APPROX_DP, CVCONTOUR_APPROX_LEVEL,0);
+		else //Convex Hull of the segmentation
+			approx = cvConvexHull2(contour,mem_storage,CV_CLOCKWISE,1);
+
+		float area = cvContourArea( approx, CV_WHOLE_SEQ );
+
+		blobs.push_back(vBlob());
+
+		//fill the blob
+		Rect box = cvBoundingRect(approx);
+		blobs[i].area	= fabs(area);
+		blobs[i].isHole	= area < 0 ? true : false;
+		blobs[i].box	= box;
+		blobs[i].center.x = box.x + box.width/2;
+		blobs[i].center.y = box.y + box.height/2;
+		
+		// get the points for the blob
+		CvPoint           pt;
+		CvSeqReader       reader;
+		cvStartReadSeq( approx, &reader, 0 );
+
+		for (int k=0;k<approx->total;k++)
 		{
-			double area = fabs(cvContourArea( c ));
-			if( area >= minArea)
-			{
-				CvSeq* contour;
-				if(poly1_hull0) //Polygonal approximation of the segmentation
-					contour = cvApproxPoly(c,sizeof(CvContour),mem_storage,CV_POLY_APPROX_DP, CVCONTOUR_APPROX_LEVEL,0);
-				else //Convex Hull of the segmentation
-					contour = cvConvexHull2(c,mem_storage,CV_CLOCKWISE,1);
-
-				//Bounding rectangles around blobs			
-				Rect box = cvBoundingRect(contour);
-				Point center;
-				center.x = box.x + box.width/2;
-				center.y = box.y + box.height/2;
-				vBlob blob(box, center, area);
-				blob.isHole = isHole;
-				
-				for (int i=0;i<contour->total;i++)
-					blob.pts.push_back(*((Point*)cvGetSeqElem(contour, i)));
-				
-				blobs.push_back(blob);
-
-				cvDrawContours(src,contour,CV_CVX_WHITE,CV_CVX_WHITE,-1,CV_FILLED,8); //draw to src
-			}//END if( area >= minArea)
-
-			if (isHole)
-				c = c->h_next;//洞的h_next是洞
-			else
-				c = c->v_next;//轮廓点v_next是洞
-			isHole = true;
-		}//END while (c != NULL)
+			CV_READ_SEQ_ELEM( pt, reader );
+			blobs[i].pts.push_back(pt);
+		}
+		
+	//	cvDrawContours(src,contour,CV_CVX_WHITE,CV_CVX_WHITE,-1,CV_FILLED,8); //draw to src 
 	} 
 }
 
 
 
-void vFindBlobs(IplImage *src, int morph_itr, bool poly1_hull0, float areaScale)
+void vFindBlobs(IplImage *src, int minArea, bool convexHull)
 {
 	static CvMemStorage*	mem_storage	= NULL;
-
-	//CLEAN UP RAW MASK
-	if (morph_itr > 0)
-	{
-		vOpen( src, morph_itr );
-		vClose( src, morph_itr );
-	}
 
 	//FIND CONTOURS AROUND ONLY BIGGER REGIONS
 	if( mem_storage==NULL ) mem_storage = cvCreateMemStorage(0);
 	else cvClearMemStorage(mem_storage);
 	
-	double minArea = src->height * src->width*areaScale;  //calculate area threshold
-
-	CvContourScanner scanner = cvStartFindContours(src,mem_storage,sizeof(CvContour),CV_RETR_EXTERNAL,CV_CHAIN_APPROX_SIMPLE);
+	CvContourScanner scanner = cvStartFindContours(src,mem_storage,sizeof(CvContour),CV_RETR_LIST,CV_CHAIN_APPROX_SIMPLE);
 
 	CvSeq* c;
 	while( c = cvFindNextContour( scanner ) )
@@ -257,7 +276,7 @@ void vFindBlobs(IplImage *src, int morph_itr, bool poly1_hull0, float areaScale)
 		if( area >= minArea)
 		{
 			CvSeq* contour;
-			if(poly1_hull0) //Polygonal approximation of the segmentation
+			if(convexHull) //Polygonal approximation of the segmentation
 				contour = cvApproxPoly(c,sizeof(CvContour),mem_storage,CV_POLY_APPROX_DP, CVCONTOUR_APPROX_LEVEL,0);
 			else //Convex Hull of the segmentation
 				contour = cvConvexHull2(c,mem_storage,CV_CLOCKWISE,1); 
@@ -445,6 +464,8 @@ bool VideoInput::init(char* video_file)
 
 bool VideoInput::init(int argc, char** argv)
 {
+	_argc = argc;
+	_argv = argv;
 	if( argc == 1 || (argc == 2 && strlen(argv[1]) == 1 && ::isdigit(argv[1][0])))
 		return init( argc == 2 ? argv[1][0] - '0' : 0 );
 	else if( argc == 2 )
@@ -457,13 +478,20 @@ void VideoInput::wait(int t)
 	if (_InputType == From_Image)
 		return;
 	for (int i=0;i<t;i++)
-		cvQueryFrame(_capture);
+		get_frame();
 }
 
 IplImage* VideoInput::get_frame()
 {
 	if (_InputType != From_Image)
+	{
 		_frame = cvQueryFrame(_capture);
+		if (_frame == NULL)
+		{
+			cvReleaseCapture(&_capture);
+			init(_argc, _argv);
+		}
+	}
 	return _frame;
 }
 
@@ -600,6 +628,8 @@ void vHighPass(IplImage* src, IplImage* dst, int blurLevel/* = 10*/, int noiseLe
 		// filter out the noise using a median filter
 		cvSmooth(dst, dst, CV_MEDIAN, noiseLevel*2+1);
 	}
+	else
+		cvCopy(src, dst);
 }
  
 void vGetPerspectiveMatrix(CvMat*& warp_matrix, cv::Point2f xsrcQuad[4], cv::Point2f xdstQuad[4])
@@ -1237,3 +1267,18 @@ void convertHSVtoRGB(const IplImage *imageHSV, IplImage *imageRGB)
 	}
 }
 
+vBlob::vBlob()
+{
+	area = 0;
+	angle  = 0;
+	isHole = false;	
+}
+
+vBlob::vBlob(Rect rc, Point ct, float ar, float ang, bool hole)
+{
+	box = rc;
+	center = ct;
+	area = ar;
+	angle = ang;
+	isHole = hole;
+}

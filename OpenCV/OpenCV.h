@@ -101,9 +101,13 @@ typedef vector<IplImage*> image_array_t;
 
 struct vBlob
 {
-	vBlob(Rect rc, Point ct, float ar = 0, float ang = 0, bool hole = false):box(rc),center(ct),area(ar), angle(ang), isHole(hole){}
+	vBlob();
+	vBlob(Rect rc, Point ct, float ar = 0, float ang = 0, bool hole = false);
+
 	Rect box;
 	Point center;
+	int id;
+
 	float angle;
 	float area;
 	vector<Point> pts;
@@ -132,9 +136,9 @@ inline CvScalar random_color()
 //
 
 void vFindBlobs(IplImage *mask, vector<vBlob>& blobs,
-				int morph_itr = 1,	 bool poly1_hull0=true, float areaScale = 0.1);
+				int minArea, bool convexHull=true);
 void vFindBlobs(IplImage *mask, 
-				int morph_itr = 1,	 bool poly1_hull0=true, float areaScale = 0.1);//draw blobs only
+				int minArea, bool convexHull=true);//draw blobs only
 
 #define vDrawRect(image, rc, clr) cvDrawRect(image, cvPoint(rc.x,rc.y), cvPoint(rc.x+rc.width,rc.y+rc.height), clr)
 
@@ -196,6 +200,9 @@ struct VideoInput
 		From_Camera,
 		From_Count,
 	}_InputType;
+
+	int _argc;
+	char** _argv;
 
 	CvCapture* _capture;
 
@@ -407,9 +414,7 @@ struct Subdiv
 
 	CvRect rect;
 	CvMemStorage* storage;
-	CvSubdiv2D* subdiv; 
-	
-	CvRect rect;
+	CvSubdiv2D* subdiv;
 };
 
 void on_default(int );

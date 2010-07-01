@@ -5,7 +5,7 @@
 
 
 //uncomment this if u have "FloDebug.h"
-#define USING_FLO_DEBUG
+//#define USING_FLO_DEBUG
 
 #ifdef USING_FLO_DEBUG
 #include "FloDebug.h"
@@ -20,14 +20,9 @@ class MiniTimer
 public:
 	MiniTimer()
 	{
-		s_level++;
 		resetStartTime();
 	}
-	~MiniTimer()
-	{
-		s_level--;
-		assert(s_level>=0);
-	}
+
 	DWORD getTimeElapsedMS()//mil-seconds
 	{
 		return ::timeGetTime() - _start_time;
@@ -53,16 +48,10 @@ public:
 
 	static char* getProperBlank()
 	{
-		DWORD i;
-		for (i=0;i<s_level*2;i++)
-			_blank_str[i]='-';
-		_blank_str[i]=0;
-		return _blank_str;
+		return "--";
 	}
 
 private:
 	DWORD _start_time;
-	static DWORD s_level;
-	static char _blank_str[MAX_PATH];
 };
 

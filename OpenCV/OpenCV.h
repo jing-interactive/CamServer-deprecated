@@ -16,6 +16,7 @@
 #include <time.h>
 #include <vector>
 
+
 using namespace cv;
 using std::vector;
 
@@ -75,7 +76,8 @@ imgA[i][j].r = 111;
 void vCopyImageTo(CvArr* small_image, IplImage* big_image, const CvRect& region);
 
 void vDrawText(IplImage* img, int x,int y,char* str, CvScalar clr=CV_RGB(255,255,255));
-
+void vPolyLine(IplImage* dst, vector<Point>& pts, CvScalar clr=CV_RGB(255,255,255), int thick = 1);
+CvScalar vDefaultColor(int idx);
 //在title窗口中，显示w * h个小图片(input)
 void vShowManyImages(char* title, CvImage& input, int w, int h);
 
@@ -114,7 +116,7 @@ struct vBlob
 	bool isHole;
 };
 
-inline CvScalar random_color()
+inline CvScalar vRandomColor()
 {
 	static CvRNG   rng = cvRNG((unsigned)-1);
 	int icolor = cvRandInt(&rng);
@@ -122,9 +124,6 @@ inline CvScalar random_color()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-
-//For connected components:
-#define CVCONTOUR_APPROX_LEVEL  2   // Approx.threshold - the bigger it is, the simpler is the boundary 
 
 // This cleans up the forground segmentation mask derived from calls to cvBackCodeBookDiff
 //
@@ -147,7 +146,7 @@ void vFindBlobs(IplImage *mask,
 //  silh - input video frame
 //  dst - resultant motion picture
 //  args - optional parameters
-vector<vBlob>  update_mhi( IplImage* silh, IplImage* dst);
+vector<vBlob>  vUpdateMhi( IplImage* silh, IplImage* dst);
 /*
 
 #include "OpenCV.h"
@@ -229,17 +228,20 @@ struct VideoInput
 };
 
 
-struct HaarDetection
+struct vHaarDetector
 {
-	CvHaarClassifierCascade* cascade;
-	CvMemStorage* storage; 
+	//
+	bool init(char* cascade_name);
+	void detect_object(IN IplImage* img, OUT vector<CvRect>& regions);	
 	CvRect object_rect;
 
-	HaarDetection();
-	~HaarDetection();
-	bool init(char* cascade_name);
+	//
+	CvHaarClassifierCascade* cascade;
+	CvMemStorage* storage;
 
-	void detect_object(IN IplImage* img, OUT vector<CvRect>& regions);
+	vHaarDetector();
+	~vHaarDetector();
+
 };
 
 
@@ -388,9 +390,6 @@ void vPerspectiveTransform(const CvArr* src, CvArr* dst, cv::Point srcQuad[4], c
 
 CvFGDStatModelParams cvFGDStatModelParams();
 
-void vPolyLine(IplImage* dst, vector<Point>& pts, CvScalar clr=CV_RGB(255,255,255), int thick = 1);
-
-CvScalar vDefaultColor(int idx);
 void vGetPerspectiveMatrix(CvMat*& warp_matrix, cv::Point2f xsrcQuad[4], cv::Point2f xdstQuad[4]);
 
 
@@ -441,4 +440,34 @@ void convertHSVtoRGB(const IplImage *imageHSV, IplImage *imageRGB);
 }
 
 
-#define vAddWeighted(src, alpha, dst) cvAddWeighted(src, alpha, dst, 1-alpha, 0, dst);>>>>>>> .r12
+#define vAddWeighted(src, alpha, dst) cvAddWeighted(src, alpha, dst, 1-alpha, 0, dst);
+ 
+struct vFingerDetector{
+		
+	vFingerDetector();
+	
+	bool findFingers(const vBlob& blob, int k = 10);
+	bool findHands(const vBlob& smblob, int k = 200);
+	
+	float dlh,max;
+	
+	int handspos[2];
+	
+	vector<cv::Point2f>		ppico;
+	vector<cv::Point2f>		smppico;
+	
+	vector<float>				kpointcurv;
+	vector<float>				smkpointcurv;
+	
+	vector<bool>				bfingerRuns;
+	
+	vector<cv::Point2f>		lhand;
+	vector<cv::Point2f>		rhand;
+	
+//	cv::Vec2f	v1,v2,aux1;
+	 
+	cv::Vec3f	v1D,vxv;
+	cv::Vec3f	v2D;
+	 	
+	 float teta,lhd;
+};

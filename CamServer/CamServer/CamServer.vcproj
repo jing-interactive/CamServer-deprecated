@@ -177,15 +177,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\cvButtons.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\FloDebug.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\MiniTimer.cpp"
 				>
 			</File>
 			<File
@@ -198,10 +190,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath=".\cvButtons.h"
-				>
-			</File>
 			<File
 				RelativePath=".\FloDebug.h"
 				>
@@ -263,11 +251,23 @@
 			Name="OpenCV"
 			>
 			<File
+				RelativePath=".\OpenCV\cvButtons.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\OpenCV\cvButtons.h"
+				>
+			</File>
+			<File
 				RelativePath=".\OpenCV\OpenCV.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\OpenCV\OpenCV.h"
+				>
+			</File>
+			<File
+				RelativePath=".\OpenCV\vector2d.h"
 				>
 			</File>
 		</Filter>

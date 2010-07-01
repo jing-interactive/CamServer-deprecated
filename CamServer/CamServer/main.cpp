@@ -1,7 +1,7 @@
 #include "OpenCV/OpenCV.h" 
+#include "OpenCV/cvButtons.h"
 #include "ofxOsc/ofxOsc.h"
 #include "MiniTimer.h"
-#include "cvButtons.h"
 #include "ofxArgs.h"
 
 bool using_debug_file = true;
@@ -15,6 +15,7 @@ bool fixed_fps = false;//是否限制帧数
 bool total_gui = true;//是否显示所有图像
 bool contour_mode = true;//是否发送轮廓点 
 bool face_track = false;//是否人脸识别
+bool finger_track = true;//是否手指识别
 int hull_mode = 0;//
 
 int fps = 120;
@@ -25,6 +26,7 @@ cv::Point2f dstQuad[4];
 vector<vBlob> blobs;
 cv::Rect roi[4]; 
 CvMat* warp_matrix = NULL;
+
 
 #define PARAM_DARK 255
 #define PARAM_BRIGHT 255
@@ -291,10 +293,12 @@ int WINAPI WinMain(
 		MiniTimer timer;
 		MiniTimer timer2;
 		
-		HaarDetection haar;
+		vHaarDetector haar;
 		if (face_track)
 			haar.init("../media/haarcascade_frontalface_alt.xml");
 		vector<CvRect> face_rects;
+
+		vFingerDetector finger;
 
 		while (true)
 		{
@@ -404,9 +408,9 @@ int WINAPI WinMain(
 			vFindBlobs(grayBuffer, blobs, paramMinArea, hull_mode);
 			timer.profileFunction("vFindBlobs");
 
-			UINT n = blobs.size();
+			UINT nBlobs = blobs.size();
 
-			sprintf(g_buffer, "%d object\n", n);
+			sprintf(g_buffer, "%d object\n", nBlobs);
 			_write(g_buffer);
 			{
 				ofxOscMessage m;
@@ -429,7 +433,24 @@ int WINAPI WinMain(
 					vDrawRect(frame, f, vDefaultColor(i));
 				}
 			}
-			for (UINT i=0;i<n;i++)
+
+			if (finger_track)
+			{
+				for (UINT i=0;i<nBlobs;i++)
+				{
+					bool ffound=finger.findFingers(blobs[i], 12);
+				//	bool hfound=finger.findHands(blobs[0]);
+					if (ffound)
+					{
+						for (int f=0;f<finger.ppico.size();f++)
+						{	
+							cvCircle(frame, finger.ppico[f], 10, vRandomColor());
+						}
+					}
+				}
+			}
+
+			for (UINT i=0;i<nBlobs;i++)
 			{
 				vBlob& obj = blobs[i];
 
@@ -526,7 +547,6 @@ int WINAPI WinMain(
 			vDrawText(the_gui::setting, 20,20, g_buffer);
 			cvShowImage("参数设置", the_gui::setting);	
 			timer2.profileFunction("total"); 
-			FloWrite("\n");
 		}
 		save_config();
 	} 

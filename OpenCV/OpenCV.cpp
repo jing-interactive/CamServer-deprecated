@@ -1,4 +1,5 @@
 #include "OpenCV.h"
+#include "vector2d.h"
 
 #ifdef _DEBUG
 	#pragma comment(lib,"cv210d.lib")
@@ -63,7 +64,7 @@ CvScalar default_colors[] =
 const int sizeOfColors = sizeof(default_colors)/sizeof(CvScalar);
 CvScalar vDefaultColor(int idx){ return default_colors[idx%sizeOfColors];}
 
-void HaarDetection::detect_object( IplImage* img, vector<CvRect>& regions)
+void vHaarDetector::detect_object( IplImage* img, vector<CvRect>& regions)
 {
 	if (!cascade)
 		return;
@@ -171,21 +172,6 @@ void feature_out(IplImage* img, IplImage* mask, int thresh)
 #define CV_CVX_WHITE	CV_RGB(0xff,0xff,0xff)
 #define CV_CVX_BLACK	CV_RGB(0x00,0x00,0x00)
 
-static int qsort_carea_compare( const void* _a, const void* _b) {
-	int out = 0;
-	// pointers, ugh.... sorry about this
-	CvSeq* a = *((CvSeq **)_a);
-	CvSeq* b = *((CvSeq **)_b);
-	// use opencv to calc size, then sort based on size
-	float areaa = fabs(cvContourArea(a, CV_WHOLE_SEQ));
-	float areab = fabs(cvContourArea(b, CV_WHOLE_SEQ));
-	// note, based on the -1 / 1 flip
-	// we sort biggest to smallest, not smallest to biggest
-	if( areaa > areab ) { out = -1; }
-	else {                out =  1; }
-	return out;
-}
-
 bool qsort_area_compare(const CvSeq* a, const CvSeq* b)
 {
 	float areaa = fabs(cvContourArea(a, CV_WHOLE_SEQ));
@@ -193,9 +179,12 @@ bool qsort_area_compare(const CvSeq* a, const CvSeq* b)
 	return areaa < areab;
 }
 
+#define CVCONTOUR_APPROX_LEVEL  1   // Approx.threshold - the bigger it is, the simpler is the boundary 
+
 void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea, bool convexHull)
 {
-	static CvMemStorage*	mem_storage	= NULL; 
+	static CvMemStorage*	mem_storage	= NULL;
+	static CvMoments myMoments;
 
 	if( mem_storage==NULL ) mem_storage = cvCreateMemStorage(0);
 	else cvClearMemStorage(mem_storage);
@@ -234,6 +223,7 @@ void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea, bool convexHul
 			approx = cvConvexHull2(contour,mem_storage,CV_CLOCKWISE,1);
 
 		float area = cvContourArea( approx, CV_WHOLE_SEQ );
+		cvMoments( approx, &myMoments );
 
 		blobs.push_back(vBlob());
 
@@ -242,8 +232,8 @@ void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea, bool convexHul
 		blobs[i].area	= fabs(area);
 		blobs[i].isHole	= area < 0 ? true : false;
 		blobs[i].box	= box;
-		blobs[i].center.x = box.x + box.width/2;
-		blobs[i].center.y = box.y + box.height/2;
+		blobs[i].center.x = myMoments.m10 / myMoments.m00;
+		blobs[i].center.y = myMoments.m01 / myMoments.m00;
 		
 		// get the points for the blob
 		CvPoint           pt;
@@ -299,7 +289,7 @@ const double MHI_DURATION = 1;
 const double MAX_TIME_DELTA = 0.5;
 const double MIN_TIME_DELTA = 0.05;
 
-vector<vBlob>  update_mhi( IplImage* silh, IplImage* dst )
+vector<vBlob>  vUpdateMhi( IplImage* silh, IplImage* dst )
 {
 	// temporary images
 	static IplImage *mhi = 0; // MHI
@@ -528,19 +518,19 @@ VideoInput::~VideoInput()
 
 
 
-HaarDetection::HaarDetection()
+vHaarDetector::vHaarDetector()
 {
 	cascade = NULL;
 	storage = NULL;  
 }
 
-HaarDetection::~HaarDetection()
+vHaarDetector::~vHaarDetector()
 {
 	if (cascade) cvReleaseHaarClassifierCascade(&this->cascade);
 	if (storage) cvReleaseMemStorage(&this->storage); 
 }
 
-bool HaarDetection::init(char* cascade_name)
+bool vHaarDetector::init(char* cascade_name)
 {
 	cascade = (CvHaarClassifierCascade*)cvLoad( cascade_name, 0, 0, 0 );
 	storage = cvCreateMemStorage(0);
@@ -1284,4 +1274,159 @@ vBlob::vBlob(Rect rc, Point ct, float ar, float ang, bool hole)
 	area = ar;
 	angle = ang;
 	isHole = hole;
+}
+
+
+
+vFingerDetector::vFingerDetector()
+{
+	//k is used for fingers and k is used for hand detection
+	teta=0.f;
+	handspos[0]=0;
+	handspos[1]=0;
+}
+
+bool vFingerDetector::findFingers (const vBlob& blob, int k/* = 10*/)
+{
+	ppico.clear();
+	kpointcurv.clear();
+	bfingerRuns.clear();
+	
+	int nPts = blob.pts.size();
+
+	irr::vector2df	v1,v2;
+
+	for(int i=k; i<nPts-k; i++)
+	{		
+		//calculating angre between vectors
+		v1.set(blob.pts[i].x-blob.pts[i-k].x,	blob.pts[i].y-blob.pts[i-k].y);
+		v2.set(blob.pts[i].x-blob.pts[i+k].x,	blob.pts[i].y-blob.pts[i+k].y);
+		
+		v1D = Vec3f(blob.pts[i].x-blob.pts[i-k].x,	blob.pts[i].y-blob.pts[i-k].y,	0);
+		v2D = Vec3f(blob.pts[i].x-blob.pts[i+k].x,	blob.pts[i].y-blob.pts[i+k].y,	0);
+		
+		vxv = v1D.cross(v2D);
+		
+		v1.normalize();
+		v2.normalize();
+		teta=v1.getAngleWith(v2);
+		
+		//control conditions 
+		if(fabs(teta) < 40)
+		{	//pik?
+			if(vxv[2] > 0)
+			{
+				bfingerRuns.push_back(true);
+				//we put the select poins into ppico vector
+				ppico.push_back(blob.pts[i]);
+				kpointcurv.push_back(teta);
+			}
+		}
+	}
+	if(ppico.size()>0)
+	{
+		return true;
+	}
+	else 
+	{
+		return false;
+	}	
+}
+
+bool vFingerDetector::findHands(const vBlob& smblob, int k)
+{
+	//smppico.clear();
+	//kpointcurv.clear();
+	//lhand.clear();
+	//rhand.clear();	
+	//	
+	//cv::Point hcentroid=smblob.center;
+
+	//int nPts = smblob.pts.size();
+	//for(int i=k; i<nPts-k; i++)
+	//{
+	//	
+	//	v1 = Vec2f(smblob.pts[i].x-smblob.pts[i-k].x,	smblob.pts[i].y-smblob.pts[i-k].y);
+	//	v2 = Vec2f(smblob.pts[i].x-smblob.pts[i+k].x,	smblob.pts[i].y-smblob.pts[i+k].y);
+	//	
+	//	v1D = Vec3f(smblob.pts[i].x-smblob.pts[i-k].x,	smblob.pts[i].y-smblob.pts[i-k].y,	0);
+	//	v2D = Vec3f(smblob.pts[i].x-smblob.pts[i+k].x,	smblob.pts[i].y-smblob.pts[i+k].y,	0);
+	//	
+	//	vxv = v1D.cross(v2D);
+	//	
+	//	v1.normalize();
+	//	v2.normalize();
+	//	
+	//	teta=v1.angle(v2);
+	//	
+	//	if(fabs(teta) < 30)
+	//	{	//pik?
+	//		if(vxv.z > 0)
+	//		{
+	//			smppico.push_back(smblob.pts[i]);
+	//			kpointcurv.push_back(teta);
+	//		}
+	//	}
+	//}
+	//for(int i=0; i<smppico.size();i++)
+	//{
+	//	if(i==0)
+	//	{
+	//		lhand.push_back(smppico[i]);
+	//	}
+	//	else
+	//	{
+	//		aux1.set(smppico[i].x-smppico[0].x,smppico[i].y-smppico[0].y);
+	//		dlh=aux1.length();
+	//	
+	//		//we detect left and right hand and 
+	//	
+	//		if(dlh<100)
+	//		{
+	//			lhand.push_back(smppico[i]);
+	//		}
+	//		if(dlh>100)
+	//		{
+	//			rhand.push_back(smppico[i]);
+	//		}
+	//	}
+	//}
+	////try to find for each hand the point wich is farder to the centroid of the Blob
+	//if(lhand.size()>0)
+	//{		
+	//	aux1.set(lhand[0].x-hcentroid.x,lhand[0].y-hcentroid.y);
+	//	lhd=aux1.length();
+	//	max=lhd;
+	//	handspos[0]=0;
+	//	for(int i=1; i<lhand.size(); i++)
+	//	{
+	//		aux1.set(lhand[i].x-hcentroid.x,lhand[i].y-hcentroid.y);
+	//		lhd=aux1.length();
+	//		if(lhd>max)
+	//		{
+	//			max=lhd;
+	//			handspos[0]=i;
+	//		}
+	//	}
+	//}
+	//if(rhand.size()>0)
+	//{
+	//	aux1.set(rhand[0].x-hcentroid.x,rhand[0].y-hcentroid.y);
+	//	lhd=aux1.length();
+	//	max=lhd;
+	//	handspos[1]=0;
+	//	for(int i=1; i<rhand.size(); i++)
+	//	{
+	//		aux1.set(rhand[i].x-hcentroid.x,rhand[i].y-hcentroid.y);
+	//		lhd=aux1.length();
+	//		if(lhd>max)
+	//		{
+	//			max=lhd;
+	//			handspos[1]=i;
+	//		}
+	//	}
+	//}
+	if(rhand.size()>0 || lhand.size()>0) return true;
+	return false;
+	//Positions of hands are in (lhand[handspos[0]].x, y+lhand[handspos[0]].y) for left hand and (rhand[handspos[1]].x, y+rhand[handspos[1]].y) for right hand
 }

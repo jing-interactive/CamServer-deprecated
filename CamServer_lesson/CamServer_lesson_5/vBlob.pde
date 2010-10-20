@@ -1,5 +1,3 @@
-import org.processing.wiki.triangulate.*;
-
 class vBlob
 {
   public vBlob(float _cx, float _cy, float _w, float _h)
@@ -8,13 +6,13 @@ class vBlob
     cy = _cy;
     w = _w;
     h = _h;
-    //对新添加的成员进行初始化
     isHole = false;
     points = new ArrayList();
-    //  triangles = new ArrayList();
   }
   float cx,cy;//中心点的坐标
   float w,h;//宽度和高度
+  boolean isHole;//是否是洞
+  ArrayList points;//保存轮廓点 
 
   public void draw()//进行绘制
   {
@@ -26,34 +24,6 @@ class vBlob
       rect( cx, cy, w, h);
     }
   }
-
-  public void build_tri()
-  {      
-    triangles = Triangulate.triangulate(points);
-  }
-
-  public void draw_tri()//进行绘制
-  {
-    // draw the mesh of triangles
-    stroke(0, 40);
-    fill(255, 40);
-    beginShape(TRIANGLES);
-
-    for (int i = 0; i < triangles.size(); i++) {
-      Triangle t = (Triangle)triangles.get(i);
-      vertex(t.p1.x, t.p1.y);
-      vertex(t.p2.x, t.p2.y);
-      vertex(t.p3.x, t.p3.y);
-    }
-
-    endShape();
-  }
-
-  //++++++++++++++++第四课新添加的
-  boolean isHole;//是否是洞
-  ArrayList points = null;//保存轮廓点
-  ArrayList triangles = null;//delaunay
-
   private void drawContour()
   {
     if (isHole)//如果是洞，使用不同的颜色

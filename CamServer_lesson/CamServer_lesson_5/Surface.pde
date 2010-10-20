@@ -18,10 +18,14 @@ class Surface {
 
       // This is what box2d uses to put the surface in its world
       EdgeChainDef edges = new EdgeChainDef();      
-      for (int i=0;i<n;i++)
+      for (int i=-1;i<n;i++)
       {
         // The edge point in our window
-        PVector pos = (PVector)src.points.get(i);
+        PVector pos;
+        if (i == -1)
+          pos = (PVector)src.points.get(n-1);
+        else
+          pos = (PVector)src.points.get(i);
         Vec2 screenEdge = new Vec2(pos.x,pos.y);
         // We store it for rendering
         surface.add(screenEdge);

@@ -5,7 +5,7 @@ import org.jbox2d.dynamics.*;
 
 PBox2D box2d;
 // A list for all of our rectangles
-ArrayList boxes;
+ArrayList boxList;
 
 void physics_setup()
 {
@@ -15,16 +15,7 @@ void physics_setup()
   // We are setting a custom gravity
   box2d.setGravity(0, -20); 
 
-  boxes = new ArrayList();
-}
-
-void physics_clear()
-{
-  for (int i = boxes.size()-1; i >= 0; i--) 
-  {
-    Box p = (Box) boxes.get(i);
-    boxes.remove(i);
-  }
+  boxList = new ArrayList();
 }
 
 void physics_draw()
@@ -35,22 +26,32 @@ void physics_draw()
   if (random(1) > 0.8)
   {
     Box p = new Box(width/2,random(30,70));
-    boxes.add(p);
+    boxList.add(p);
   }
 
   // Display all the boxes
-  for (int i = 0; i < boxes.size(); i++) {
-    Box p = (Box) boxes.get(i);
+  for (int i = 0; i < boxList.size(); i++) {
+    Box p = (Box) boxList.get(i);
     p.display();
   }
 
-  // Boxes that leave the screen, we delete them
+  // boxes that leave the screen, we delete them
   // (note they have to be deleted from both the box2d world and our list
-  for (int i = boxes.size()-1; i >= 0; i--) {
-    Box p = (Box) boxes.get(i);
+  for (int i = boxList.size()-1; i >= 0; i--) {
+    Box p = (Box) boxList.get(i);
     if (p.done()) {
-      boxes.remove(i);
+      boxList.remove(i);
     }
+  }
+}
+
+void physics_clear()
+{//clear box
+  for (int i = boxList.size()-1; i >= 0; i--) 
+  {
+    Box p = (Box) boxList.get(i);
+    p.killBody();
+    boxList.remove(i);
   }
 }
 

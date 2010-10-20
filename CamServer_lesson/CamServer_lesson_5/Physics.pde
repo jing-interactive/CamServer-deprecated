@@ -18,11 +18,20 @@ void physics_setup()
   boxes = new ArrayList();
 }
 
+void physics_clear()
+{
+  for (int i = boxes.size()-1; i >= 0; i--) 
+  {
+    Box p = (Box) boxes.get(i);
+    boxes.remove(i);
+  }
+}
+
 void physics_draw()
 {
   box2d.step();
 
-//add box randomly
+  //add box randomly
   if (random(1) > 0.8)
   {
     Box p = new Box(width/2,random(30,70));

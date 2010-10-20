@@ -6,7 +6,7 @@ ArrayList blobList = new ArrayList();
 ArrayList surfaceList = new ArrayList();
 
 void setup() {
-  size(640, 480);
+  size(500, 480);
   smooth();
 
   oscP5 = new OscP5(this,3333);//3333是CamServer的端口号，我提到过一次的
@@ -23,8 +23,8 @@ void draw()
     vBlob obj = (vBlob)blobList.get(i);
     obj.draw();
 
-    obj.build_tri();
-    obj.draw_tri();
+    // obj.build_tri();
+    // obj.draw_tri();
   }
   for (int i=0;i<surfaceList.size();i++)
   {
@@ -34,19 +34,28 @@ void draw()
   physics_draw();
 }
 
-void mouseMoved()
+void mouseClicked()
 { 
-  vBlob b = new vBlob(0,0,0,0);
-  b.points.add(new PVector(mouseX-200,mouseY));
-  b.points.add(new PVector(mouseX+200,mouseY));
-
-  for (int i=0;i<surfaceList.size();i++)
+  if (mouseButton == LEFT)
   {
-    Surface obj = (Surface)surfaceList.get(i);
-    obj.killBody();
-  }  
-  surfaceList.clear();
-  surfaceList.add(new Surface(b));
+    for (int i=0;i<surfaceList.size();i++)
+    {
+      Surface obj = (Surface)surfaceList.get(i);
+      obj.killBody();
+    }  
+    surfaceList.clear();
+
+    for (int i=0;i<blobList.size();i++)
+    {
+      vBlob blob = (vBlob)blobList.get(i);
+      surfaceList.add(new Surface(blob));
+    }
+  }
+  else
+    if (mouseButton == RIGHT)
+    {
+      physics_clear();
+    }
 }
 
 void oscEvent(OscMessage msg) 
@@ -54,12 +63,13 @@ void oscEvent(OscMessage msg)
   if(msg.checkAddrPattern("/start")) 
   {// 收到 /start 意味着一次更新的开始
     blobList.clear();//将blobList清空，因为我们要把全新的数据塞进去了
-    for (int i=0;i<surfaceList.size();i++)
-    {
-      Surface obj = (Surface)surfaceList.get(i);
-      obj.killBody();
-    }
-    surfaceList.clear();
+    // prev_blob = null;
+    /*  for (int i=0;i<surfaceList.size();i++)
+     {
+     Surface obj = (Surface)surfaceList.get(i);
+     obj.killBody();
+     }
+     surfaceList.clear();*/
   }
   else
   {
@@ -90,7 +100,10 @@ void oscEvent(OscMessage msg)
         obj.isHole = isHole;
       }
       blobList.add(obj);
-      surfaceList.add(new Surface(obj));
+
+      //prev_blob = obj;
+
+      //surfaceList.add(new Surface(obj));
     }
   }
 }

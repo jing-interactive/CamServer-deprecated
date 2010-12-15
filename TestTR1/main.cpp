@@ -1,4 +1,8 @@
-#include <memory>
+#include <stdio.h>
 
-tr1::shared_ptr<int> xxxx;
-xxxx.
+
+int main()
+{
+	printf("hello!\n");
+	return 0;
+}

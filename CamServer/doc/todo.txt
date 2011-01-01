@@ -1,0 +1,15 @@
+to do
+[rgb done]1.彩色环境做差值,rgb/hsv模式
+2.自动得识别背景
+3.相机矫正
+[done]4.浮点坐标
+5.face比例，通用的识别器
+6.hand
+[done]7.main重构
+[done]8.xml
+[WNF]9.正常的关闭
+[done]10.ofxOsc lib build inside
+[done]11.p5更新
+[done]12.UI多线程
+[done]13.预设背景[Black/White]，可切换
+14.高效的blob track算法

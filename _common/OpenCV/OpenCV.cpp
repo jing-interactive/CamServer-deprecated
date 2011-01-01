@@ -1,6 +1,6 @@
 #include "OpenCV.h"
 
-//#define _I_REALLY_NEED_DEBUG
+#define _I_REALLY_NEED_DEBUG
 
 #if defined _I_REALLY_NEED_DEBUG && _DEBUG
 #pragma comment(lib,"cv210d.lib")

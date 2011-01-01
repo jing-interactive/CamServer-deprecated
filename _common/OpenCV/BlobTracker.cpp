@@ -1175,11 +1175,11 @@ void vBlobTracker2::doBlobMoved( vTrackedBlob& b ) {
 void vBlobTracker2::doBlobOff( vTrackedBlob& b ) {
 	b.status = statusLeave;
 	leaveBlobs.push_back(b);
-	b.id = vTrackedBlob::BLOB_TO_DELETE;	
 	if( listener != NULL ) {
 		listener->blobOff( b.center.x, b.center.y, b.id, 0/*findOrder(b.id)*/ );
 	} else {
 		printf("blob: %d leave-\n" , b.id);
 	}
+	b.id = vTrackedBlob::BLOB_TO_DELETE;	
 }
 

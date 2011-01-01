@@ -27,24 +27,35 @@
 	CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 	WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-#include "UdpSocket.h"
-
-#include <winsock2.h>   // this must come first to prevent errors with MSVC7
-#include <windows.h>
-#include <mmsystem.h>   // for timeGetTime()
+#include "ip/UdpSocket.h"
 
 #include <vector>
 #include <algorithm>
 #include <stdexcept>
 #include <assert.h>
 #include <signal.h>
+#include <math.h>
+#include <errno.h>
+#include <string.h> // for memset
 
-#include "NetworkingUtils.h"
-#include "PacketListener.h"
-#include "TimerListener.h"
+#include <pthread.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <netdb.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <netinet/in.h> // for sockaddr_in
+
+#include "ip/PacketListener.h"
+#include "ip/TimerListener.h"
 
 
-typedef int socklen_t;
+#if defined(__APPLE__) && !defined(_SOCKLEN_T)
+// pre system 10.3 didn have socklen_t
+typedef ssize_t socklen_t;
+#endif
 
 
 static void SockaddrFromIpEndpointName( struct sockaddr_in& sockAddr, const IpEndpointName& endpoint )
@@ -59,8 +70,8 @@ static void SockaddrFromIpEndpointName( struct sockaddr_in& sockAddr, const IpEn
 
 	sockAddr.sin_port =
 		(endpoint.port == IpEndpointName::ANY_PORT)
-		? (short)0
-		: htons( (short)endpoint.port );
+		? 0
+		: htons( endpoint.port );
 }
 
 
@@ -78,12 +89,10 @@ static IpEndpointName IpEndpointNameFromSockaddr( const struct sockaddr_in& sock
 
 
 class UdpSocket::Implementation{
-    NetworkInitializer networkInitializer_;
-
 	bool isBound_;
 	bool isConnected_;
 
-	SOCKET socket_;
+	int socket_;
 	struct sockaddr_in connectedAddr_;
 	struct sockaddr_in sendToAddr_;
 
@@ -92,21 +101,19 @@ public:
 	Implementation()
 		: isBound_( false )
 		, isConnected_( false )
-		, socket_( INVALID_SOCKET )
+		, socket_( -1 )
 	{
-		if( (socket_ = socket( AF_INET, SOCK_DGRAM, 0 )) == INVALID_SOCKET ){
+		if( (socket_ = socket( AF_INET, SOCK_DGRAM, 0 )) == -1 ){
             throw std::runtime_error("unable to create udp socket\n");
         }
 
-		int on=1;
-		setsockopt(socket_, SOL_SOCKET, SO_BROADCAST, (char*)&on, sizeof(on));
 		memset( &sendToAddr_, 0, sizeof(sendToAddr_) );
         sendToAddr_.sin_family = AF_INET;
 	}
 
 	~Implementation()
 	{
-		if (socket_ != INVALID_SOCKET) closesocket(socket_);
+		if (socket_ != -1) close(socket_);
 	}
 
 	IpEndpointName LocalEndpointFor( const IpEndpointName& remoteEndpoint ) const
@@ -142,10 +149,11 @@ public:
 			// unconnect from the remote address
 		
 			struct sockaddr_in unconnectSockAddr;
-			SockaddrFromIpEndpointName( unconnectSockAddr, IpEndpointName() );
-
-			if( connect(socket_, (struct sockaddr *)&unconnectSockAddr, sizeof(unconnectSockAddr)) < 0 
-					&& WSAGetLastError() != WSAEADDRNOTAVAIL ){
+			memset( (char *)&unconnectSockAddr, 0, sizeof(unconnectSockAddr ) );
+			unconnectSockAddr.sin_family = AF_UNSPEC;
+			// address fields are zero
+			int connectResult = connect(socket_, (struct sockaddr *)&unconnectSockAddr, sizeof(unconnectSockAddr));
+			if ( connectResult < 0 && errno != EAFNOSUPPORT ) {
 				throw std::runtime_error("unable to un-connect udp socket\n");
 			}
 		}
@@ -174,7 +182,7 @@ public:
     void SendTo( const IpEndpointName& remoteEndpoint, const char *data, int size )
 	{
 		sendToAddr_.sin_addr.s_addr = htonl( remoteEndpoint.address );
-        sendToAddr_.sin_port = htons( (short)remoteEndpoint.port );
+        sendToAddr_.sin_port = htons( remoteEndpoint.port );
 
         sendto( socket_, data, size, 0, (sockaddr*)&sendToAddr_, sizeof(sendToAddr_) );
 	}
@@ -211,7 +219,7 @@ public:
 		return result;
 	}
 
-	SOCKET& Socket() { return socket_; }
+	int Socket() { return socket_; }
 };
 
 UdpSocket::UdpSocket()
@@ -289,28 +297,32 @@ extern "C" /*static*/ void InterruptSignalHandler( int );
 
 
 class SocketReceiveMultiplexer::Implementation{
-    NetworkInitializer networkInitializer_;
-
 	std::vector< std::pair< PacketListener*, UdpSocket* > > socketListeners_;
 	std::vector< AttachedTimerListener > timerListeners_;
 
 	volatile bool break_;
-	HANDLE breakEvent_;
+	int breakPipe_[2]; // [0] is the reader descriptor and [1] the writer
 
 	double GetCurrentTimeMs() const
 	{
-		return timeGetTime(); // FIXME: bad choice if you want to run for more than 40 days
+		struct timeval t;
+
+		gettimeofday( &t, 0 );
+
+		return ((double)t.tv_sec*1000.) + ((double)t.tv_usec / 1000.);
 	}
 
 public:
     Implementation()
 	{
-		breakEvent_ = CreateEvent( NULL, FALSE, FALSE, NULL );
+		if( pipe(breakPipe_) != 0 )
+			throw std::runtime_error( "creation of asynchronous break pipes failed\n" );
 	}
 
     ~Implementation()
 	{
-		CloseHandle( breakEvent_ );
+		close( breakPipe_[0] );
+		close( breakPipe_[1] );
 	}
 
     void AttachSocketListener( UdpSocket *socket, PacketListener *listener )
@@ -357,24 +369,27 @@ public:
 	{
 		break_ = false;
 
-		// prepare the window events which we use to wake up on incoming data
-		// we use this instead of select() primarily to support the AsyncBreak() 
-		// mechanism.
+		// configure the master fd_set for select()
 
-		std::vector<HANDLE> events( socketListeners_.size() + 1, 0 );
-		int j=0;
+		fd_set masterfds, tempfds;
+		FD_ZERO( &masterfds );
+		FD_ZERO( &tempfds );
+		
+		// in addition to listening to the inbound sockets we
+		// also listen to the asynchronous break pipe, so that AsynchronousBreak()
+		// can break us out of select() from another thread.
+		FD_SET( breakPipe_[0], &masterfds );
+		int fdmax = breakPipe_[0];		
+
 		for( std::vector< std::pair< PacketListener*, UdpSocket* > >::iterator i = socketListeners_.begin();
-				i != socketListeners_.end(); ++i, ++j ){
+				i != socketListeners_.end(); ++i ){
 
-			HANDLE event = CreateEvent( NULL, FALSE, FALSE, NULL );
-			WSAEventSelect( i->second->impl_->Socket(), event, FD_READ ); // note that this makes the socket non-blocking which is why we can safely call RecieveFrom() on all sockets below
-			events[j] = event;
+			if( fdmax < i->second->impl_->Socket() )
+				fdmax = i->second->impl_->Socket();
+			FD_SET( i->second->impl_->Socket(), &masterfds );
 		}
 
 
-		events[ socketListeners_.size() ] = breakEvent_; // last event in the collection is the break event
-
-		
 		// configure the timer queue
 		double currentTimeMs = GetCurrentTimeMs();
 
@@ -389,27 +404,44 @@ public:
 		char *data = new char[ MAX_BUFFER_SIZE ];
 		IpEndpointName remoteEndpoint;
 
+		struct timeval timeout;
+
 		while( !break_ ){
+			tempfds = masterfds;
 
-			double currentTimeMs = GetCurrentTimeMs();
+			struct timeval *timeoutPtr = 0;
+			if( !timerQueue_.empty() ){
+				double timeoutMs = timerQueue_.front().first - GetCurrentTimeMs();
+				if( timeoutMs < 0 )
+					timeoutMs = 0;
+			
+				// 1000000 microseconds in a second
+				timeout.tv_sec = (long)(timeoutMs * .001);
+				timeout.tv_usec = (long)((timeoutMs - (timeout.tv_sec * 1000)) * 1000);
+				timeoutPtr = &timeout;
+			}
 
-            DWORD waitTime = INFINITE;
-            if( !timerQueue_.empty() ){
+			if( select( fdmax + 1, &tempfds, 0, 0, timeoutPtr ) < 0 && errno != EINTR ){
+   				throw std::runtime_error("select failed\n");
+			}
 
-                waitTime = (DWORD)( timerQueue_.front().first >= currentTimeMs
-                            ? timerQueue_.front().first - currentTimeMs
-                            : 0 );
-            }
-
-			DWORD waitResult = WaitForMultipleObjects( (DWORD)socketListeners_.size() + 1, &events[0], FALSE, waitTime );
+			if ( FD_ISSET( breakPipe_[0], &tempfds ) ){
+				// clear pending data from the asynchronous break pipe
+				char c;
+				read( breakPipe_[0], &c, 1 );
+			}
+			
 			if( break_ )
 				break;
 
-			if( waitResult != WAIT_TIMEOUT ){
-				for( int i = waitResult - WAIT_OBJECT_0; i < (int)socketListeners_.size(); ++i ){
-					int size = socketListeners_[i].second->ReceiveFrom( remoteEndpoint, data, MAX_BUFFER_SIZE );
+			for( std::vector< std::pair< PacketListener*, UdpSocket* > >::iterator i = socketListeners_.begin();
+					i != socketListeners_.end(); ++i ){
+
+				if( FD_ISSET( i->second->impl_->Socket(), &tempfds ) ){
+
+					int size = i->second->ReceiveFrom( remoteEndpoint, data, MAX_BUFFER_SIZE );
 					if( size > 0 ){
-						socketListeners_[i].first->ProcessPacket( data, size, remoteEndpoint );
+						i->first->ProcessPacket( data, size, remoteEndpoint );
 						if( break_ )
 							break;
 					}
@@ -434,17 +466,6 @@ public:
 		}
 
 		delete [] data;
-
-		// free events
-		j = 0;
-		for( std::vector< std::pair< PacketListener*, UdpSocket* > >::iterator i = socketListeners_.begin();
-				i != socketListeners_.end(); ++i, ++j ){
-
-			WSAEventSelect( i->second->impl_->Socket(), events[j], 0 ); // remove association between socket and event
-			CloseHandle( events[j] );
-			unsigned long enableNonblocking = 0;
-			ioctlsocket( i->second->impl_->Socket(), FIONBIO, &enableNonblocking );  // make the socket blocking again
-		}
 	}
 
     void Break()
@@ -455,7 +476,9 @@ public:
     void AsynchronousBreak()
 	{
 		break_ = true;
-		SetEvent( breakEvent_ );
+
+		// Send a termination message to the asynchronous break pipe, so select() will return
+		write( breakPipe_[1], "!", 1 );
 	}
 };
 

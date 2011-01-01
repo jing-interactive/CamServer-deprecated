@@ -30,7 +30,6 @@
 #ifndef INCLUDED_OSCTYPES_H
 #define INCLUDED_OSCTYPES_H
 
-#pragma warning( disable: 4996 )
 
 namespace osc{
 
@@ -41,6 +40,11 @@ namespace osc{
 typedef __int64 int64;
 typedef unsigned __int64 uint64;
 
+#elif defined(__x86_64__) || defined(_M_X64)
+
+typedef long int64;
+typedef unsigned long uint64;
+
 #else
 
 typedef long long int64;
@@ -50,7 +54,7 @@ typedef unsigned long long uint64;
 
 
 
-#ifdef __x86_64__
+#if defined(__x86_64__) || defined(_M_X64)
 
 typedef signed int int32;
 typedef unsigned int uint32;
@@ -121,9 +125,9 @@ extern MessageTerminator EndMessage;
 struct NilType{
 };
 
-//extern NilType Nil;
+extern NilType Nil;
 
-	
+
 struct InfinitumType{
 };
 

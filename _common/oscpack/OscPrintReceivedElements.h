@@ -31,7 +31,6 @@
 #define INCLUDED_OSCPRINTRECEIVEDELEMENTS_H
 
 #include <iosfwd>
-#include <string.h>
 
 #ifndef INCLUDED_OSCRECEIVEDELEMENTS_H
 #include "OscReceivedElements.h"

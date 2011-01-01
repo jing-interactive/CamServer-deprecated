@@ -36,9 +36,9 @@
 #endif
 
 // osc
-#include "OscTypes.h"
-#include "OscPacketlistener.h"
-#include "UdpSocket.h"
+#include "oscpack/OscTypes.h"
+#include "oscpack/OscPacketlistener.h"
+#include "oscpack/UdpSocket.h"
 
 // ofxOsc
 #include "ofxOscMessage.h"

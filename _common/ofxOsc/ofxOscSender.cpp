@@ -23,7 +23,7 @@
 #include "ofxOscSender.h"
 
 
-#include "UdpSocket.h"
+#include "oscpack/UdpSocket.h"
 
 #include <assert.h>
 

@@ -207,26 +207,6 @@
 			Name="ofxOsc"
 			>
 			<File
-				RelativePath="..\..\_common\ofxOsc\IpEndpointName.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\_common\ofxOsc\IpEndpointName.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\_common\ofxOsc\MessageMappingOscPacketListener.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\_common\ofxOsc\NetworkingUtils.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\_common\ofxOsc\NetworkingUtils.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\_common\ofxOsc\ofxOsc.h"
 				>
 			</File>
@@ -264,66 +244,6 @@
 			</File>
 			<File
 				RelativePath="..\..\_common\ofxOsc\ofxOscSender.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\_common\ofxOsc\OscException.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\_common\ofxOsc\OscHostEndianness.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\_common\ofxOsc\OscOutboundPacketStream.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\_common\ofxOsc\OscOutboundPacketStream.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\_common\ofxOsc\OscPacketListener.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\_common\ofxOsc\OscPrintReceivedElements.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\_common\ofxOsc\OscPrintReceivedElements.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\_common\ofxOsc\OscReceivedElements.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\_common\ofxOsc\OscReceivedElements.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\_common\ofxOsc\OscTypes.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\_common\ofxOsc\OscTypes.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\_common\ofxOsc\PacketListener.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\_common\ofxOsc\TimerListener.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\_common\ofxOsc\UdpSocket.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\_common\ofxOsc\UdpSocket.h"
 				>
 			</File>
 		</Filter>
@@ -392,6 +312,90 @@
 			</File>
 			<File
 				RelativePath=".\VideoServer.rc"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="oscpack"
+			>
+			<File
+				RelativePath="..\..\_common\oscpack\IpEndpointName.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\_common\oscpack\IpEndpointName.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\_common\oscpack\MessageMappingOscPacketListener.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\_common\oscpack\win32\NetworkingUtils.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\_common\oscpack\NetworkingUtils.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\_common\oscpack\OscException.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\_common\oscpack\OscHostEndianness.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\_common\oscpack\OscOutboundPacketStream.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\_common\oscpack\OscOutboundPacketStream.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\_common\oscpack\OscPacketListener.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\_common\oscpack\OscPrintReceivedElements.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\_common\oscpack\OscPrintReceivedElements.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\_common\oscpack\OscReceivedElements.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\_common\oscpack\OscReceivedElements.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\_common\oscpack\OscTypes.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\_common\oscpack\OscTypes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\_common\oscpack\PacketListener.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\_common\oscpack\TimerListener.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\_common\oscpack\win32\UdpSocket.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\_common\oscpack\UdpSocket.h"
 				>
 			</File>
 		</Filter>

@@ -1,7 +1,7 @@
-#ifndef __TOUCHLIB_VECTOR2D__
-#define __TOUCHLIB_VECTOR2D__
+#ifndef __TOUCHLIB_point2D__
+#define __TOUCHLIB_point2D__
 
-namespace irr 
+namespace cv 
 {
 
 	// The following code was originally written by Nikolaus Gebhardt as part of Irrlicht.
@@ -29,73 +29,74 @@ namespace irr
 
 
 	template <class T>
-	class vector2d
+	class point2d
 	{
 	public:
 
-		vector2d(): X(0), Y(0) {};
-		vector2d(T nx, T ny) : X(nx), Y(ny) {};
-		vector2d(const vector2d<T>& other)	:X(other.X), Y(other.Y) {};
+		point2d(): X(0), Y(0) {};
+		point2d(T nx, T ny) : X(nx), Y(ny) {};
+		point2d(const point2d<T>& other)	:X(other.X), Y(other.Y) {};
 
 		// operators
 
-		vector2d<T> operator-() const { return vector2d<T>(-X, -Y);   }
+		point2d<T> operator-() const { return point2d<T>(-X, -Y);   }
 
-		vector2d<T>& operator=(const vector2d<T>& other)	{ X = other.X; Y = other.Y; return *this; }
+		point2d<T>& operator=(const point2d<T>& other)	{ X = other.X; Y = other.Y; return *this; }
 
-		vector2d<T> operator+(const vector2d<T>& other) const { return vector2d<T>(X + other.X, Y + other.Y);	}
-		vector2d<T>& operator+=(const vector2d<T>& other)	{ X+=other.X; Y+=other.Y; return *this; }
+		point2d<T> operator+(const point2d<T>& other) const { return point2d<T>(X + other.X, Y + other.Y);	}
+		point2d<T>& operator+=(const point2d<T>& other)	{ X+=other.X; Y+=other.Y; return *this; }
 
-		vector2d<T> operator-(const vector2d<T>& other) const { return vector2d<T>(X - other.X, Y - other.Y);	}
-		vector2d<T>& operator-=(const vector2d<T>& other)	{ X-=other.X; Y-=other.Y; return *this; }
+		point2d<T> operator-(const point2d<T>& other) const { return point2d<T>(X - other.X, Y - other.Y);	}
+		point2d<T>& operator-=(const point2d<T>& other)	{ X-=other.X; Y-=other.Y; return *this; }
 
-		vector2d<T> operator*(const vector2d<T>& other) const { return vector2d<T>(X * other.X, Y * other.Y);	}
-		vector2d<T>& operator*=(const vector2d<T>& other)	{ X*=other.X; Y*=other.Y; return *this; }
-		vector2d<T> operator*(const T v) const { return vector2d<T>(X * v, Y * v);	}
-		vector2d<T>& operator*=(const T v) { X*=v; Y*=v; return *this; }
+		point2d<T> operator*(const point2d<T>& other) const { return point2d<T>(X * other.X, Y * other.Y);	}
+		point2d<T>& operator*=(const point2d<T>& other)	{ X*=other.X; Y*=other.Y; return *this; }
+		point2d<T> operator*(const T v) const { return point2d<T>(X * v, Y * v);	}
+		point2d<T>& operator*=(const T v) { X*=v; Y*=v; return *this; }
 
-		vector2d<T> operator/(const vector2d<T>& other) const { return vector2d<T>(X / other.X, Y / other.Y);	}
-		vector2d<T>& operator/=(const vector2d<T>& other)	{ X/=other.X; Y/=other.Y; return *this; }
-		vector2d<T> operator/(const T v) const { return vector2d<T>(X / v, Y / v);	}
-		vector2d<T>& operator/=(const T v) { X/=v; Y/=v; return *this; }
+		point2d<T> operator/(const point2d<T>& other) const { return point2d<T>(X / other.X, Y / other.Y);	}
+		point2d<T>& operator/=(const point2d<T>& other)	{ X/=other.X; Y/=other.Y; return *this; }
+		point2d<T> operator/(const T v) const { return point2d<T>(X / v, Y / v);	}
+		point2d<T>& operator/=(const T v) { X/=v; Y/=v; return *this; }
 
-		bool operator==(const vector2d<T>& other) const { return other.X==X && other.Y==Y; }
-		bool operator!=(const vector2d<T>& other) const { return other.X!=X || other.Y!=Y; }
+		bool operator==(const point2d<T>& other) const { return other.X==X && other.Y==Y; }
+		bool operator!=(const point2d<T>& other) const { return other.X!=X || other.Y!=Y; }
+		bool operator<(const point2d<T>& other) const { return (X < other.X) || ( (X == other.X) && (Y < other.Y)); } 
 
 		// functions
 
 		void set(const T& nx, const T& ny) {X=nx; Y=ny; }
-		void set(const vector2d<T>& p) { X=p.X; Y=p.Y;}
+		void set(const point2d<T>& p) { X=p.X; Y=p.Y;}
 
-		//! Returns the length of the vector
-		//! \return Returns the length of the vector.
+		//! Returns the length of the point
+		//! \return Returns the length of the point.
 		float getLength() const { return sqrt(X*X + Y*Y); }
 		float getLengthSQ() const { return (X*X + Y*Y); }
 
-		//! Returns the dot product of this vector with an other.
-		T dotProduct(const vector2d<T>& other) const
+		//! Returns the dot product of this point with an other.
+		T dotProduct(const point2d<T>& other) const
 		{
 			return X*other.X + Y*other.Y;
 		}
 
-		//! Calculates the cross product with another vector
-		T crossProduct(const vector2d<T>& p) const
+		//! Calculates the cross product with another point
+		T crossProduct(const point2d<T>& p) const
 		{
 			return X * p.Y - Y * p.X;
 		}
 
 
-		//! Returns distance from an other point. Here, the vector is interpreted as
+		//! Returns distance from an other point. Here, the point is interpreted as
 		//! point in 2 dimensional space.
-		float getDistanceFrom(const vector2d<T>& other) const
+		float getDistanceFrom(const point2d<T>& other) const
 		{
 			float vx = X - other.X; float vy = Y - other.Y;
 			return sqrt(vx*vx + vy*vy);
 		}
 
-		//! Returns distance from an other point. Here, the vector is interpreted as
+		//! Returns distance from an other point. Here, the point is interpreted as
 		//! point in 2 dimensional space.
-		float getDistanceFromSQ(const vector2d<T>& other) const
+		float getDistanceFromSQ(const point2d<T>& other) const
 		{
 			float vx = X - other.X; 
 			float vy = Y - other.Y;
@@ -104,7 +105,7 @@ namespace irr
 		}
 
 		//! rotates the point around a center by an amount of degrees.
-		void rotateBy(float degrees, const vector2d<T>& center)
+		void rotateBy(float degrees, const point2d<T>& center)
 		{
 			degrees *= GRAD_PI2;
 			T cs = (T)cos(degrees);
@@ -119,8 +120,8 @@ namespace irr
 			Y += center.Y;
 		}
 
-		//! normalizes the vector.
-		vector2d<T>& normalize()
+		//! normalizes the point.
+		point2d<T>& normalize()
 		{
 			T l = (T)getLength();
 			if (l == 0)
@@ -132,7 +133,7 @@ namespace irr
 			return *this;
 		}
 
-		//! Calculates the angle of this vector in grad in the trigonometric sense.
+		//! Calculates the angle of this point in grad in the trigonometric sense.
 		//! This method has been suggested by Pr3t3nd3r.
 		//! \return Returns a value between 0 and 360.
 		inline float getAngleTrig() const
@@ -155,7 +156,7 @@ namespace irr
 					return 180.0+atan(-Y/-X) * GRAD_PI;
 		} 
 
-		//! Calculates the angle of this vector in grad in the counter trigonometric sense.
+		//! Calculates the angle of this point in grad in the counter trigonometric sense.
 		//! \return Returns a value between 0 and 360.
 		inline float getAngle() const
 		{
@@ -182,9 +183,9 @@ namespace irr
 			return tmp;
 		}
 
-		//! Calculates the angle between this vector and another one in grad.
+		//! Calculates the angle between this point and another one in grad.
 		//! \return Returns a value between 0 and 90.
-		inline float getAngleWith(const vector2d<T>& b) const
+		inline float getAngleWith(const point2d<T>& b) const
 		{
 			float tmp = X*b.X + Y*b.Y;
 
@@ -198,28 +199,28 @@ namespace irr
 		}
 
 
-		//! returns interpolated vector
-		//! \param other: other vector to interpolate between
+		//! returns interpolated point
+		//! \param other: other point to interpolate between
 		//! \param d: value between 0.0f and 1.0f.
-		vector2d<T> getInterpolated(const vector2d<T>& other, float d) const
+		point2d<T> getInterpolated(const point2d<T>& other, float d) const
 		{
 			float inv = 1.0f - d;
-			return vector2d<T>(other.X*inv + X*d,
+			return point2d<T>(other.X*inv + X*d,
 							   other.Y*inv + Y*d);
 		}
 
-		//! Returns if this vector interpreted as a point is on a line between two other points.
+		//! Returns if this point interpreted as a point is on a line between two other points.
 		/** It is assumed that the point is on the line. */
-		bool isBetweenPoints(const vector2d<T>& begin, const vector2d<T>& end) const
+		bool isBetweenPoints(const point2d<T>& begin, const point2d<T>& end) const
 		{
 			float f = (float)(end - begin).getLengthSQ();
 			return (float)getDistanceFromSQ(begin) < f && 
 				(float)getDistanceFromSQ(end) < f;
 		}
 
-		static bool isOnSameSide(vector2d<T> p1, vector2d<T> p2, vector2d<T> a, vector2d<T> b)
+		static bool isOnSameSide(point2d<T> p1, point2d<T> p2, point2d<T> a, point2d<T> b)
 		{
-			vector2d<T> ba = b - a;
+			point2d<T> ba = b - a;
 
 			float cp1 = ba.crossProduct(p1-a);
 			float cp2 = ba.crossProduct(p2-a);
@@ -235,10 +236,10 @@ namespace irr
 		T X, Y;
 	};
 
-	//! Typedef for float 2d vector.
-	typedef vector2d<float> vector2df;
-	//! Typedef for integer 2d vector.
-	typedef vector2d<int> vector2di;
+	//! Typedef for float 2d point.
+	typedef point2d<float> point2df;
+	//! Typedef for integer 2d point.
+	typedef point2d<int> point2di;
 
 } // end namespace touchscreen
 

@@ -5,7 +5,7 @@ OscP5 oscP5;//OSC对象
 
 class vBlob
 {
-  public vBlob(float _cx, float _cy, float _w, float _h)
+  vBlob(float _cx, float _cy, float _w, float _h)
   {
     cx = _cx;
     cy = _cy;

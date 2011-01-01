@@ -57,7 +57,7 @@ void ofxOscReceiver::setup( int listen_port )
 
 ofxOscReceiver::~ofxOscReceiver()
 {
-//	delete listen_socket;
+	delete listen_socket;
 }
 
 

@@ -1,5 +1,3 @@
-vvvvvvvvvvvvvvvvvvvvvvvvvv
-
 #pragma once
 
 //little utilities
@@ -18,8 +16,6 @@ vvvvvvvvvvvvvvvvvvvvvvvvvv
 
 #define RAND() (float) (rand()/(RAND_MAX * 1.0))
 #define SIGN(x) (((x) < 0) ? -1 : 1)
-
-ddddddddddddd
 
 #define prefix_m(variable_name) m_##variable_name
 #define prefix_m_p(variable_name) m_p##variable_name

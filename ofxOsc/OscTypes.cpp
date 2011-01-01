@@ -27,24 +27,14 @@
 	CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 	WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-#ifndef INCLUDED_OSCPRINTRECEIVEDELEMENTS_H
-#define INCLUDED_OSCPRINTRECEIVEDELEMENTS_H
-
-#include <iosfwd>
-#include <string.h>
-
-#ifndef INCLUDED_OSCRECEIVEDELEMENTS_H
-#include "OscReceivedElements.h"
-#endif /* INCLUDED_OSCRECEIVEDELEMENTS_H */
-
+#include "OscTypes.h"
 
 namespace osc{
 
-std::ostream& operator<<( std::ostream & os, const ReceivedPacket& p );
-std::ostream& operator<<( std::ostream & os, const ReceivedMessageArgument& arg );
-std::ostream& operator<<( std::ostream & os, const ReceivedMessage& m );
-std::ostream& operator<<( std::ostream & os, const ReceivedBundle& b );
+BundleInitiator BeginBundleImmediate(1);
+BundleTerminator EndBundle;
+MessageTerminator EndMessage;
+NilType Nil;
+InfinitumType Infinitum;
 
 } // namespace osc
-
-#endif /* INCLUDED_OSCPRINTRECEIVEDELEMENTS_H */

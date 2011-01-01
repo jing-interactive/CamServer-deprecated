@@ -1,19 +1,82 @@
 #include "OpenCV.h"
-#include "vector2d.h"
 
-#ifdef _DEBUG
-	#pragma comment(lib,"cv210d.lib")
-	#pragma comment(lib,"cvaux210d.lib")
-	#pragma comment(lib,"cxcore210d.lib")
-	#pragma comment(lib,"highgui210d.lib")
+//#define _I_REALLY_NEED_DEBUG
+
+#if defined _I_REALLY_NEED_DEBUG && _DEBUG
+#pragma comment(lib,"cv210d.lib")
+#pragma comment(lib,"cvaux210d.lib")
+#pragma comment(lib,"cxcore210d.lib")
+#pragma comment(lib,"highgui210d.lib")
 #else
-	#pragma comment(lib,"cv210.lib")
-	#pragma comment(lib,"cvaux210.lib")
-	#pragma comment(lib,"cxcore210.lib")
-	#pragma comment(lib,"highgui210.lib")
+#pragma comment(lib,"cv210.lib")
+#pragma comment(lib,"cvaux210.lib")
+#pragma comment(lib,"cxcore210.lib")
+#pragma comment(lib,"highgui210.lib")
 #endif
 
- 
+#include <set>
+
+#define NO_FLIP 1000
+/*
+flip_param -> flip_mode
+0 -> NO_FLIP
+1 -> 0	:	horizontal
+2 -> 1	:	vertical
+3 -> -1	:	both
+*/ 
+void vFlip(const CvArr* src, int flipX, int flipY)
+{
+	int flip_param = flipX*2 + flipY;
+	int mode = NO_FLIP;//NO FLIP
+	switch(flip_param)
+	{
+	case 1:
+		mode = 0;break;
+	case 2:
+		mode = 1;break;
+	case 3:
+		mode = -1;break;
+	default:
+		break;
+	}
+	if (mode != NO_FLIP)
+		cvFlip(src, 0, mode);
+}
+//============================================================================
+static bool IsEdgeIn(int ind1, int ind2,
+					 const std::vector<std::vector<int> > &edges)
+{
+	for (int i = 0; i < edges.size (); i++)
+	{
+		if ((edges[i][0] == ind1 && edges[i][1] == ind2) || 
+			(edges[i][0] == ind2 && edges[i][1] == ind1) )
+			return true;
+	}
+	return false;
+}
+
+//============================================================================
+static bool IsTriangleNotIn(const std::vector<int>& one_tri, 
+							const std::vector<std::vector<int> > &tris)
+{
+	std::set<int> tTriangle;
+	std::set<int> sTriangle;
+
+	for (int i = 0; i < tris.size (); i ++)
+	{
+		tTriangle.clear();
+		sTriangle.clear();
+		for (int j = 0; j < 3; j++ )
+		{
+			tTriangle.insert(tris[i][j]);
+			sTriangle.insert(one_tri[j]);
+		}
+		if (tTriangle == sTriangle)    return false;
+	}
+
+	return true;
+}
+
 void vCopyImageTo(CvArr* tiny_image, IplImage* big_image, const CvRect& region)
 {
 	CV_Assert(tiny_image && big_image);
@@ -64,70 +127,6 @@ CvScalar default_colors[] =
 const int sizeOfColors = sizeof(default_colors)/sizeof(CvScalar);
 CvScalar vDefaultColor(int idx){ return default_colors[idx%sizeOfColors];}
 
-void vHaarDetector::detect_object( IplImage* img, vector<CvRect>& regions)
-{
-	if (!cascade)
-		return;
-
-	double scale = 1.5;
-	regions.clear();
-
-	Ptr<IplImage> gray = cvCreateImage( cvSize(img->width,img->height), 8, 1 );
-	Ptr<IplImage> tiny = cvCreateImage( cvSize( cvRound (img->width/scale),
-		cvRound (img->height/scale)), 8, 1 );
-
-	vGrayScale(img, gray);
-	cvResize( gray, tiny );
-	cvEqualizeHist( tiny, tiny );
-	cvClearMemStorage( storage );
-
-	if( cascade )
-	{
-		double t = (double)cvGetTickCount();
-		CvSeq* found = cvHaarDetectObjects( tiny, cascade, storage,
-			1.1, 2, 0
-			//|CV_HAAR_FIND_BIGGEST_OBJECT
-			//|CV_HAAR_DO_ROUGH_SEARCH
-			|CV_HAAR_DO_CANNY_PRUNING
-			//|CV_HAAR_SCALE_IMAGE
-			,
-			cvSize(30, 30) );
-		t = (double)cvGetTickCount() - t;
-		//printf( "detection time = %gms\n", t/((double)cvGetTickFrequency()*1000.) );
-		for(int i = 0; i < (found ? found->total : 0); i++ )
-		{
-			CvRect* r = (CvRect*)cvGetSeqElem( found, i );
-			CvRect rr = cvRect(r->x*scale, r->y*scale, r->width*scale,r->height*scale);
-			regions.push_back(rr);
-
-			//CvPoint center;
-			//CvScalar color = vDefaultColor(i);
-			//int radius;
-			//center.x = cvRound((r->x + r->width*0.5)*scale);
-			//center.y = cvRound((r->y + r->height*0.5)*scale);
-			//radius = cvRound((r->width + r->height)*0.25*scale);
-
-			////
-			//CvBox2D b;
-			//b.angle = 0;
-			//b.center.x = cvRound((r->x + r->width*0.5)*scale);
-			//b.center.y = cvRound((r->y + r->height*0.5)*scale);
-			//b.size = cvSize2D32f(r->width*scale, r->height*scale);
-			//cvEllipseBox(img, b, color, 3, 8, 0);
-			//cvCircle( img, center, radius, color, 3, 8, 0 );
-			//let the main loop render it
-
-			//{//fake
-			//	face_detected = true;
-			//	face_rect.x = center.x - radius;
-			//	face_rect.y = center.y - radius;
-			//	face_rect.width = radius;
-			//	face_rect.height = radius;
-			//}
-		}
-	}
-}
-
 
 char* get_time(bool full_length)
 {
@@ -168,237 +167,6 @@ void feature_out(IplImage* img, IplImage* mask, int thresh)
 } 
 
 
-//Just some convienience macros
-#define CV_CVX_WHITE	CV_RGB(0xff,0xff,0xff)
-#define CV_CVX_BLACK	CV_RGB(0x00,0x00,0x00)
-
-bool qsort_area_compare(const CvSeq* a, const CvSeq* b)
-{
-	float areaa = fabs(cvContourArea(a, CV_WHOLE_SEQ));
-	float areab = fabs(cvContourArea(b, CV_WHOLE_SEQ));
-	return areaa < areab;
-}
-
-#define CVCONTOUR_APPROX_LEVEL  1   // Approx.threshold - the bigger it is, the simpler is the boundary 
-
-void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea, bool convexHull)
-{
-	static CvMemStorage*	mem_storage	= NULL;
-	static CvMoments myMoments;
-
-	if( mem_storage==NULL ) mem_storage = cvCreateMemStorage(0);
-	else cvClearMemStorage(mem_storage);
-
-	blobs.clear();
-	 
-	CvSeq* contour_list = 0;
-	cvFindContours(src,mem_storage,&contour_list, sizeof(CvContour),
-		CV_RETR_LIST,CV_CHAIN_APPROX_SIMPLE);
-
-	std::vector<CvSeq*> pBlobList;
-
-	// put the contours from the linked list, into an array for sorting
-	for (CvSeq* ptr = contour_list; ptr != NULL; ptr=ptr->h_next)
-	{
-		float area = fabs( cvContourArea(ptr, CV_WHOLE_SEQ) );
-		if( (area > minArea) /*&& (area < maxArea)*/ ) {
-			pBlobList.push_back(ptr);
-		}
-	}
-
-	// sort the pointers based on size
-	int nBlobs = pBlobList.size();	
-	//if( nBlobs > 0 ) {
-	//	qsort( (void*)pBlobList[0], nBlobs, sizeof(CvSeq*), qsort_carea_compare);
-	//}
-	std::sort(pBlobList.begin(), pBlobList.end(), qsort_area_compare);
-
-	for (int i=0;i<nBlobs;i++)
-	{
-		CvSeq* contour = pBlobList[i];
-		CvSeq* approx = NULL;
-		if(convexHull) //Polygonal approximation of the segmentation
-			approx = cvApproxPoly(contour,sizeof(CvContour),mem_storage,CV_POLY_APPROX_DP, CVCONTOUR_APPROX_LEVEL,0);
-		else //Convex Hull of the segmentation
-			approx = cvConvexHull2(contour,mem_storage,CV_CLOCKWISE,1);
-
-		float area = cvContourArea( approx, CV_WHOLE_SEQ );
-		cvMoments( approx, &myMoments );
-
-		blobs.push_back(vBlob());
-
-		//fill the blob
-		Rect box = cvBoundingRect(approx);
-		blobs[i].area	= fabs(area);
-		blobs[i].isHole	= area < 0 ? true : false;
-		blobs[i].box	= box;
-		blobs[i].center.x = myMoments.m10 / myMoments.m00;
-		blobs[i].center.y = myMoments.m01 / myMoments.m00;
-		
-		// get the points for the blob
-		CvPoint           pt;
-		CvSeqReader       reader;
-		cvStartReadSeq( approx, &reader, 0 );
-
-		for (int k=0;k<approx->total;k++)
-		{
-			CV_READ_SEQ_ELEM( pt, reader );
-			blobs[i].pts.push_back(pt);
-		}
-		
-	//	cvDrawContours(src,contour,CV_CVX_WHITE,CV_CVX_WHITE,-1,CV_FILLED,8); //draw to src 
-	} 
-}
-
-
-
-void vFindBlobs(IplImage *src, int minArea, bool convexHull)
-{
-	static CvMemStorage*	mem_storage	= NULL;
-
-	//FIND CONTOURS AROUND ONLY BIGGER REGIONS
-	if( mem_storage==NULL ) mem_storage = cvCreateMemStorage(0);
-	else cvClearMemStorage(mem_storage);
-	
-	CvContourScanner scanner = cvStartFindContours(src,mem_storage,sizeof(CvContour),CV_RETR_LIST,CV_CHAIN_APPROX_SIMPLE);
-
-	CvSeq* c;
-	while( c = cvFindNextContour( scanner ) )
-	{
-		double area = fabs(cvContourArea( c ));
-		if( area >= minArea)
-		{
-			CvSeq* contour;
-			if(convexHull) //Polygonal approximation of the segmentation
-				contour = cvApproxPoly(c,sizeof(CvContour),mem_storage,CV_POLY_APPROX_DP, CVCONTOUR_APPROX_LEVEL,0);
-			else //Convex Hull of the segmentation
-				contour = cvConvexHull2(c,mem_storage,CV_CLOCKWISE,1); 
-
-			cvDrawContours(src,contour,CV_CVX_WHITE,CV_CVX_WHITE,-1,CV_FILLED,8); //draw to src
-		}
-	}
-	cvEndFindContours( &scanner );	
-}
-
-
-
-
-
-// various tracking parameters (in seconds)
-const double MHI_DURATION = 1;
-const double MAX_TIME_DELTA = 0.5;
-const double MIN_TIME_DELTA = 0.05;
-
-vector<vBlob>  vUpdateMhi( IplImage* silh, IplImage* dst )
-{
-	// temporary images
-	static IplImage *mhi = 0; // MHI
-	static IplImage *orient = 0; // orientation
-	static IplImage *mask = 0; // valid orientation mask
-	static IplImage *segmask = 0; // motion segmentation map
-	static CvMemStorage* storage = 0; // temporary storage
-
-	double timestamp = (double)clock()/CLOCKS_PER_SEC; // get current time in seconds
-	CvSize size = cvSize(silh->width,silh->height); // get current frame size
-	CvSeq* seq;
-	CvRect comp_rect;
-	double count;
-	double angle;
-	CvPoint center;
-	double magnitude;          
-	CvScalar color;
-
-	vector<vBlob> result;
-
-	// allocate images at the beginning or
-	// reallocate them if the frame size is changed
-	if( !mhi || mhi->width != size.width || mhi->height != size.height ) {
-
-		cvReleaseImage( &mhi );
-		cvReleaseImage( &orient );
-		cvReleaseImage( &segmask );
-		cvReleaseImage( &mask );
-
-		mhi = cvCreateImage( size, IPL_DEPTH_32F, 1 );
-		cvZero( mhi ); // clear MHI at the beginning
-		orient = cvCreateImage( size, IPL_DEPTH_32F, 1 );
-		segmask = cvCreateImage( size, IPL_DEPTH_32F, 1 );
-		mask = cvCreateImage( size, IPL_DEPTH_8U, 1 );
-	}
-
-	//    cvThreshold( silh, silh, diff_threshold, 1, CV_THRESH_BINARY ); // and threshold it
-	cvUpdateMotionHistory( silh, mhi, timestamp, MHI_DURATION ); // update MHI
-
-	// convert MHI to blue 8u image
-	cvCvtScale( mhi, mask, 255./MHI_DURATION,
-		(MHI_DURATION - timestamp)*255./MHI_DURATION );
-	cvZero( dst );
-	cvCvtPlaneToPix( mask, 0, 0, 0, dst );
-
-	// calculate motion gradient orientation and valid orientation mask
-	cvCalcMotionGradient( mhi, mask, orient, MAX_TIME_DELTA, MIN_TIME_DELTA, 3 );
-
-	if( !storage )
-		storage = cvCreateMemStorage(0);
-	else
-		cvClearMemStorage(storage);
-
-	// segment motion: get sequence of motion components
-	// segmask is marked motion components map. It is not used further
-	seq = cvSegmentMotion( mhi, segmask, storage, timestamp, MAX_TIME_DELTA );
-
-	// iterate through the motion components,
-	// One more iteration (i == -1) corresponds to the whole image (global motion)
-	for(int i = -1; i < seq->total; i++ ) {
-
-		if( i < 0 ) { // case of the whole image
-			comp_rect = cvRect( 0, 0, size.width, size.height );
-			color = CV_RGB(255,255,255);
-			magnitude = 50;
-		}
-		else { // i-th motion component
-			comp_rect = ((CvConnectedComp*)cvGetSeqElem( seq, i ))->rect;
-			if( comp_rect.width + comp_rect.height < 75 ) // reject very tiny components
-				continue;
-			color = CV_RGB(255,0,0);
-			magnitude = 25;
-		}
-
-		// select component ROI
-		cvSetImageROI( silh, comp_rect );
-		cvSetImageROI( mhi, comp_rect );
-		cvSetImageROI( orient, comp_rect );
-		cvSetImageROI( mask, comp_rect );
-
-		// calculate orientation
-		angle = cvCalcGlobalOrientation( orient, mask, mhi, timestamp, MHI_DURATION);
-		angle = 360.0 - angle;  // adjust for images with top-left origin
-
-		count = cvNorm( silh, 0, CV_L1, 0 ); // calculate number of points within silhouette ROI
-
-		cvResetImageROI( mhi );
-		cvResetImageROI( orient );
-		cvResetImageROI( mask );
-		cvResetImageROI( silh );
-
-		// check for the case of little motion
-		if( count < comp_rect.width*comp_rect.height * 0.05 )
-			continue;
-
-		// draw a clock with arrow indicating the direction
-		center = cvPoint( (comp_rect.x + comp_rect.width/2),
-			(comp_rect.y + comp_rect.height/2) );
-
-		cvCircle( dst, center, cvRound(magnitude*1.2), color, 3, CV_AA, 0 );
-		cvLine( dst, center, cvPoint( cvRound( center.x + magnitude*cos(angle*CV_PI/180)),
-			cvRound( center.y - magnitude*sin(angle*CV_PI/180))), color, 3, CV_AA, 0 );
-
-		result.push_back(vBlob(comp_rect, center, angle));
-	}
-
-	return result;
-}
-
 
 VideoInput::VideoInput()
 {
@@ -408,55 +176,91 @@ VideoInput::VideoInput()
 	_InputType = From_Count;
 }
 
+void VideoInput::setAutoExplosure(bool is)
+{
+	if (_capture)
+		cvSetCaptureProperty(_capture,CV_CAP_PROP_AUTO_EXPOSURE,(double)is);
+}
+ 
+bool VideoInput::getAutoExplosure()
+{
+	if (_capture)
+		return cvGetCaptureProperty(_capture,CV_CAP_PROP_AUTO_EXPOSURE);
+	else 
+		return false;
+}
+
+void VideoInput::setParamExplosure(int value)
+{
+	if (_capture)
+		cvSetCaptureProperty(_capture,CV_CAP_PROP_EXPOSURE,(double)value);
+}
+
+void VideoInput::showSettingsDialog()
+{
+	if (_capture)
+		cvSetCaptureProperty(_capture,CV_CAP_PROP_SHOW_DIALOG, true);
+}
+
 bool VideoInput::init(int cam_idx)
 {
 	_capture = cvCaptureFromCAM(CV_CAP_DSHOW+cam_idx);
 
 	if( !_capture )
 	{
-		printf("Could not initialize camera #%d.\n", cam_idx);
-		return false;
+		_capture = cvCaptureFromCAM(cam_idx);
+
+		if (!_capture)
+		{
+			printf("Could not initialize camera # %d\n", cam_idx);
+			return false;
+		}
+		else
+		{
+			printf("Reading from camera # %d.\n", cam_idx);
+			return true;
+		}
 	}
 	else
 	{
 		_InputType = From_Camera;
-		printf("Loaded from camera #%d.\n", cam_idx);
+		printf("Reading from camera # %d via DirectShow.\n", cam_idx);
 		_post_init();
 		return true;
 	}
 }
 
-bool VideoInput::init(char* video_file)
+bool VideoInput::init(char* file_name)
 {
-	_frame = cvLoadImage(video_file);
+	_frame = cvLoadImage(file_name);
 
 	if (_frame)
 	{
-		printf("Loaded from image %s.\n", video_file);
+		printf("Reading from image %s.\n", file_name);
 		_InputType = From_Image;
 	}
 	else
 	{
-		_capture = cvCaptureFromAVI(video_file);
+		_capture = cvCaptureFromAVI(file_name);
 		if( _capture )
 		{
-			printf("Loaded from video %s.\n", video_file);
+			printf("Reading from video %s.\n", file_name);
 			_InputType = From_Video;
 		}
 		else
 		{
-			printf("Could not open file %s.\n", video_file);
+			printf("Could not open file %s.\n", file_name);
 			return false;
 		}
 	}
-		
+
 	_post_init();
 	return true;
-	
+
 }
 
 bool VideoInput::init(int argc, char** argv)
-{
+{	
 	_argc = argc;
 	_argv = argv;
 	if( argc == 1 || (argc == 2 && strlen(argv[1]) == 1 && ::isdigit(argv[1][0])))
@@ -479,6 +283,7 @@ IplImage* VideoInput::get_frame()
 	if (_InputType != From_Image)
 	{
 		_frame = cvQueryFrame(_capture);
+		_frame_num ++;
 		if (_frame == NULL)
 		{
 			cvReleaseCapture(&_capture);
@@ -495,49 +300,29 @@ void VideoInput::_post_init()
 		_frame = get_frame();
 		_fps = cvGetCaptureProperty(_capture, CV_CAP_PROP_FPS);
 		_codec = cvGetCaptureProperty(_capture, CV_CAP_PROP_FOURCC);
+		if (_fps == 0)
+			printf("Fps: unknown");
+		else
+			printf("Fps: %d", _fps);
 	}
-	if (_fps == 0)
-		_fps = 30;
 
 	_size.width = _frame->width;
 	_size.height = _frame->height;
 	_half_size.width  = _size.width/2;
 	_half_size.height  = _size.height/2;
-	_channel = _frame->nChannels;	
+	_channel = _frame->nChannels;
+	_frame_num = 0;
 
-	printf("°æ ‰»Î≤Œ ˝°øfps: %d, size: %d,%d\n", _fps, _size.width, _size.height);
+	printf("; Size: <%d,%d>\n",  _size.width, _size.height);
 }
 
 VideoInput::~VideoInput()
 {
 	if (_capture != NULL)
 		cvReleaseCapture( &_capture );
-//	if (_frame != NULL)
-//		cvReleaseImage(&_frame);
+	//	if (_frame != NULL)
+	//		cvReleaseImage(&_frame);
 }
-
-
-
-vHaarDetector::vHaarDetector()
-{
-	cascade = NULL;
-	storage = NULL;  
-}
-
-vHaarDetector::~vHaarDetector()
-{
-	if (cascade) cvReleaseHaarClassifierCascade(&this->cascade);
-	if (storage) cvReleaseMemStorage(&this->storage); 
-}
-
-bool vHaarDetector::init(char* cascade_name)
-{
-	cascade = (CvHaarClassifierCascade*)cvLoad( cascade_name, 0, 0, 0 );
-	storage = cvCreateMemStorage(0);
-
-	return cascade && storage;
-}
-
 
 vBackCodeBook::vBackCodeBook()
 {
@@ -624,7 +409,7 @@ void vHighPass(IplImage* src, IplImage* dst, int blurLevel/* = 10*/, int noiseLe
 	else
 		cvCopy(src, dst);
 }
- 
+
 void vGetPerspectiveMatrix(CvMat*& warp_matrix, cv::Point2f xsrcQuad[4], cv::Point2f xdstQuad[4])
 {
 	static CvPoint2D32f srcQuad[4]; 
@@ -658,27 +443,27 @@ void vPerspectiveTransform(const CvArr* src, CvArr* dst, cv::Point xsrcQuad[4], 
 CvFGDStatModelParams cvFGDStatModelParams()
 {
 	CvFGDStatModelParams p;
-    p.Lc = CV_BGFG_FGD_LC;			/* Quantized levels per 'color' component. Power of two, typically 32, 64 or 128.				*/
-    p.N1c = CV_BGFG_FGD_N1C;			/* Number of color vectors used to model normal background color variation at a given pixel.			*/
-    p.N2c = CV_BGFG_FGD_N2C;			/* Number of color vectors retained at given pixel.  Must be > N1c, typically ~ 5/3 of N1c.			*/
-				/* Used to allow the first N1c vectors to adapt over time to changing background.				*/
+	p.Lc = CV_BGFG_FGD_LC;			/* Quantized levels per 'color' component. Power of two, typically 32, 64 or 128.				*/
+	p.N1c = CV_BGFG_FGD_N1C;			/* Number of color vectors used to model normal background color variation at a given pixel.			*/
+	p.N2c = CV_BGFG_FGD_N2C;			/* Number of color vectors retained at given pixel.  Must be > N1c, typically ~ 5/3 of N1c.			*/
+	/* Used to allow the first N1c vectors to adapt over time to changing background.				*/
 
-    p.Lcc = CV_BGFG_FGD_LCC;			/* Quantized levels per 'color co-occurrence' component.  Power of two, typically 16, 32 or 64.			*/
-    p.N1cc = CV_BGFG_FGD_N1CC;		/* Number of color co-occurrence vectors used to model normal background color variation at a given pixel.	*/
-    p.N2cc = CV_BGFG_FGD_N2CC;		/* Number of color co-occurrence vectors retained at given pixel.  Must be > N1cc, typically ~ 5/3 of N1cc.	*/
-				/* Used to allow the first N1cc vectors to adapt over time to changing background.				*/
+	p.Lcc = CV_BGFG_FGD_LCC;			/* Quantized levels per 'color co-occurrence' component.  Power of two, typically 16, 32 or 64.			*/
+	p.N1cc = CV_BGFG_FGD_N1CC;		/* Number of color co-occurrence vectors used to model normal background color variation at a given pixel.	*/
+	p.N2cc = CV_BGFG_FGD_N2CC;		/* Number of color co-occurrence vectors retained at given pixel.  Must be > N1cc, typically ~ 5/3 of N1cc.	*/
+	/* Used to allow the first N1cc vectors to adapt over time to changing background.				*/
 
-    p.is_obj_without_holes;/* If TRUE we ignore holes within foreground blobs. Defaults to TRUE.						*/
-    p.perform_morphing;	/* Number of erode-dilate-erode foreground-blob cleanup iterations.						*/
-				/* These erase one-pixel junk blobs and merge almost-touching blobs. Default value is 1.			*/
+	p.is_obj_without_holes;/* If TRUE we ignore holes within foreground blobs. Defaults to TRUE.						*/
+	p.perform_morphing;	/* Number of erode-dilate-erode foreground-blob cleanup iterations.						*/
+	/* These erase one-pixel junk blobs and merge almost-touching blobs. Default value is 1.			*/
 
-    p.alpha1 = CV_BGFG_FGD_ALPHA_1;		/* How quickly we forget old background pixel values seen.  Typically set to 0.1  				*/
-    p.alpha2 = CV_BGFG_FGD_ALPHA_2;		/* "Controls speed of feature learning". Depends on T. Typical value circa 0.005. 				*/
-    p.alpha3 = CV_BGFG_FGD_ALPHA_3;		/* Alternate to alpha2, used (e.g.) for quicker initial convergence. Typical value 0.1.				*/
+	p.alpha1 = CV_BGFG_FGD_ALPHA_1;		/* How quickly we forget old background pixel values seen.  Typically set to 0.1  				*/
+	p.alpha2 = CV_BGFG_FGD_ALPHA_2;		/* "Controls speed of feature learning". Depends on T. Typical value circa 0.005. 				*/
+	p.alpha3 = CV_BGFG_FGD_ALPHA_3;		/* Alternate to alpha2, used (e.g.) for quicker initial convergence. Typical value 0.1.				*/
 
-    p.delta = CV_BGFG_FGD_DELTA;		/* Affects color and color co-occurrence quantization, typically set to 2.					*/
-    p.T = CV_BGFG_FGD_T;			/* "A percentage value which determines when new features can be recognized as new background." (Typically 0.9).*/
-    p.minArea = CV_BGFG_FGD_MINAREA;		/* Discard foreground blobs whose bounding box is tinyer than this threshold.					*/
+	p.delta = CV_BGFG_FGD_DELTA;		/* Affects color and color co-occurrence quantization, typically set to 2.					*/
+	p.T = CV_BGFG_FGD_T;			/* "A percentage value which determines when new features can be recognized as new background." (Typically 0.9).*/
+	p.minArea = CV_BGFG_FGD_MINAREA;		/* Discard foreground blobs whose bounding box is tinyer than this threshold.					*/
 
 	return  p;
 }
@@ -695,28 +480,180 @@ void vBackGaussian::init(IplImage* initial, void* param)
 	bg_model = cvCreateGaussianBGModel( initial, p );
 }
 
+void vBackGrayDiff::setIntParam(int idx, int value)
+{
+	IBackGround::setIntParam(idx, value);
+	if (idx == 1)
+		dark_thresh = 255-value;
+}
+
 void vBackGrayDiff::init(IplImage* initial, void* param/* = NULL*/){
 	cv::Size size = cvGetSize(initial);
 
-	grayFrame.release();
-	grayFrame = cvCreateImage(size, 8, 1);
-	grayBg.release();
-	grayBg = cvCreateImage(size, 8, 1);
-	grayDiff.release();
-	grayDiff = cvCreateImage(size, 8, 1);
+	Frame.release();
+	Frame = cvCreateImage(size, 8, 1);
+	Bg.release();
+	Bg = cvCreateImage(size, 8, 1);
+	Fore.release();
+	Fore = cvCreateImage(size, 8, 1);
 
-	vGrayScale(initial, grayBg);
+	thresh = 50;
+	dark_thresh = 200;
+
+	vGrayScale(initial, Bg);
 }
 
 void vBackGrayDiff::update(IplImage* image, int mode/* = 0*/){
-	vGrayScale(image, grayFrame);
+	vGrayScale(image, Frame);
 	if (mode == DETECT_BOTH)
-		cvAbsDiff(grayFrame, grayBg, grayDiff);
+	{
+		BwImage frame(Frame);
+		BwImage bg(Bg);
+		BwImage fore(Fore);
+
+		cvZero(Fore);
+		for (int y=0;y<image->height;y++)
+			for (int x=0;x<image->width;x++)
+			{
+				int delta = frame[y][x] - bg[y][x];
+				if (delta >= thresh || delta <= -dark_thresh)
+					fore[y][x] = 255;
+			}
+	}
 	else if (mode == DETECT_DARK)
-		cvSub(grayBg, grayFrame, grayDiff);
+	{
+		cvSub(Bg, Frame, Fore);
+		vThresh(Fore, dark_thresh);
+	}
 	else if (mode == DETECT_BRIGHT)
-		cvSub(grayFrame, grayBg, grayDiff);
-	vThresh(grayDiff, thresh);
+	{
+		cvSub(Frame, Bg, Fore);
+		vThresh(Fore, thresh);
+	}	
+}
+
+
+void vBackColorDiff::init(IplImage* initial, void* param/* = NULL*/){
+	cv::Size size = cvGetSize(initial);
+	nChannels = initial->nChannels;
+
+	Frame.release();
+	Frame = cvCloneImage(initial);
+	Bg.release();
+	Bg = cvCloneImage(initial);
+	Fore.release();
+	Fore = cvCreateImage(size, 8, 1);
+
+	thresh = 220;
+	dark_thresh = 30;
+}
+
+void vBackColorDiff::update(IplImage* image, int mode/* = 0*/){
+//	vGrayScale(image, Frame);
+	cvCopyImage(image, Frame);
+	if (mode == DETECT_BOTH)
+	{
+		if (nChannels == 1)
+		{
+			BwImage frame(Frame);
+			BwImage bg(Bg);
+			BwImage fore(Fore);
+
+			cvZero(Fore);
+			for (int y=0;y<image->height;y++)
+				for (int x=0;x<image->width;x++)
+				{
+					int delta = frame[y][x] - bg[y][x];
+					if (delta >= thresh || delta <= -dark_thresh)
+						fore[y][x] = 255;
+				}
+		}
+		else
+		{
+			RgbImage frame(Frame);
+			RgbImage bg(Bg);
+			BwImage fore(Fore);
+
+			int min_t = 255-thresh;
+			int max_t = 255-dark_thresh;
+			cvZero(Fore);
+			for (int y=0;y<image->height;y++)
+				for (int x=0;x<image->width;x++)
+				{
+					int r = frame[y][x].r - bg[y][x].r;
+					int g = frame[y][x].g - bg[y][x].g;
+					int b = frame[y][x].b - bg[y][x].b;
+#if 1
+					if ((r >= thresh || r <= -dark_thresh)
+						&& (g >= thresh || g <= -dark_thresh)
+							&& (b >= thresh || b <= -dark_thresh))
+#else
+					int delta = r*r+g*g+b*b;
+					if (delta >= min_t*min_t && delta <= max_t*max_t)
+#endif
+						fore[y][x] = 255;
+				}
+		}
+	}
+	else if (mode == DETECT_DARK)
+	{
+		cvSub(Bg, Frame, Fore);
+		vThresh(Fore, dark_thresh);
+	}
+	else if (mode == DETECT_BRIGHT)
+	{
+		cvSub(Frame, Bg, Fore);
+		vThresh(Fore, thresh);
+	}	
+}
+
+void vThreeFrameDiff::init(IplImage* initial, void* param/* = NULL*/)
+{
+	cv::Size size = cvGetSize(initial);
+
+	grayFrameOne.release();
+	grayFrameOne = cvCreateImage(size, 8, 1);
+	vGrayScale(initial, grayFrameOne);
+	grayFrameTwo.release();
+	grayFrameTwo = cvCreateImage(size, 8, 1);
+	vGrayScale(initial, grayFrameTwo);
+	grayFrameThree.release();
+	grayFrameThree = cvCreateImage(size, 8, 1);
+	vGrayScale(initial, grayFrameThree);
+	grayDiff.release();
+	grayDiff = cvCreateImage(size, 8, 1);
+}
+
+void vThreeFrameDiff::update(IplImage* image, int mode/* = 0*/){
+	vGrayScale(image, grayFrameThree);
+
+	BwImage one(grayFrameOne);
+	BwImage two(grayFrameTwo);
+	BwImage three(grayFrameThree);
+	BwImage diff(grayDiff);
+
+	cvZero(grayDiff);
+	for (int y=0;y<image->height;y++)
+		for (int x=0;x<image->width;x++)
+		{
+			if (abs(one[y][x] - two[y][x]) > thresh ||
+				abs(three[y][x] - two[y][x]) > thresh)
+				diff[y][x] = 255;
+		}
+
+		show_image(grayFrameOne);
+		show_image(grayFrameTwo);
+		show_image(grayFrameThree);
+		cvCopyImage(grayFrameTwo, grayFrameOne);
+		cvCopyImage(grayFrameThree, grayFrameTwo);
+
+	//if (mode == DETECT_BOTH)
+	//	cvAbsDiff(grayFrame, grayBg, grayDiff);
+	//else if (mode == DETECT_DARK)
+	//	cvSub(grayBg, grayFrame, grayDiff);
+	//else if (mode == DETECT_BRIGHT)
+	//	cvSub(grayFrame, grayBg, grayDiff);
+	//vThresh(grayDiff, thresh);
 }
 
 void vPolyLine(IplImage* dst, vector<Point>& pts, CvScalar clr, int thick)
@@ -731,6 +668,11 @@ void vPolyLine(IplImage* dst, vector<Point>& pts, CvScalar clr, int thick)
 		}
 		cvLine(dst, pts[k], pts[0], clr, thick);
 	}
+}
+
+bool operator < (const Point& a, const Point& b)
+{
+	return a.x < b.x && a.y < b.y;
 }
 
 static void draw_edge( IplImage* img, CvSubdiv2DEdge edge, CvScalar color )
@@ -861,37 +803,160 @@ void vDrawVoroni( CvSubdiv2D * subdiv, IplImage * src, IplImage * dst, bool draw
 
 
 
-Subdiv::Subdiv(int w, int h)
+DelaunaySubdiv::DelaunaySubdiv(int w, int h)
 {
 	storage = cvCreateMemStorage();
-	rect = cvRect(0, 0, w, h);
+	rect = cvRect(0, 0, w, h); 
 
 	subdiv = cvCreateSubdivDelaunay2D(rect, storage);
 }
 
-void Subdiv::insert(float x, float y)
+void DelaunaySubdiv::insert(float x, float y)
 {
 	Point2f pt(x,y);
 	cvSubdivDelaunay2DInsert(subdiv, pt);
+	pt_map.insert(std::make_pair(point2di(x, y), points.size() ) );
+	points.push_back(Point(x,y));	
 }
 
-void Subdiv::clear()
+void DelaunaySubdiv::clear()
 {
 	cvClearMemStorage(storage);
 	subdiv = cvCreateSubdivDelaunay2D(rect, storage);
+	pt_map.clear();
+	points.clear();	
 }
 
-void Subdiv::build()
+void DelaunaySubdiv::intoEdge(CvSubdiv2DEdge edge)
 {
-	cvCalcSubdivVoronoi2D( subdiv );
+	CvSubdiv2DEdge e = edge;
+	int i;
+	const int count = 3;
+	Point triple[count];
+
+	//// count number of edges in facet 
+	//do
+	//{
+	//	count++;
+	//	e = cvSubdiv2DGetEdge( e, CV_NEXT_AROUND_LEFT );
+	//}
+	//while( e != edge && count < subdiv->quad_edges * 4 );
+
+	//// gather points
+	//e = edge;
+	//assert(count == 3);
+	for( i = 0; i < count; i++ )
+	{
+		CvSubdiv2DPoint *pt = cvSubdiv2DEdgeOrg( e );
+		if( !pt || fabs( pt->pt.x ) > 1500 || fabs( pt->pt.y ) > 1500)
+			break;
+
+		triple[i] = Point(pt->pt.x ,  pt->pt.y);
+		e = cvSubdiv2DGetEdge( e, CV_NEXT_AROUND_LEFT );		
+	}
+
+	if( i == count )
+	{
+		Triangle aTri;
+
+		for (int k=0;k<3;k++)
+		{
+			aTri[k] = getIndex(triple[k].x, triple[k].y);
+			if (aTri[k] == -1) return;
+		}
+		aTri.center.X = (triple[0].x + triple[1].x + triple[2].x)/3;
+		aTri.center.Y = (triple[0].y + triple[1].y + triple[2].y)/3;
+
+		triangles.push_back(aTri);
+	}
 }
+
+int  DelaunaySubdiv::getIndex(float x, float y)
+{	
+	int ret = -1;
+	map<point2di, int>::const_iterator it =  pt_map.find(point2di(x,y));
+	if (it != pt_map.end())
+		ret = it->second;
+	return ret;
+}
+
+void DelaunaySubdiv::buildTriangles()
+{
+	triangles.clear();
+	int i, total = subdiv->edges->total;
+
+	for( i = 0; i < total; i++ )
+	{
+		CvQuadEdge2D *edge = (CvQuadEdge2D *) cvGetSetElem( subdiv->edges, i );
+
+		if( edge && CV_IS_SET_ELEM( edge ))
+		{
+			CvSubdiv2DEdge e = (CvSubdiv2DEdge) edge;
+			//e itslef
+			intoEdge( cvSubdiv2DRotateEdge( e, 0 ));
+			//reversed e
+			intoEdge( cvSubdiv2DRotateEdge( e, 2 ));
+		}
+	}
+	sort(triangles.begin(),triangles.end());
+	std::vector<Triangle>::iterator it = unique(triangles.begin(),triangles.end());
+	triangles.erase(it, triangles.end());
+}
+
+
+void DelaunaySubdiv::build()
+{
+	//	cvCalcSubdivVoronoi2D( subdiv );
+
+	buildTriangles();
+
+	return;
+
+	cv_try_begin(); 
+
+	int count = points.size();
+	int __n = count;
+	//hull.resize(count);
+	//	hull = Mat(1, count, CV_32FC2);
+
+	//CvPoint* _points =new CvPoint[count];
+	//int* _hull = new int[count];
+	cv::Mat pointMat( 1, count, CV_32SC2, &points[0] ); 
+	//	 CvMat hullMat = cvMat( 1, count, CV_32SC1, &hull[0]);
+	//  for(int  i = 0; i < count; i++ )
+	//  {
+	//      pt0.x = rand() % (width/2) + width/4;
+	//      pt0.y = rand() % (height/2) + height/4;
+	//     _points[i] = pt0;
+	//points[i] = points[i];
+	//  }
+
+	//  cvConvexHull2( &pointMat, ConvexHull, CV_CLOCKWISE, 0 );
+	cv::convexHull(pointMat, hull);
+
+	CvMat ConvexHull = cvMat (1, __n, CV_32SC2, &hull[0]);
+
+	//	cv::Mat pointMat(1, count, CV_32SC2, &points[0] );	 
+
+	//		cv::convexHull(pointMat, hullMat);
+	//	convexHull(pointMat, hull);
+	//
+	////	CvMat* pointMa = cvCreateMat(1, count, CV_32SC2);
+	//	cvConvexHull2(&(CvMat)pointMat, ConvexHull, CV_CLOCKWISE, 0);
+	//	cv::Mat hullMat(1, hull.size(), CV_32SC2, &hull[0] ); 
+	//
+	//	doDelaunay(subdiv,  &ConvexHull);
+	//	cvReleaseMat(&pointMa);
+
+	cv_try_end();
+} 
  
 
-void Subdiv::drawDelaunay( IplImage* src,IplImage * dst , bool drawLine)
+void DelaunaySubdiv::drawDelaunay( IplImage* src,IplImage * dst , bool drawLine)
 {
 	int i, total = subdiv->edges->total;
 
-	build();
+	cvCalcSubdivVoronoi2D( subdiv );
 
 	for( i = 0; i < total; i++ )
 	{
@@ -913,11 +978,11 @@ void Subdiv::drawDelaunay( IplImage* src,IplImage * dst , bool drawLine)
 }
 
 
-void Subdiv::drawVoroni( IplImage * src, IplImage * dst, bool drawLine )
+void DelaunaySubdiv::drawVoroni( IplImage * src, IplImage * dst, bool drawLine )
 {
 	int i, total = subdiv->edges->total;
 
-	build();
+	cvCalcSubdivVoronoi2D( subdiv );
 
 	//icvSet( dst, 255 );
 	for( i = 0; i < total; i++ )
@@ -956,7 +1021,7 @@ int BrightnessAdjust(const IplImage* srcImg,
 
 	int x,y,i;
 	float val;
-	for (i = 0; i < n; i++)//≤ …´ÕºœÒ–Ë“™¥¶¿Ì3∏ˆÕ®µ¿£¨ª“∂»ÕºœÒ’‚¿Ôø…“‘…æµÙ
+	for (i = 0; i < n; i++)//¬≤√ä√â¬´√ç¬º√è√±√ê√®√í¬™¬¥¬¶√Ä√≠3¬∏√∂√ç¬®¬µ√Ä¬£¬¨¬ª√í¬∂√à√ç¬º√è√±√ï√¢√Ä√Ø¬ø√â√í√î√â¬æ¬µ√¥
 	{
 		for (y = 0; y < h; y++)
 		{
@@ -965,7 +1030,7 @@ int BrightnessAdjust(const IplImage* srcImg,
 
 				val = ((uchar*)(srcImg->imageData + srcImg->widthStep*y))[x*n+i];
 				val += brightness;
-				//∂‘ª“∂»÷µµƒø…ƒ‹“Á≥ˆΩ¯––¥¶¿Ì
+				//¬∂√î¬ª√í¬∂√à√ñ¬µ¬µ√Ñ¬ø√â√Ñ√ú√í√ß¬≥√∂¬Ω√∏√ê√ê¬¥¬¶√Ä√≠
 				if(val>255)	val=255;
 				if(val<0) val=0;
 				((uchar*)(dstImg->imageData + dstImg->widthStep*y))[x*n+i] = (uchar)val;
@@ -989,7 +1054,7 @@ int ContrastAdjust(const IplImage* srcImg,
 
 	int x,y,i;
 	float val;
-	for (i = 0; i < n; i++)//≤ …´ÕºœÒ–Ë“™¥¶¿Ì3∏ˆÕ®µ¿£¨ª“∂»ÕºœÒ’‚¿Ôø…“‘…æµÙ
+	for (i = 0; i < n; i++)//¬≤√ä√â¬´√ç¬º√è√±√ê√®√í¬™¬¥¬¶√Ä√≠3¬∏√∂√ç¬®¬µ√Ä¬£¬¨¬ª√í¬∂√à√ç¬º√è√±√ï√¢√Ä√Ø¬ø√â√í√î√â¬æ¬µ√¥
 	{
 		for (y = 0; y < h; y++)
 		{
@@ -998,7 +1063,7 @@ int ContrastAdjust(const IplImage* srcImg,
 
 				val = ((uchar*)(srcImg->imageData + srcImg->widthStep*y))[x*n+i];
 				val = 128 + (val - 128) * nPercent;
-				//∂‘ª“∂»÷µµƒø…ƒ‹“Á≥ˆΩ¯––¥¶¿Ì
+				//¬∂√î¬ª√í¬∂√à√ñ¬µ¬µ√Ñ¬ø√â√Ñ√ú√í√ß¬≥√∂¬Ω√∏√ê√ê¬¥¬¶√Ä√≠
 				if(val>255) val=255;
 				if(val<0) val=0;
 				((uchar*)(dstImg->imageData + dstImg->widthStep*y))[x*n+i] = (uchar)val;
@@ -1260,173 +1325,99 @@ void convertHSVtoRGB(const IplImage *imageHSV, IplImage *imageRGB)
 	}
 }
 
-vBlob::vBlob()
+void cvSkinSegment(IplImage* img, IplImage* mask)
+{  
+	CvSize imageSize = cvSize(img->width, img->height);  
+	IplImage *imgY = cvCreateImage(imageSize, IPL_DEPTH_8U, 1);  
+	IplImage *imgCr = cvCreateImage(imageSize, IPL_DEPTH_8U, 1);  
+	IplImage *imgCb = cvCreateImage(imageSize, IPL_DEPTH_8U, 1);  
+
+
+	IplImage *imgYCrCb = cvCreateImage(imageSize, img->depth, img->nChannels);  
+	cvCvtColor(img,imgYCrCb,CV_BGR2YCrCb);  
+	cvSplit(imgYCrCb, imgY, imgCr, imgCb, 0);  
+	int y, cr, cb, l, x1, y1, value;  
+	unsigned char *pY, *pCr, *pCb, *pMask;  
+
+	pY = (unsigned char *)imgY->imageData;  
+	pCr = (unsigned char *)imgCr->imageData;  
+	pCb = (unsigned char *)imgCb->imageData;  
+	pMask = (unsigned char *)mask->imageData;  
+	cvSetZero(mask);  
+	l = img->height * img->width;  
+	for (int i = 0; i < l; i++){  
+		y  = *pY;  
+		cr = *pCr;  
+		cb = *pCb;  
+		cb -= 109;  
+		cr -= 152  
+			;  
+		x1 = (819*cr-614*cb)/32 + 51;  
+		y1 = (819*cr+614*cb)/32 + 77;  
+		x1 = x1*41/1024;  
+		y1 = y1*73/1024;  
+		value = x1*x1+y1*y1;  
+		if(y<100)    (*pMask)=(value<700) ? 255:0;  
+		else        (*pMask)=(value<850)? 255:0;  
+		pY++;  
+		pCr++;  
+		pCb++;  
+		pMask++;  
+	}  
+	cvReleaseImage(&imgY);  
+	cvReleaseImage(&imgCr);  
+	cvReleaseImage(&imgCb);  
+	cvReleaseImage(&imgYCrCb);  
+}  
+
+
+void vFillPoly(IplImage* img, const vector<Point>& pt_list, const Scalar& clr/* = Scalar(255,255,255)*/)
 {
-	area = 0;
-	angle  = 0;
-	isHole = false;	
+	const Point* pts = &pt_list[0];
+	const int npts = pt_list.size();
+	cv::fillPoly(Mat(img), &pts, &npts, 1, clr);
 }
 
-vBlob::vBlob(Rect rc, Point ct, float ar, float ang, bool hole)
+void vLinePoly(IplImage* img, const vector<Point>& pt_list, const Scalar& clr/* = Scalar(255,255,255)*/, int thick/* = 1*/)
 {
-	box = rc;
-	center = ct;
-	area = ar;
-	angle = ang;
-	isHole = hole;
+	const Point* pts = &pt_list[0];
+	const int npts = pt_list.size();
+	cv::polylines(Mat(img), &pts, &npts, 1, true, clr, thick);
 }
 
-
-
-vFingerDetector::vFingerDetector()
+void vLinePoly(IplImage* img, const vector<Point2f>& pt_list, const Scalar& clr/* = Scalar(255,255,255)*/, int thick/* = 1*/)
 {
-	//k is used for fingers and k is used for hand detection
-	teta=0.f;
-	handspos[0]=0;
-	handspos[1]=0;
+	const int npts = pt_list.size();
+	Point* pts = new Point[npts];
+	for (int i=0;i<npts;i++)
+		pts[i] = pt_list[i];
+
+	cv::polylines(Mat(img), (const Point**)&pts, &npts, 1, true, clr, thick);
+
+	delete[] pts;
 }
 
-bool vFingerDetector::findFingers (const vBlob& blob, int k/* = 10*/)
+bool vTestRectHitRect(const Rect& object1, const Rect& object2)
 {
-	ppico.clear();
-	kpointcurv.clear();
-	bfingerRuns.clear();
-	
-	int nPts = blob.pts.size();
+	int left1, left2;
+	int right1, right2;
+	int top1, top2;
+	int bottom1, bottom2;
 
-	irr::vector2df	v1,v2;
+	left1 = object1.x;
+	left2 = object2.x;
+	right1 = object1.x + object1.width;
+	right2 = object2.x + object2.width;
+	top1 = object1.y;
+	top2 = object2.y;
+	bottom1 = object1.y + object1.height;
+	bottom2 = object2.y + object2.height;
 
-	for(int i=k; i<nPts-k; i++)
-	{		
-		//calculating angre between vectors
-		v1.set(blob.pts[i].x-blob.pts[i-k].x,	blob.pts[i].y-blob.pts[i-k].y);
-		v2.set(blob.pts[i].x-blob.pts[i+k].x,	blob.pts[i].y-blob.pts[i+k].y);
-		
-		v1D = Vec3f(blob.pts[i].x-blob.pts[i-k].x,	blob.pts[i].y-blob.pts[i-k].y,	0);
-		v2D = Vec3f(blob.pts[i].x-blob.pts[i+k].x,	blob.pts[i].y-blob.pts[i+k].y,	0);
-		
-		vxv = v1D.cross(v2D);
-		
-		v1.normalize();
-		v2.normalize();
-		teta=v1.getAngleWith(v2);
-		
-		//control conditions 
-		if(fabs(teta) < 40)
-		{	//pik?
-			if(vxv[2] > 0)
-			{
-				bfingerRuns.push_back(true);
-				//we put the select poins into ppico vector
-				ppico.push_back(blob.pts[i]);
-				kpointcurv.push_back(teta);
-			}
-		}
-	}
-	if(ppico.size()>0)
-	{
-		return true;
-	}
-	else 
-	{
-		return false;
-	}	
-}
+	if (bottom1 < top2) return false;
+	if (top1 > bottom2) return false;
 
-bool vFingerDetector::findHands(const vBlob& smblob, int k)
-{
-	//smppico.clear();
-	//kpointcurv.clear();
-	//lhand.clear();
-	//rhand.clear();	
-	//	
-	//cv::Point hcentroid=smblob.center;
+	if (right1 < left2) return false;
+	if (left1 > right2) return false;
 
-	//int nPts = smblob.pts.size();
-	//for(int i=k; i<nPts-k; i++)
-	//{
-	//	
-	//	v1 = Vec2f(smblob.pts[i].x-smblob.pts[i-k].x,	smblob.pts[i].y-smblob.pts[i-k].y);
-	//	v2 = Vec2f(smblob.pts[i].x-smblob.pts[i+k].x,	smblob.pts[i].y-smblob.pts[i+k].y);
-	//	
-	//	v1D = Vec3f(smblob.pts[i].x-smblob.pts[i-k].x,	smblob.pts[i].y-smblob.pts[i-k].y,	0);
-	//	v2D = Vec3f(smblob.pts[i].x-smblob.pts[i+k].x,	smblob.pts[i].y-smblob.pts[i+k].y,	0);
-	//	
-	//	vxv = v1D.cross(v2D);
-	//	
-	//	v1.normalize();
-	//	v2.normalize();
-	//	
-	//	teta=v1.angle(v2);
-	//	
-	//	if(fabs(teta) < 30)
-	//	{	//pik?
-	//		if(vxv.z > 0)
-	//		{
-	//			smppico.push_back(smblob.pts[i]);
-	//			kpointcurv.push_back(teta);
-	//		}
-	//	}
-	//}
-	//for(int i=0; i<smppico.size();i++)
-	//{
-	//	if(i==0)
-	//	{
-	//		lhand.push_back(smppico[i]);
-	//	}
-	//	else
-	//	{
-	//		aux1.set(smppico[i].x-smppico[0].x,smppico[i].y-smppico[0].y);
-	//		dlh=aux1.length();
-	//	
-	//		//we detect left and right hand and 
-	//	
-	//		if(dlh<100)
-	//		{
-	//			lhand.push_back(smppico[i]);
-	//		}
-	//		if(dlh>100)
-	//		{
-	//			rhand.push_back(smppico[i]);
-	//		}
-	//	}
-	//}
-	////try to find for each hand the point wich is farder to the centroid of the Blob
-	//if(lhand.size()>0)
-	//{		
-	//	aux1.set(lhand[0].x-hcentroid.x,lhand[0].y-hcentroid.y);
-	//	lhd=aux1.length();
-	//	max=lhd;
-	//	handspos[0]=0;
-	//	for(int i=1; i<lhand.size(); i++)
-	//	{
-	//		aux1.set(lhand[i].x-hcentroid.x,lhand[i].y-hcentroid.y);
-	//		lhd=aux1.length();
-	//		if(lhd>max)
-	//		{
-	//			max=lhd;
-	//			handspos[0]=i;
-	//		}
-	//	}
-	//}
-	//if(rhand.size()>0)
-	//{
-	//	aux1.set(rhand[0].x-hcentroid.x,rhand[0].y-hcentroid.y);
-	//	lhd=aux1.length();
-	//	max=lhd;
-	//	handspos[1]=0;
-	//	for(int i=1; i<rhand.size(); i++)
-	//	{
-	//		aux1.set(rhand[i].x-hcentroid.x,rhand[i].y-hcentroid.y);
-	//		lhd=aux1.length();
-	//		if(lhd>max)
-	//		{
-	//			max=lhd;
-	//			handspos[1]=i;
-	//		}
-	//	}
-	//}
-	if(rhand.size()>0 || lhand.size()>0) return true;
-	return false;
-	//Positions of hands are in (lhand[handspos[0]].x, y+lhand[handspos[0]].y) for left hand and (rhand[handspos[1]].x, y+rhand[handspos[1]].y) for right hand
-}
+	return true;
+};

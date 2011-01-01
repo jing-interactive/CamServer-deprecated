@@ -24,12 +24,7 @@
 
 #pragma comment(lib, "ws2_32.lib")
 
-#ifdef _DEBUG
-#pragma comment(lib,"oscpackd.lib")
-#else
-#pragma comment(lib,"oscpack.lib")
-#endif
-
+//#pragma comment(lib,"oscpack.lib")
 
 #include "ofxOscArg.h"
 #include "ofxOscMessage.h"

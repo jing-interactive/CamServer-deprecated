@@ -26,9 +26,9 @@ CFloDebug::CFloDebug(char *filename){
 
 	// now the file is created, re-open with append mode
 
-	fclose(m_fpDebug);
-	m_fpDebug = fopen(filename,"a+");
-	assert(m_fpDebug && "can not close the debug file");
+//	fclose(m_fpDebug);
+//	m_fpDebug = fopen(filename,"w");
+//	assert(m_fpDebug && "can not close the debug file");
 }
 
 CFloDebug::~CFloDebug(void){

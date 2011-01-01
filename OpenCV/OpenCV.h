@@ -6,6 +6,7 @@
 #pragma warning( disable: 4996 )
 #pragma warning( disable: 4305 )
 #pragma warning( disable: 4018 )
+#pragma warning( disable: 4099 )
 #pragma warning( disable: 4819 )
 
 #include <cv.h>
@@ -15,11 +16,15 @@
 #include <stdarg.h>
 #include <time.h>
 #include <vector>
+#include <map>
 
+#include "vector2d.h"
 
 using namespace cv;
-using std::vector;
 
+using std::vector;
+//using std::set;
+using std::map;
 //CV_FOURCC('P','I','M','1')    = MPEG-1 codec
 //CV_FOURCC('M','J','P','G')    = motion-jpeg codec (does not work well)
 //CV_FOURCC('M', 'P', '4', '2') = MPEG-4.2 codec
@@ -28,7 +33,8 @@ using std::vector;
 //CV_FOURCC('U', '2', '6', '3') = H263 codec
 //CV_FOURCC('I', '2', '6', '3') = H263I codec
 //CV_FOURCC('F', 'L', 'V', '1') = FLV1 codec
-
+ 
+void vFlip(const CvArr* src, int flipX, int flipY);
 
 template<class T> class Image
 {
@@ -101,20 +107,12 @@ char* get_time(bool full_length = true);
 
 typedef vector<IplImage*> image_array_t;
 
-struct vBlob
-{
-	vBlob();
-	vBlob(Rect rc, Point ct, float ar = 0, float ang = 0, bool hole = false);
-
-	Rect box;
-	Point center;
-	int id;
-
-	float angle;
-	float area;
-	vector<Point> pts;
-	bool isHole;
-};
+const CvScalar CV_RED = CV_RGB(255,0,0);
+const CvScalar CV_GREEN = CV_RGB(0,255,0);
+const CvScalar CV_BLUE = CV_RGB(0,0,255);
+const CvScalar CV_BLACK = CV_RGB(0,0,0);
+const CvScalar CV_WHITE = CV_RGB(255,255,255);
+const CvScalar CV_GRAY = CV_RGB(122,122,122); 
 
 inline CvScalar vRandomColor()
 {
@@ -123,43 +121,21 @@ inline CvScalar vRandomColor()
 	return CV_RGB(icolor&255, (icolor>>8)&255, (icolor>>16)&255);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////
-
-// This cleans up the forground segmentation mask derived from calls to cvBackCodeBookDiff
-//
-// mask			Is a grayscale (8 bit depth) "raw" mask image which will be cleaned up
-//
-// OPTIONAL PARAMETERS:
-// poly1_hull0	If set, approximate connected component by (DEFAULT) polygon, or else convex hull (false)
-// areaScale 	Area = image (width*height)*areaScale.  If contour area < this, delete that contour (DEFAULT: 0.1)
-//
-
-void vFindBlobs(IplImage *mask, vector<vBlob>& blobs,
-				int minArea, bool convexHull=true);
-void vFindBlobs(IplImage *mask, 
-				int minArea, bool convexHull=true);//draw blobs only
-
 #define vDrawRect(image, rc, clr) cvDrawRect(image, cvPoint(rc.x,rc.y), cvPoint(rc.x+rc.width,rc.y+rc.height), clr)
 
-
-// parameters:
-//  silh - input video frame
-//  dst - resultant motion picture
-//  args - optional parameters
-vector<vBlob>  vUpdateMhi( IplImage* silh, IplImage* dst);
 /*
 
-#include "OpenCV.h"
+#include "OpenCV/OpenCV.h"
 
-VideoInput video_input;
+VideoInput input;
 
 int main(int argc, char** argv )
 {	
-if (video_input.init(argc,argv))
+if (input.init(argc,argv))
 {
 while (true)
 {
-IplImage* raw = video_input.get_frame(); 
+IplImage* raw = input.get_frame(); 
 if (!raw)
 break;
 cvFlip(raw, 0, 1);
@@ -177,8 +153,8 @@ return 0;
 
 #define vGrayScale(clr, gray) cvCvtColor(clr, gray, CV_BGR2GRAY) 
 #define vColorFul(gray, clr) cvCvtColor(gray, clr , CV_GRAY2BGR) 
-#define vThresh(gray, thresh) cvThreshold( gray, gray, thresh, 255, CV_THRESH_BINARY )
-#define vThreshInv(gray, thresh) cvThreshold( gray, gray, thresh, 255, CV_THRESH_BINARY_INV )
+#define vThresh(gray, thresh) cvThreshold( gray, gray, thresh, 255, CV_THRESH_BINARY )//if > thresh -> white
+#define vThreshInv(gray, thresh) cvThreshold( gray, gray, thresh, 255, CV_THRESH_BINARY_INV )//if < thresh -> white
 #define vAutoThresh(gray, max_value) cvAdaptiveThreshold(gray, gray, max_value)
 #define vOpen(img, times) cvMorphologyEx( img, img, NULL, NULL, CV_MOP_OPEN, times );//È¥³ý°×É«Ð¡ÇøÓò
 #define vClose(img, times) cvMorphologyEx( img, img, NULL, NULL, CV_MOP_CLOSE, times );//È¥³ýºÚÉ«Ð¡ÇøÓò
@@ -187,6 +163,9 @@ return 0;
 
 #define vFullScreen(win_name) \
 	cvSetWindowProperty(win_name, CV_WND_PROP_FULLSCREEN, 1);
+
+#define vCreateGray(clr) cvCreateImage(cvGetSize(clr), 8, 1);
+#define vCreateColor(clr) cvCreateImage(cvGetSize(clr), 8, 3);
 
 struct VideoInput
 {
@@ -205,12 +184,19 @@ struct VideoInput
 
 	CvCapture* _capture;
 
+	void setAutoExplosure(bool is);
+	bool getAutoExplosure();
+	void setParamExplosure(int value);
+	void showSettingsDialog();
+
 	IplImage* _frame;
 	int _cam_idx;
 	Size _size;
 	Size _half_size;
 	int _channel;
 	int _codec;
+
+	int _frame_num;
 
 	VideoInput();
 
@@ -227,31 +213,15 @@ struct VideoInput
 	~VideoInput();
 };
 
-
-struct vHaarDetector
-{
-	//
-	bool init(char* cascade_name);
-	void detect_object(IN IplImage* img, OUT vector<CvRect>& regions);	
-	CvRect object_rect;
-
-	//
-	CvHaarClassifierCascade* cascade;
-	CvMemStorage* storage;
-
-	vHaarDetector();
-	~vHaarDetector();
-
-};
-
-
 struct IBackGround
 {
 	CvBGStatModel* bg_model;
+
 	int thresh;
+	
 	IBackGround(){
 		bg_model = NULL;
-		thresh = 100;
+		thresh = 200;
 	}
 
 	virtual void init(IplImage* initial, void* param = NULL) = 0;
@@ -259,9 +229,11 @@ struct IBackGround
 	virtual void update(IplImage* image, int mode = 0){
 		cvUpdateBGStatModel( image, bg_model );
 	}
-	void setThresh(int th){
-		thresh = th;
+	virtual void setIntParam(int idx, int value)
+	{
+		if (idx ==0) thresh = 255-value;
 	}
+
 	virtual IplImage* getForeground(){
 		return bg_model->foreground;
 	}
@@ -292,74 +264,106 @@ struct vBackGaussian: public IBackGround
 
 struct vBackGrayDiff: public IBackGround
 {
-	Ptr<IplImage> grayFrame;
-	Ptr<IplImage> grayBg;
-	Ptr<IplImage> grayDiff ;
+	Ptr<IplImage> Frame;
+	Ptr<IplImage> Bg;
+	Ptr<IplImage> Fore ;
+ 
+	int dark_thresh;
 
 	void init(IplImage* initial, void* param = NULL);
 
+	void setIntParam(int idx, int value);
 	///mode: 0-> ¼ì²âÃ÷Óë°µ 1->¼ì²âºÚ°µ 2->¼ì²âÃ÷ÁÁ
 	void update(IplImage* image, int mode = DETECT_BOTH);
 
 	IplImage* getForeground(){
-		return grayDiff;
+		return Fore;
 	}
 	IplImage* getBackground(){
-		return grayBg;
+		return Bg;
 	}
 };
 
-struct vBackColorDiff: public IBackGround
+struct vBackColorDiff: public vBackGrayDiff
 {
-	Ptr<IplImage> colorBg;
-	Ptr<IplImage> grayDiff;
+	int nChannels;
+	void init(IplImage* initial, void* param = NULL);
 
-	int w;
-	int h;
-	int step; 
-	int step2;
+	///mode: 0-> ¼ì²âÃ÷Óë°µ 1->¼ì²âºÚ°µ 2->¼ì²âÃ÷ÁÁ
+	void update(IplImage* image, int mode = DETECT_BOTH);
+};
 
-	void init(IplImage* initial, void* param = NULL){
-		cv::Size size = cvGetSize(initial);
-		colorBg.release();
-		colorBg = cvCloneImage(initial);
+//ÈýÖ¡²îÖµ·¨
+struct vThreeFrameDiff: public IBackGround
+{
+	Ptr<IplImage> grayFrameOne;
+	Ptr<IplImage> grayFrameTwo;
+	Ptr<IplImage> grayFrameThree;
+	Ptr<IplImage> grayDiff ;
 
-		grayDiff.release();
-		grayDiff = cvCreateImage(size, 8, 1);
+	void init(IplImage* initial, void* param = NULL);
 
-		w = colorBg->width;
-		h = colorBg->height;
-		step = colorBg->widthStep; 
-		step2 = grayDiff->widthStep;
-	}
+	void update(IplImage* image, int mode = 0);
 
-	void update(IplImage* image, int mode = 0){
-
-		cvZero(grayDiff);
-		for(int y=0;y<h;y++) 
-			for(int x=0;x<w;x++) 
-			{
-				uchar* pixel = &((uchar*)(image->imageData + step*y))[x*3];
-				uchar* pixel2 = &((uchar*)(colorBg->imageData + step*y))[x*3];
-				uchar* p = &((uchar*)(grayDiff->imageData + step2*y))[x];
-
-				uchar r = pixel[0] - pixel2[0];
-				uchar g = pixel[1] - pixel2[1];
-				uchar b = pixel[2] - pixel2[2];
-
-				if ((r*r+g*g+b*b) > thresh*thresh)						
-					*p = 255;
-				else
-					*p = 0;
-			}
-	}
 	IplImage* getForeground(){
 		return grayDiff;
 	}
 	IplImage* getBackground(){
-		return colorBg;
+		return grayDiff;
 	}
 };
+//
+//struct vBackColorDiff: public IBackGround
+//{
+//	Ptr<IplImage> colorBg;
+//	Ptr<IplImage> grayDiff; 
+//
+//	int w;
+//	int h;
+//	int step; 
+//	int step2;
+//
+//	void init(IplImage* initial, void* param = NULL){
+//		cv::Size size = cvGetSize(initial);
+//		colorBg.release();
+//		colorBg = cvCloneImage(initial);
+//
+//		grayDiff.release();
+//		grayDiff = cvCreateImage(size, 8, 1);
+//
+//		w = colorBg->width;
+//		h = colorBg->height;
+//		step = colorBg->widthStep; 
+//		step2 = grayDiff->widthStep;
+//	} 
+//
+//	void update(IplImage* image, int mode = 0){
+//
+//		cvZero(grayDiff);
+//		for(int y=0;y<h;y++) 
+//			for(int x=0;x<w;x++) 
+//			{
+//				uchar* pixel = &((uchar*)(image->imageData + step*y))[x*3];
+//				uchar* pixel2 = &((uchar*)(colorBg->imageData + step*y))[x*3];
+//				uchar* p = &((uchar*)(grayDiff->imageData + step2*y))[x];
+//
+//				uchar r = pixel[0] - pixel2[0];
+//				uchar g = pixel[1] - pixel2[1];
+//				uchar b = pixel[2] - pixel2[2];
+//
+//				if ((r*r+g*g+b*b) > thresh*thresh)						
+//					*p = 255;
+//				else
+//					*p = 0;
+//			}
+//	}
+//	IplImage* getForeground(){
+//		return grayDiff;
+//	}
+//	IplImage* getBackground(){
+//		return colorBg;
+//	}
+//};
 
 struct vBackCodeBook
 {
@@ -397,23 +401,52 @@ void vGetPerspectiveMatrix(CvMat*& warp_matrix, cv::Point2f xsrcQuad[4], cv::Poi
 void vDrawDelaunay( CvSubdiv2D* subdiv,IplImage* src,IplImage * dst, bool drawLine = true );
 void vDrawVoroni( CvSubdiv2D * subdiv, IplImage * src, IplImage * dst, bool drawLine = true );
 
-
-
-struct Subdiv
+struct Triangle
 {
-	Subdiv(int w, int h);
+	int& operator[](int i){return idx[i];}
+	const int operator[](int i) const{return idx[i];}
+	int idx[3];
+	point2di center;
+
+	bool operator == (const Triangle& other) const 
+	{
+		return center == other.center;
+	}
+
+	bool operator < (const Triangle& other) const 
+	{
+		return center < other.center;
+	}
+};
+
+struct DelaunaySubdiv
+{
+	DelaunaySubdiv(int w, int h);
 
 	void insert(float x, float y);
 	void clear();
 	void build();
 
-	void getTriangles();
 	void drawDelaunay( IplImage* src,IplImage * dst, bool drawLine = true );
 	void drawVoroni( IplImage* src,IplImage * dst, bool drawLine = true );
+
+	int getIndex(float x, float y);
 
 	CvRect rect;
 	CvMemStorage* storage;
 	CvSubdiv2D* subdiv;
+
+	std::vector<Point> points;
+	std::vector<Point> hull;
+
+	std::vector<Triangle> triangles;//x,y,z -> vert_0, vert_1, vert_2
+//	Mat hull;
+	std::map<point2di, int> pt_map;
+
+//	std::vector<std::vector<int> > triangles;	
+private:
+	void buildTriangles();
+	void intoEdge(CvSubdiv2DEdge edge);
 };
 
 void on_default(int );
@@ -442,32 +475,26 @@ void convertHSVtoRGB(const IplImage *imageHSV, IplImage *imageRGB);
 
 #define vAddWeighted(src, alpha, dst) cvAddWeighted(src, alpha, dst, 1-alpha, 0, dst);
  
-struct vFingerDetector{
-		
-	vFingerDetector();
-	
-	bool findFingers(const vBlob& blob, int k = 10);
-	bool findHands(const vBlob& smblob, int k = 200);
-	
-	float dlh,max;
-	
-	int handspos[2];
-	
-	vector<cv::Point2f>		ppico;
-	vector<cv::Point2f>		smppico;
-	
-	vector<float>				kpointcurv;
-	vector<float>				smkpointcurv;
-	
-	vector<bool>				bfingerRuns;
-	
-	vector<cv::Point2f>		lhand;
-	vector<cv::Point2f>		rhand;
-	
-//	cv::Vec2f	v1,v2,aux1;
-	 
-	cv::Vec3f	v1D,vxv;
-	cv::Vec3f	v2D;
-	 	
-	 float teta,lhd;
-};
+void cvSkinSegment(IplImage* img, IplImage* mask);
+
+void vFillPoly(IplImage* img, const vector<Point>& pt_list, const Scalar& clr = Scalar(255,255,255));
+void vLinePoly(IplImage* img, const vector<Point>& pt_list, const Scalar& clr = Scalar(255,255,255), int thick = 1);
+void vLinePoly(IplImage* img, const vector<Point2f>& pt_list, const Scalar& clr = Scalar(255,255,255), int thick = 1);
+
+inline bool isPointInsideRect(int x, int y, const Rect& rect)
+{
+	return (x >= rect.x && x <= rect.x+rect.width &&
+		y >= rect.y && y <= rect.height);
+}
+
+// inline bool vTestRectHitRect(const Rect& A, const Rect& B)
+// {
+// 	int AminX = A.x, AminY = A.y, BminX = B.x, BminY = B.y;
+// 	int AmaxX = A.x+A.width, AmaxY = A.y+A.height, BmaxX = B.x+B.width, BmaxY = B.y+B.height;
+// // 	return (AminX <= BmaxX && AminY <= BmaxY &&
+// // 		AmaxX >= BminX && AmaxY >= BminY);
+// 	return isPointInsideRect()
+// }
+
+// Object-to-object bounding-box collision detector:
+bool vTestRectHitRect(const Rect& object1, const Rect& object2);

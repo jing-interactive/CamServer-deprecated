@@ -6,37 +6,47 @@
  *  Copyright 2009 Tangible Interaction. All rights reserved.
  *
  */
+
+//	-opt1 "value 1"
+//	opt2="value 2"
+//	-flag1
+
 #ifndef _OFXARGS
 #define _OFXARGS
 
 #include <iostream>
 #include <vector>
 #include <map>
-using namespace std;
+#include <string>
+
+using std::vector;
+using std::map;
+using std::cout;
+using std::endl;
 
 class ofxArgs{
 private:
 	int argc;
-	vector<string> args;
-	map<string,string> opts;
+	vector<std::string> args;
+	map<std::string,std::string> opts;
 	
-	int strToInt(string value);
-	float strToFloat(string value);
+	int strToInt(std::string value);
+	float strToFloat(std::string value);
 	
 public:
 	ofxArgs(int argc, char* argv[]);
 	
 	int getCount();
 	
-	bool contains(string key);
+	bool contains(std::string key);
 
-	float getFloat(string key);
-	int getInt(string key);
-	string getString(string key);
+	float getFloat(std::string key);
+	int getInt(std::string key);
+	std::string getString(std::string key);
 	
 	float getFloat(int index);
 	int getInt(int index);
-	string getString(int index);
+	std::string getString(int index);
 	
 	void printArgs();
 	void printOpts();

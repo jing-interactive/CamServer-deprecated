@@ -27,7 +27,7 @@ void CvButtons::paintButtons(IplImage *img){
 			cvRectangle( img, cvPoint(x-4,y-4), cvPoint(x2+4,y2+4), C2, 1,CV_AA );
 			
 			// Check for mouse pressed event:
-			if( me == CV_EVENT_LBUTTONDOWN || mf & CV_EVENT_FLAG_LBUTTON ){
+			if( me == CV_EVENT_LBUTTONDOWN/* || mf & CV_EVENT_FLAG_LBUTTON */){
 				
 				// Check if toggle button has to change state:
 				if( it->toggle == 0 || it->toggle == 1 ) it->toggle = !it->toggle;

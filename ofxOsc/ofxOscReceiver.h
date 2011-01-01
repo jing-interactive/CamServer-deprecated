@@ -37,7 +37,7 @@
 
 // osc
 #include "OscTypes.h"
-#include "OscPacketListener.h"
+#include "OscPacketlistener.h"
 #include "UdpSocket.h"
 
 // ofxOsc

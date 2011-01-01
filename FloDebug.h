@@ -28,7 +28,7 @@
 
 extern bool using_debug_file;//u decide whether to use it.
 
-#define debug_file_name  "µ÷ÊÔÎÄ¼þ.txt"//uh..  u can changed its name
+#define debug_file_name  "application.log"//uh..  u can changed its name
 
 class CFloDebug{
 	//it's used to deal with error information
@@ -48,5 +48,6 @@ private:
 
 
 #define FloWrite  if (using_debug_file) CFloDebug::GetItself()->Write
+#define FloWriteLn()  FloWrite("\n=====================================\n");
 #define shared_file_ptr  CFloDebug::GetItself()->get_file()
 

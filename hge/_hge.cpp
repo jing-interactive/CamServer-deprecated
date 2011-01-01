@@ -1,4 +1,7 @@
-#include "HGE_utility.h"
+#include "_hge.h"
+
+#pragma comment(lib, "hge.lib")
+#pragma comment(lib, "hgehelp.lib")
 
 HGE *hge=0;
 hgeParticleManager *particleManager = 0;
@@ -15,7 +18,7 @@ bool middle_click = false;
 int mouse_wheel = 0;
 
 bool init_hge(int w, int h, hgeCallback FrameFunc, hgeCallback RenderFunc,
-			  int bpp, bool windowed)
+			  /*int bpp,*/ bool windowed)
 {
 	// Get HGE interface
 	hge = hgeCreate(HGE_VERSION);
@@ -24,39 +27,33 @@ bool init_hge(int w, int h, hgeCallback FrameFunc, hgeCallback RenderFunc,
 	hge->System_SetState(HGE_LOGFILE, "运行信息.log");
 	hge->System_SetState(HGE_FRAMEFUNC, FrameFunc);
 	hge->System_SetState(HGE_RENDERFUNC, RenderFunc);
-	hge->System_SetState(HGE_TITLE, "天平模拟 @ vinjn");
-	hge->System_SetState(HGE_USESOUND, false);
-
+	hge->System_SetState(HGE_TITLE, "App @ vinjn");
+	hge->System_SetState(HGE_USESOUND, true);
+	hge->System_SetState(HGE_SHOWSPLASH, false);
 	// Set up video mode
 	hge->System_SetState(HGE_WINDOWED, windowed);
 	hge->System_SetState(HGE_SCREENWIDTH, w);
 	hge->System_SetState(HGE_SCREENHEIGHT, h);
-	hge->System_SetState(HGE_SCREENBPP, bpp);
+//	hge->System_SetState(HGE_SCREENBPP, bpp);
 	hge->System_SetState(HGE_FPS, 60);
 
 	bool res =  hge->System_Initiate();
 
 	particleManager = new hgeParticleManager();
 
-#ifdef USING_GUICHAIN
-	init_gui(w, h);
-#endif
 	return res;
 }
 
 void release_hge()
 {
-#ifdef USING_GUICHAIN
-	release_gui();
-#endif
 	delete particleManager;
 	hge->System_Shutdown();
 	hge->Release();
 }
 
-int msg_box(char* info, UINT flag)
+int msg_box(TCHAR* info, UINT flag)
 {
-	return MessageBoxA(NULL, info, "HGE", flag);
+	return MessageBox(NULL, info, L"HGE", flag);
 }
 
 
@@ -104,71 +101,6 @@ void update_mouse()
 	prev_mouse = mouse;
 }
 
-
-#ifdef USING_GUICHAIN
-
-gcn::Gui* gui = NULL;
-gcn::HGEGraphics* graphics = NULL;
-gcn::HGEInput* input = NULL;
-gcn::HGEImageLoader* imageLoader = NULL;
-
-gcn::Container* top = NULL;
-gcn::ImageFont* fontGui = NULL;
-
-void init_gui(int w, int h)
-{
-    imageLoader = new gcn::HGEImageLoader();
-    // The ImageLoader Guichan should use needs to be passed to the Image object
-    // using a static function.
-    gcn::Image::setImageLoader(imageLoader);
-    graphics = new gcn::HGEGraphics();
-    input = new gcn::HGEInput();
-
-    // Now we create the Gui object to be used with this HGE application.
-    gui = new gcn::Gui();
-    // The Gui object needs a Graphics to be able to draw itself and an Input
-    // object to be able to check for user input. In this case we provide the
-    // Gui object with HGE implementations of these objects hence making Guichan
-    // able to utilise HGE.
-    gui->setGraphics(graphics);
-    gui->setInput(input);
-
-    top = new gcn::Container();
-    // We set the dimension of the top container to match the screen.
-    top->setDimension(gcn::Rectangle(0, 0, w, h));
-    // Finally we pass the top widget to the Gui object.
-    gui->setTop(top);
-
-    //[font]
-    fontGui = new gcn::ImageFont("fixedfont.bmp", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
-    // Widgets may have a global font so we don't need to pass the
-    // font object to every created widget. The global font is static.
-    gcn::Widget::setGlobalFont(fontGui);
-}
-
-void update_gui()
-{
-	gui->logic();
-}
-
-void render_gui()
-{
-	gui->draw();
-}
-
-void release_gui()
-{
-    SAFE_DELETE(gui);
-	SAFE_DELETE(fontGui);
-	SAFE_DELETE(imageLoader);
-	SAFE_DELETE(input);
-	SAFE_DELETE(graphics);
-}
-
-#endif
-
-
-
 bool isPointInsideBox(hgeVector& point, hgeVector& box1, hgeVector& box2)
 {
 	return point.x <= box2.x && point.y <= box2.y
@@ -182,15 +114,6 @@ void Gfx_RenderCross(hgeVector& pos, int size, DWORD color)
 	hge->Gfx_RenderLine(pos.x- size, pos.y+ size, pos.x+ size,pos.y- size,color);
 }
 
-void Gfx_RenderRect(hgeRect& rect, DWORD color)
-{
-	hge->Gfx_RenderLine(rect.x1, rect.y1, rect.x1, rect.y2, color);
-	hge->Gfx_RenderLine(rect.x1, rect.y2, rect.x2, rect.y2, color);
-	hge->Gfx_RenderLine(rect.x2, rect.y2, rect.x2, rect.y1, color);
-	hge->Gfx_RenderLine(rect.x2, rect.y1, rect.x1, rect.y1, color);
-}
-
-
 void Gfx_RenderPixel(hgeVector& pos, DWORD color)
 {
 	hge->Gfx_RenderLine(pos.x,pos.y,pos.x+1,pos.y+1);
@@ -200,3 +123,24 @@ float getAngle(float x, float y)
 {
 	return hgeVector(x,y).Angle();
 } 
+
+#ifdef HAVING_OPENCV
+
+void IplImage_to_HTEXTURE(IplImage* img, HTEXTURE tex)
+{
+	if (!hge || !tex) return;
+
+	DWORD* pixels = hge->Texture_Lock(tex, false);
+	char* ardata = (char*)img->imageData;
+	char* final_loc = ardata + img->imageSize;
+
+	while(ardata < final_loc)
+	{
+		*pixels++ = color_t(ardata[2], ardata[1],ardata[0]);
+		ardata += 3;
+	}
+	//memcpy(pixels, ardata, img->imageSize);
+	hge->Texture_Unlock(tex);
+}
+
+#endif

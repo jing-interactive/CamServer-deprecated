@@ -27,24 +27,55 @@
 	CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 	WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-#ifndef INCLUDED_OSCPRINTRECEIVEDELEMENTS_H
-#define INCLUDED_OSCPRINTRECEIVEDELEMENTS_H
+#include "IpEndpointName.h"
 
-#include <iosfwd>
-#include <string.h>
+#include <stdio.h>
 
-#ifndef INCLUDED_OSCRECEIVEDELEMENTS_H
-#include "OscReceivedElements.h"
-#endif /* INCLUDED_OSCRECEIVEDELEMENTS_H */
+#include "NetworkingUtils.h"
 
 
-namespace osc{
+unsigned long IpEndpointName::GetHostByName( const char *s )
+{
+	return ::GetHostByName(s);
+}
 
-std::ostream& operator<<( std::ostream & os, const ReceivedPacket& p );
-std::ostream& operator<<( std::ostream & os, const ReceivedMessageArgument& arg );
-std::ostream& operator<<( std::ostream & os, const ReceivedMessage& m );
-std::ostream& operator<<( std::ostream & os, const ReceivedBundle& b );
 
-} // namespace osc
+void IpEndpointName::AddressAsString( char *s ) const
+{
+	if( address == ANY_ADDRESS ){
+		sprintf( s, "<any>" );
+	}else{
+		sprintf( s, "%d.%d.%d.%d",
+				(int)((address >> 24) & 0xFF),
+				(int)((address >> 16) & 0xFF),
+				(int)((address >> 8) & 0xFF),
+				(int)(address & 0xFF) );
+	}
+}
 
-#endif /* INCLUDED_OSCPRINTRECEIVEDELEMENTS_H */
+
+void IpEndpointName::AddressAndPortAsString( char *s ) const
+{
+	if( port == ANY_PORT ){
+		if( address == ANY_ADDRESS ){
+			sprintf( s, "<any>:<any>" );
+		}else{
+			sprintf( s, "%d.%d.%d.%d:<any>",
+				(int)((address >> 24) & 0xFF),
+				(int)((address >> 16) & 0xFF),
+				(int)((address >> 8) & 0xFF),
+				(int)(address & 0xFF) );
+		}
+	}else{
+		if( address == ANY_ADDRESS ){
+			sprintf( s, "<any>:%d", port );
+		}else{
+			sprintf( s, "%d.%d.%d.%d:%d",
+				(int)((address >> 24) & 0xFF),
+				(int)((address >> 16) & 0xFF),
+				(int)((address >> 8) & 0xFF),
+				(int)(address & 0xFF),
+				(int)port );
+		}
+	}	
+}

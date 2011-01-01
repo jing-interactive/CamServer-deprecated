@@ -46,7 +46,7 @@ bool CComDialog::PopFileOpenDlg (char* pstrFileName,
     _ofn.lpstrDefExt = extension;		// extension name
     _ofn.lpstrTitle = pstrTitleName; // title of dlg box
 
-    return GetOpenFileName(&_ofn);
+    return GetOpenFileName(&_ofn) == TRUE;
 }
 
 
@@ -59,7 +59,7 @@ bool CComDialog::PopFileSaveDlg (char* pstrFileName,
     //_ofn.lpstrFileTitle            = pstrTitleName ;
     _ofn.lpstrDefExt = extension;		// extension name
 
-    return GetSaveFileName (&_ofn) ;
+    return GetSaveFileName (&_ofn) == TRUE;
 }
 
 

@@ -2,16 +2,13 @@
 
 //#define USING_GUICHAIN
 
-#include <hge.h>
-#include <hgesprite.h>
-#include <hgefont.h>
-#include <hgeparticle.h>
-#include <hgeVector.h>
-#include <hgedistort.h>
-#include <hgeresource.h>
-
-#pragma comment(lib, "hge.lib")
-#pragma comment(lib, "hgehelp.lib")
+#include <hge/hge.h>
+#include <hge/hgesprite.h>
+#include <hge/hgefont.h>
+#include <hge/hgeparticle.h>
+#include <hge/hgeVector.h>
+#include <hge/hgedistort.h>
+#include <hge/hgeresource.h>
 
 #pragma comment(linker, "/NODEFAULTLIB:LIBCD.LIB") 
 
@@ -19,7 +16,7 @@ extern HGE *hge;
 extern hgeParticleManager *particleManager;
 
 bool init_hge(int w, int h, hgeCallback FrameFunc, hgeCallback RenderFunc,
-			  int bpp = 32, bool windowed  = true);
+			  /*int bpp = 32,*/ bool windowed  = true);
 void release_hge();
 
 int msg_box(char* info, UINT flag = MB_OK);
@@ -45,16 +42,32 @@ extern const int win_height;
 
 void Gfx_RenderCross(hgeVector& pos, int size, DWORD color);
 void Gfx_RenderPixel(hgeVector& pos, DWORD color);
-void Gfx_RenderRect(hgeRect& rect, DWORD color);
 
-template <typename T>
-void _clamp(T& vec, T min, T max)
+struct color_t
 {
-	if (vec < min)
-		vec = min;
-	if (vec > max)
-		vec = max;		
-}
+	//color_t(const DWORD argb = 0xFF000000){
+	//	_argb = argb;
+	//}
+	color_t( BYTE gray ){
+		_r = _g = _b = gray;
+		_a = 0xFF;
+	} 
+	color_t( BYTE r, BYTE g, BYTE b, BYTE a = 0xFF ){
+		_r = r;
+		_g = g;
+		_b = b;
+		_a = a;
+	} 
+	operator DWORD() const{
+		return _argb;
+	}
+	union 
+    {
+		DWORD _argb;                  // compressed format
+		BYTE _argb_M[4];             // array format
+		struct {  BYTE _b,_g,_r,_a;  }; // explict name format
+    }; 
+};
 
 inline int random_win_x(){return hge->Random_Int(0, win_width);} 
 inline int random_win_y(){return hge->Random_Int(0, win_height);} 
@@ -64,27 +77,8 @@ void hgeVector_clamp(hgeVector& vec, float min, float max);
 bool isPointInsideBox(hgeVector& point, hgeVector& box1, hgeVector& box2);
 
 float getAngle(float x, float y);
-
-#ifdef USING_GUICHAIN
-	#include <guichan.hpp>
-	#include <guichan/hge.hpp>
-	#ifdef _DEBUG
-		#pragma comment(lib, "guichain_d.lib")
-	#else
-		#pragma comment(lib, "guichain.lib")
-	#endif
-
-extern gcn::Gui* gui;
-extern gcn::HGEGraphics* graphics;
-extern gcn::HGEInput* input;
-extern gcn::HGEImageLoader* imageLoader;
-
-extern gcn::Container* top;
-extern gcn::ImageFont* fontGui;
-
-void init_gui(int w, int h);
-void update_gui();
-void render_gui();
-void release_gui();
-
+ 
+#ifdef HAVING_OPENCV
+#include "cv.h"
+void IplImage_to_HTEXTURE(IplImage* img, HTEXTURE tex);
 #endif

@@ -65,6 +65,10 @@
 
 #endif
 
+#ifndef OSC_HOST_LITTLE_ENDIAN
+#define OSC_HOST_LITTLE_ENDIAN
+#endif
+
 #if !defined(OSC_HOST_LITTLE_ENDIAN) && !defined(OSC_HOST_BIG_ENDIAN)
 
 #error please edit OSCHostEndianness.h to configure endianness

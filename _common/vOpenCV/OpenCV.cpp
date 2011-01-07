@@ -1,21 +1,23 @@
 #include "OpenCV.h"
 
-#if defined _DEBUG
-#pragma comment(lib,"cv210d.lib")
-#pragma comment(lib,"cvaux210d.lib")
-#pragma comment(lib,"cxcore210d.lib")
-#pragma comment(lib,"highgui210d.lib")
-#else
-#pragma comment(lib,"cv210.lib")
-#pragma comment(lib,"cvaux210.lib")
-#pragma comment(lib,"cxcore210.lib")
-#pragma comment(lib,"highgui210.lib")
+#ifdef WIN32
+    #if defined _DEBUG
+        #pragma comment(lib,"cv210d.lib")
+        #pragma comment(lib,"cvaux210d.lib")
+        #pragma comment(lib,"cxcore210d.lib")
+        #pragma comment(lib,"highgui210d.lib")
+    #else
+        #pragma comment(lib,"cv210.lib")
+        #pragma comment(lib,"cvaux210.lib")
+        #pragma comment(lib,"cxcore210.lib")
+        #pragma comment(lib,"highgui210.lib")
+    #endif
 #endif
 
 #include <set>
 
 void vRotateImage(IplImage* image, float angle, float centreX, float centreY){
-   
+
    CvPoint2D32f centre;
    CvMat *translate = cvCreateMat(2, 3, CV_32FC1);
    cvSetZero(translate);
@@ -137,7 +139,7 @@ CvScalar vDefaultColor(int idx){ return default_colors[idx%sizeOfColors];}
 
 char* get_time(bool full_length)
 {
-	static char str[MAX_PATH];
+	static char str[256];
 	time_t timep;
 	tm *p;
 	time(&timep);

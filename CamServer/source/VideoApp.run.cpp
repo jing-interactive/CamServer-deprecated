@@ -4,12 +4,12 @@
 #include "MiniTimer.h"
 
 void VideoApp::run()
-{	
+{
 	MiniTimer timer;
 	MiniTimer timer_total;
 
 	while (app_running)
-	{ 
+	{
 		FloWriteLn();
 
 		timer.resetStartTime();
@@ -29,10 +29,10 @@ void VideoApp::run()
 		}
 
 		int key = cvWaitKey(1);
-		if (key == VK_ESCAPE)
+		if (key == 0x1B)
 			app_running = false;
 
-		if (key == VK_BACK)
+		if (key == 0x08)
 		{//reset four corner points
 			theConfig.corners[0] = cv::Point2f(0,0);
 			theConfig.corners[1] = cv::Point2f(HalfWidth,0);
@@ -43,7 +43,7 @@ void VideoApp::run()
 
 			onRefreshBack();
 		}
-		if (key == VK_SPACE)
+		if (key == 0x20)
 		{//toggle big window visibility
 			monitorVisible = !monitorVisible;
 			monitor_gui::show(monitorVisible);
@@ -62,7 +62,7 @@ void VideoApp::run()
 		{//needs perspective transform
 			cvWarpPerspective(half_raw, frame, warp_matrix);
 		}
-		timer.profileFunction("vPerspectiveTransform");	
+		timer.profileFunction("vPerspectiveTransform");
 
 		if (to_reset_back)
 		{
@@ -103,7 +103,7 @@ void VideoApp::run()
 
 		timer.profileFunction("backModel->update");
 		//fore->blobs
-		vHighPass(fore, grayBuffer, theConfig.paramBlur1, theConfig.paramBlur2);		
+		vHighPass(fore, grayBuffer, theConfig.paramBlur1, theConfig.paramBlur2);
 		cvCopyImage(grayBuffer, fore);
 		timer.profileFunction("vHighPass");
 
@@ -117,14 +117,14 @@ void VideoApp::run()
 
 		if (theConfig.finger_track)
 		{
-			for (UINT i=0;i<blobs.size();i++)
+			for (int i=0;i<blobs.size();i++)
 			{
 				bool ffound=finger.findFingers(blobs[i], 12);
 				//	bool hfound=finger.findHands(blobs[0]);
 				if (ffound)
 				{
 					for (int f=0;f<finger.ppico.size();f++)
-					{	
+					{
 						cvCircle(frame, finger.ppico[f], 10, vRandomColor());
 					}
 				}
@@ -172,7 +172,7 @@ void VideoApp::run()
 		cvShowImage(PARAM_WINDOW, param_gui::setting);
 		timer.profileFunction("show Param Panel");
 
-		timer_total.profileFunction("total"); 
+		timer_total.profileFunction("total");
 	}
 
 	theConfig.save_to("config.xml");

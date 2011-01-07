@@ -33,7 +33,7 @@ using std::map;
 //CV_FOURCC('U', '2', '6', '3') = H263 codec
 //CV_FOURCC('I', '2', '6', '3') = H263I codec
 //CV_FOURCC('F', 'L', 'V', '1') = FLV1 codec
- 
+
 void vFlip(const CvArr* src, int flipX, int flipY);
 
 template<class T> class Image
@@ -89,15 +89,15 @@ void vShowManyImages(char* title, CvImage& input, int w, int h);
 
 #define show_image(img_name) \
 	cvNamedWindow(#img_name);\
-	cvShowImage(#img_name, img_name); 
+	cvShowImage(#img_name, img_name);
 
 #define show_image2(img_name) \
 	cvNamedWindow(#img_name, 0);\
-	cvShowImage(#img_name, img_name); 
+	cvShowImage(#img_name, img_name);
 
 #define show_mat(img_name) \
 	cv::namedWindow(#img_name, 0);\
-	cv::imshow(#img_name, img_name); 
+	cv::imshow(#img_name, img_name);
 
 //mask is 8bit，掩板图片，mask中像素的值 > thresh，则img对应位置为原色，否则为0
 //img is 24bit
@@ -112,7 +112,7 @@ const CvScalar CV_GREEN = CV_RGB(0,255,0);
 const CvScalar CV_BLUE = CV_RGB(0,0,255);
 const CvScalar CV_BLACK = CV_RGB(0,0,0);
 const CvScalar CV_WHITE = CV_RGB(255,255,255);
-const CvScalar CV_GRAY = CV_RGB(122,122,122); 
+const CvScalar CV_GRAY = CV_RGB(122,122,122);
 
 inline CvScalar vRandomColor()
 {
@@ -130,12 +130,12 @@ inline CvScalar vRandomColor()
 VideoInput input;
 
 int main(int argc, char** argv )
-{	
+{
 if (input.init(argc,argv))
 {
 while (true)
 {
-IplImage* raw = input.get_frame(); 
+IplImage* raw = input.get_frame();
 if (!raw)
 break;
 cvFlip(raw, 0, 1);
@@ -151,8 +151,8 @@ return 0;
 }
 */
 
-#define vGrayScale(clr, gray) cvCvtColor(clr, gray, CV_BGR2GRAY) 
-#define vColorFul(gray, clr) cvCvtColor(gray, clr , CV_GRAY2BGR) 
+#define vGrayScale(clr, gray) cvCvtColor(clr, gray, CV_BGR2GRAY)
+#define vColorFul(gray, clr) cvCvtColor(gray, clr , CV_GRAY2BGR)
 #define vThresh(gray, thresh) cvThreshold( gray, gray, thresh, 255, CV_THRESH_BINARY )//if > thresh -> white
 #define vThreshInv(gray, thresh) cvThreshold( gray, gray, thresh, 255, CV_THRESH_BINARY_INV )//if < thresh -> white
 #define vAutoThresh(gray, max_value) cvAdaptiveThreshold(gray, gray, max_value)
@@ -218,7 +218,7 @@ struct IBackGround
 	CvBGStatModel* bg_model;
 
 	int thresh;
-	
+
 	IBackGround(){
 		bg_model = NULL;
 		thresh = 200;
@@ -268,7 +268,7 @@ struct vBackGrayDiff: public IBackGround
 	Ptr<IplImage> Frame;
 	Ptr<IplImage> Bg;
 	Ptr<IplImage> Fore ;
- 
+
 	int dark_thresh;
 
 	void init(IplImage* initial, void* param = NULL);
@@ -317,11 +317,11 @@ struct vThreeFrameDiff: public IBackGround
 //struct vBackColorDiff: public IBackGround
 //{
 //	Ptr<IplImage> colorBg;
-//	Ptr<IplImage> grayDiff; 
+//	Ptr<IplImage> grayDiff;
 //
 //	int w;
 //	int h;
-//	int step; 
+//	int step;
 //	int step2;
 //
 //	void init(IplImage* initial, void* param = NULL){
@@ -334,15 +334,15 @@ struct vThreeFrameDiff: public IBackGround
 //
 //		w = colorBg->width;
 //		h = colorBg->height;
-//		step = colorBg->widthStep; 
+//		step = colorBg->widthStep;
 //		step2 = grayDiff->widthStep;
-//	} 
+//	}
 //
 //	void update(IplImage* image, int mode = 0){
 //
 //		cvZero(grayDiff);
-//		for(int y=0;y<h;y++) 
-//			for(int x=0;x<w;x++) 
+//		for(int y=0;y<h;y++)
+//			for(int x=0;x<w;x++)
 //			{
 //				uchar* pixel = &((uchar*)(image->imageData + step*y))[x*3];
 //				uchar* pixel2 = &((uchar*)(colorBg->imageData + step*y))[x*3];
@@ -352,7 +352,7 @@ struct vThreeFrameDiff: public IBackGround
 //				uchar g = pixel[1] - pixel2[1];
 //				uchar b = pixel[2] - pixel2[2];
 //
-//				if ((r*r+g*g+b*b) > thresh*thresh)						
+//				if ((r*r+g*g+b*b) > thresh*thresh)
 //					*p = 255;
 //				else
 //					*p = 0;
@@ -407,16 +407,16 @@ void vDrawVoroni( CvSubdiv2D * subdiv, IplImage * src, IplImage * dst, bool draw
 struct Triangle
 {
 	int& operator[](int i){return idx[i];}
-	const int operator[](int i) const{return idx[i];}
+	int operator[](int i) const{return idx[i];}
 	int idx[3];
 	point2di center;
 
-	bool operator == (const Triangle& other) const 
+	bool operator == (const Triangle& other) const
 	{
 		return center == other.center;
 	}
 
-	bool operator < (const Triangle& other) const 
+	bool operator < (const Triangle& other) const
 	{
 		return center < other.center;
 	}
@@ -446,7 +446,7 @@ struct DelaunaySubdiv
 //	Mat hull;
 	std::map<point2di, int> pt_map;
 
-//	std::vector<std::vector<int> > triangles;	
+//	std::vector<std::vector<int> > triangles;
 private:
 	void buildTriangles();
 	void intoEdge(CvSubdiv2DEdge edge);
@@ -454,7 +454,7 @@ private:
 
 void on_default(int );
 
-//亮度变换，nPercent为正时变亮，负则变暗 
+//亮度变换，nPercent为正时变亮，负则变暗
 int ContrastAdjust(const IplImage* srcImg,
 				   IplImage* dstImg,
 				   float nPercent);
@@ -477,7 +477,7 @@ void convertHSVtoRGB(const IplImage *imageHSV, IplImage *imageRGB);
 
 
 #define vAddWeighted(src, alpha, dst) cvAddWeighted(src, alpha, dst, 1-alpha, 0, dst);
- 
+
 void cvSkinSegment(IplImage* img, IplImage* mask);
 
 void vFillPoly(IplImage* img, const vector<Point>& pt_list, const Scalar& clr = Scalar(255,255,255));

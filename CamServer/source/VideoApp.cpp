@@ -22,13 +22,13 @@ void VideoApp::VideoGrabThread::threadedFunction()
 		count = _input._frame_num;
 		if (_input._InputType == _input.From_Video)
 		{
-			DWORD elapse = timer.getTimeElapsedMS();
+			unsigned int elapse = timer.getTimeElapsedMS();
 			if (elapse < 40)
 				SLEEP(40 - elapse);
 		}
 		timer.profileFunction("<<thread>>input.get_frame()");
-	}		
-} 
+	}
+}
 
 VideoApp::~VideoApp()
 {
@@ -37,7 +37,7 @@ VideoApp::~VideoApp()
 
 VideoApp::VideoApp()
 {
-	monitorVisible = true; 
+	monitorVisible = true;
 	selected = NULL;
 	warp_matrix = cvCreateMat(3, 3, CV_32FC1);
 
@@ -69,7 +69,9 @@ bool VideoApp::init(int argc, char** argv)
 	if (!input.init(argc,argv))
 	{
 		input_inited = true;
+#ifdef WIN32
 		system("pause");
+#endif
 		return false;
 	}
 	input_inited = true;
@@ -79,11 +81,11 @@ bool VideoApp::init(int argc, char** argv)
 #else
 	grab_thread->startThread(true, false);
 #endif
-	
+
 	//grab unrelated
 	sender.setup( theConfig.CLIENT, theConfig.PORT );
 	printf("[OSC] setup client as %s : %d\n", theConfig.CLIENT.c_str(), theConfig.PORT);
-	
+
 	//theConfig.auto_explosure = _input.getAutoExplosure();
 	/*if (face_track)*/
 	haar.init("../../data/haarcascade_frontalface_alt.xml");
@@ -108,7 +110,7 @@ bool VideoApp::init(int argc, char** argv)
 	roi[0] = cv::Rect(Point(k,k), half);
 	roi[1] = cv::Rect(Point(k+HalfWidth,k), half);
 	roi[2] = cv::Rect(Point(k,k+HalfHeight), half);
-	roi[3] = cv::Rect(Point(k+HalfWidth,k+HalfHeight), half);	
+	roi[3] = cv::Rect(Point(k+HalfWidth,k+HalfHeight), half);
 
 	dstQuad[0] = Point(0,0);
 	dstQuad[1] = Point(HalfWidth,0);
@@ -151,7 +153,7 @@ bool VideoApp::init(int argc, char** argv)
 }
 
 void VideoApp::onParamFlip(int fx, int fy)
-{ 
+{
 	g_Fx = fx;
 	g_Fy = fy;
 
@@ -170,7 +172,7 @@ void VideoApp::onParamFlip(int fx, int fy)
 }
 
 void VideoApp::onParamAuto(int v)
-{	
+{
 	paramMoG.win_size = (v+1)*50; //200;
 	paramMoG.n_gauss = 3; //5;
 	paramMoG.bg_threshold = 0.3; //0.7;
@@ -179,7 +181,7 @@ void VideoApp::onParamAuto(int v)
 	paramMoG.weight_init = 0.01; //0.05;
 	paramMoG.variance_init = 30; //30*30;
 
-	backModel.release();	
+	backModel.release();
 	backModel = new vBackGaussian();
 	//backModel = new vBackFGDStat();
 	onRefreshBack();
@@ -188,7 +190,7 @@ void VideoApp::onParamAuto(int v)
 
 void VideoApp::send_osc_msg()
 {
-	UINT nBlobs = blobTracker.trackedBlobs.size(); 
+	int nBlobs = blobTracker.trackedBlobs.size();
 
 	const float _W = HalfWidth;
 	const float _H = HalfHeight;
@@ -231,7 +233,7 @@ void VideoApp::send_osc_msg()
 	{
 		vector<vTrackedBlob>* pTb = pTrackBlobs[v];
 		int nB = pTb->size();
-		for (UINT i=0;i<nB;i++)
+		for (int i=0;i<nB;i++)
 		{
 			vTrackedBlob& obj = (*pTb)[i];
 
@@ -295,7 +297,7 @@ void VideoApp::send_osc_msg()
 		ofxOscMessage m;
 		m.setAddress( "/end" );
 		sender.sendMessage( m );
-	}	
+	}
 }
 
 void VideoApp::onRefreshBack()

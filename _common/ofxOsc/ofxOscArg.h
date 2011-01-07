@@ -68,6 +68,8 @@ subclasses for each possible argument type
 #if  defined _MSC_VER
 // required because MSVC isn't ANSI-C compliant
 typedef long int32_t;
+#else
+#include <stdint.h>
 #endif
 
 class ofxOscArgInt32 : public ofxOscArg

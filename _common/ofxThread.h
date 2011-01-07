@@ -1,14 +1,14 @@
 #ifndef _OFX_THREAD_H_
 #define _OFX_THREAD_H_
 
-#ifdef WIN32	
-	#include <stdio.h>
+#ifdef WIN32
 	#include <windows.h>
 	#include <process.h>
 #else
     #include <pthread.h>
     #include <semaphore.h>
 #endif
+#include <stdio.h>
 
 class ofxThread{
 

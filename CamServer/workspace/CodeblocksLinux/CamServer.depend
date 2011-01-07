@@ -1,0 +1,666 @@
+# depslib dependency file v1.0
+1294637862 source:d:\_svn\vinjncode\camserver\source\appconfig.cpp
+	"AppConfig.h"
+	"ofxArgs.h"
+	<stdio.h>
+	<opencv/cv.h>
+
+1294637862 .h>
+
+1294638894 d:\_svn\vinjncode\camserver\source\appconfig.h
+	<opencv/cxcore.h>
+	<string>
+
+1294631827 
+
+1294638796 d:\_svn\vinjncode\_common\ofxargs.h
+	<stdio.h>
+	<iostream>
+	<vector>
+	<map>
+	<string>
+
+1294631871 source:d:\_svn\vinjncode\_common\ofxargs.cpp
+	"ofxArgs.h"
+
+1294631871 "
+
+1294638981 source:d:\_svn\vinjncode\camserver\source\ui.cpp
+	"UI.h"
+	"AppConfig.h"
+	"VideoApp.h"
+
+1294638410 h"
+
+1294638870 d:\_svn\vinjncode\camserver\source\ui.h
+
+1294638944 d:\_svn\vinjncode\camserver\source\videoapp.h
+	"vOpenCV/OpenCV.h"
+	"vOpenCV/cvButtons.h"
+	"vOpenCV/BlobTracker.h"
+	"ofxOsc/ofxOsc.h"
+
+1294638944 xOsc.h"
+
+1294637272 d:\_svn\vinjncode\_common\vopencv\opencv.h
+	<opencv/cv.h>
+	<opencv/highgui.h>
+	<opencv/cvaux.h>
+	<stdio.h>
+	<stdarg.h>
+	<time.h>
+	<vector>
+	<map>
+	"vector2d.h"
+	"OpenCV/OpenCV.h"
+
+1294637272 enCV.h"
+
+1294637136 d:\_svn\vinjncode\_common\vopencv\vector2d.h
+
+1294637907 d:\_svn\vinjncode\_common\vopencv\cvbuttons.h
+	<opencv/cv.h>
+	<vector>
+
+1294638339 d:\_svn\vinjncode\_common\vopencv\blobtracker.h
+	<map>
+	<vector>
+	"Blob.h"
+
+1294637136 d:\_svn\vinjncode\_common\vopencv\blob.h
+	"OpenCV.h"
+	"vector2d.h"
+
+1294631827 d:\_svn\vinjncode\_common\ofxosc\ofxosc.h
+	"ofxOscArg.h"
+	"ofxOscMessage.h"
+	"ofxOscSender.h"
+	"ofxOscReceiver.h"
+
+1294631827 eiver.h"
+
+1294631827 d:\_svn\vinjncode\_common\ofxosc\ofxoscarg.h
+	<string>
+
+1294631827 d:\_svn\vinjncode\_common\ofxosc\ofxoscmessage.h
+	"ofxOscArg.h"
+	<vector>
+	<string>
+
+1294631827 d:\_svn\vinjncode\_common\ofxosc\ofxoscsender.h
+	<string>
+	"oscpack/OscTypes.h"
+	"oscpack/OscOutboundPacketStream.h"
+	"ofxOscBundle.h"
+	"ofxOscMessage.h"
+
+1294631827 sage.h"
+
+1294631788 d:\_svn\vinjncode\_common\oscpack\osctypes.h
+
+1294631788 d:\_svn\vinjncode\_common\oscpack\oscoutboundpacketstream.h
+	"OscTypes.h"
+	"OscException.h"
+
+1294631788 ion.h"
+
+1294631788 d:\_svn\vinjncode\_common\oscpack\oscexception.h
+	<exception>
+
+1294631788 >
+
+1294631827 d:\_svn\vinjncode\_common\ofxosc\ofxoscbundle.h
+	<vector>
+	"ofxOscMessage.h"
+
+1294631827 d:\_svn\vinjncode\_common\ofxosc\ofxoscreceiver.h
+	<deque>
+	<windows.h>
+	<pthread.h>
+	"oscpack/OscTypes.h"
+	"oscpack/OscPacketlistener.h"
+	"oscpack/UdpSocket.h"
+	"ofxOscMessage.h"
+
+1294631788 d:\_svn\vinjncode\_common\oscpack\oscpacketlistener.h
+	"OscReceivedElements.h"
+	"PacketListener.h"
+
+1294631788 tener.h"
+
+1294631788 d:\_svn\vinjncode\_common\oscpack\oscreceivedelements.h
+	<cstddef>
+	"OscTypes.h"
+	"OscException.h"
+
+1294631788 d:\_svn\vinjncode\_common\oscpack\packetlistener.h
+
+1294631788 d:\_svn\vinjncode\_common\oscpack\udpsocket.h
+	"NetworkingUtils.h"
+	"IpEndpointName.h"
+
+1294631788 tName.h"
+
+1294631788 d:\_svn\vinjncode\_common\oscpack\networkingutils.h
+
+1294631788 d:\_svn\vinjncode\_common\oscpack\ipendpointname.h
+
+1294638888 source:d:\_svn\vinjncode\camserver\source\videoapp.cpp
+	"AppConfig.h"
+	"UI.h"
+
+1294638882 .h"
+
+1294638882 source:d:\_svn\vinjncode\camserver\source\videoapp.run.cpp
+	"AppConfig.h"
+	"UI.h"
+	"MiniTimer.h"
+
+1294631871 d:\_svn\vinjncode\_common\minitimer.h
+	<windows.h>
+	<assert.h>
+	"FloDebug.h"
+	<stdio.h>
+
+1294631871 d:\_svn\vinjncode\_common\flodebug.h
+	<stdio.h>
+	<stdlib.h>
+	<assert.h>
+	<stdarg.h>
+	<time.h>
+	<math.h>
+
+1294639267 source:d:\_svn\vinjncode\camserver\source\main.cpp
+	<stdlib.h>
+	<crtdbg.h>
+	<process.h>
+	"VideoApp.h"
+
+1294631871 source:d:\_svn\vinjncode\_common\flodebug.cpp
+	"FloDebug.h"
+
+1294631827 source:d:\_svn\vinjncode\_common\ofxosc\ofxoscbundle.cpp
+	"ofxOscBundle.h"
+
+1294631827 dle.h"
+
+1294639380 source:d:\_svn\vinjncode\_common\ofxosc\ofxoscmessage.cpp
+	"ofxOscMessage.h"
+	<stdio.h>
+	<assert.h>
+
+1294631827 source:d:\_svn\vinjncode\_common\ofxosc\ofxoscreceiver.cpp
+	"ofxOscReceiver.h"
+	<pthread.h>
+	<iostream>
+	<assert.h>
+
+1294631827 source:d:\_svn\vinjncode\_common\ofxosc\ofxoscsender.cpp
+	"ofxOscSender.h"
+	"oscpack/UdpSocket.h"
+	<assert.h>
+
+1294631788 source:d:\_svn\vinjncode\_common\oscpack\ipendpointname.cpp
+	"IpEndpointName.h"
+	<stdio.h>
+	"NetworkingUtils.h"
+
+1294631788 gUtils.h"
+
+1294631788 source:d:\_svn\vinjncode\_common\oscpack\oscoutboundpacketstream.cpp
+	"OscOutboundPacketStream.h"
+	<string.h>
+	<stdlib.h>
+	<assert.h>
+	<malloc.h>
+	"OscHostEndianness.h"
+
+1294631788 dianness.h"
+
+1294631788 d:\_svn\vinjncode\_common\oscpack\oschostendianness.h
+
+1294631788 source:d:\_svn\vinjncode\_common\oscpack\oscprintreceivedelements.cpp
+	"OscPrintReceivedElements.h"
+	<iostream>
+	<iomanip>
+	<ctime>
+	<cstring>
+
+1294631788 d:\_svn\vinjncode\_common\oscpack\oscprintreceivedelements.h
+	<iosfwd>
+	"OscReceivedElements.h"
+
+1294631788 edElements.h"
+
+1294631788 source:d:\_svn\vinjncode\_common\oscpack\oscreceivedelements.cpp
+	"OscReceivedElements.h"
+	<cassert>
+	"OscHostEndianness.h"
+
+1294631788 source:d:\_svn\vinjncode\_common\oscpack\osctypes.cpp
+	"OscTypes.h"
+
+1294631779 source:d:\_svn\vinjncode\_common\oscpack\win32\networkingutils.cpp
+	"../NetworkingUtils.h"
+	<winsock2.h>
+	<windows.h>
+	<stdlib.h>
+	<stdio.h>
+
+1294631779 source:d:\_svn\vinjncode\_common\oscpack\win32\udpsocket.cpp
+	"../UdpSocket.h"
+	<winsock2.h>
+	<windows.h>
+	<mmsystem.h>
+	<vector>
+	<algorithm>
+	<stdexcept>
+	<assert.h>
+	<signal.h>
+	"../NetworkingUtils.h"
+	"../PacketListener.h"
+	"../TimerListener.h"
+
+1294631779 istener.h"
+
+1294631788 d:\_svn\vinjncode\_common\oscpack\timerlistener.h
+
+1294638410 source:d:\_svn\vinjncode\_common\vopencv\blobtracker.cpp
+	"BlobTracker.h"
+	"vector2d.h"
+	<list>
+
+1294389716 source:/home/vinjn/Documents/vinjncode/CamServer/source/AppConfig.cpp
+	"AppConfig.h"
+	"ofxArgs.h"
+	<stdio.h>
+	<opencv/cv.h>
+
+1294389716 /home/vinjn/Documents/vinjncode/CamServer/source/AppConfig.h
+	<opencv/cxcore.h>
+	<string>
+
+1294389874 /home/vinjn/Documents/vinjncode/_common/ofxArgs.h
+	<stdio.h>
+	<iostream>
+	<vector>
+	<map>
+	<string>
+
+1294397468 source:/home/vinjn/Documents/vinjncode/CamServer/source/UI.cpp
+	"UI.h"
+	"AppConfig.h"
+	"VideoApp.h"
+
+1294389716 /home/vinjn/Documents/vinjncode/CamServer/source/UI.h
+
+1294389716 /home/vinjn/Documents/vinjncode/CamServer/source/VideoApp.h
+	"vOpenCV/OpenCV.h"
+	"vOpenCV/cvButtons.h"
+	"vOpenCV/BlobTracker.h"
+	"ofxOsc/ofxOsc.h"
+
+1294389874 /home/vinjn/Documents/vinjncode/_common/vOpenCV/OpenCV.h
+	<opencv/cv.h>
+	<opencv/highgui.h>
+	<opencv/cvaux.h>
+	<stdio.h>
+	<stdarg.h>
+	<time.h>
+	<vector>
+	<map>
+	"vector2d.h"
+	"OpenCV/OpenCV.h"
+
+1294389874 /home/vinjn/Documents/vinjncode/_common/vOpenCV/vector2d.h
+
+1294389874 /home/vinjn/Documents/vinjncode/_common/vOpenCV/cvButtons.h
+	<opencv/cv.h>
+	<vector>
+
+1294397419 /home/vinjn/Documents/vinjncode/_common/vOpenCV/BlobTracker.h
+	<map>
+	<vector>
+	"Blob.h"
+
+1294389874 /home/vinjn/Documents/vinjncode/_common/vOpenCV/Blob.h
+	"OpenCV.h"
+	"vector2d.h"
+
+1294314425 /home/vinjn/Documents/vinjncode/_common/ofxOsc/ofxOsc.h
+	"ofxOscArg.h"
+	"ofxOscMessage.h"
+	"ofxOscSender.h"
+	"ofxOscReceiver.h"
+
+1294314425 /home/vinjn/Documents/vinjncode/_common/ofxOsc/ofxOscArg.h
+	<string>
+
+1294314425 /home/vinjn/Documents/vinjncode/_common/ofxOsc/ofxOscMessage.h
+	"ofxOscArg.h"
+	<vector>
+	<string>
+
+1294314425 /home/vinjn/Documents/vinjncode/_common/ofxOsc/ofxOscSender.h
+	<string>
+	"oscpack/OscTypes.h"
+	"oscpack/OscOutboundPacketStream.h"
+	"ofxOscBundle.h"
+	"ofxOscMessage.h"
+
+1294314385 /home/vinjn/Documents/vinjncode/_common/oscpack/OscTypes.h
+
+1294314385 /home/vinjn/Documents/vinjncode/_common/oscpack/OscOutboundPacketStream.h
+	"OscTypes.h"
+	"OscException.h"
+
+1294314385 /home/vinjn/Documents/vinjncode/_common/oscpack/OscException.h
+	<exception>
+
+1294314425 /home/vinjn/Documents/vinjncode/_common/ofxOsc/ofxOscBundle.h
+	<vector>
+	"ofxOscMessage.h"
+
+1294397315 /home/vinjn/Documents/vinjncode/_common/ofxOsc/ofxOscReceiver.h
+	<deque>
+	<windows.h>
+	<pthread.h>
+	"oscpack/OscTypes.h"
+	"oscpack/OscPacketListener.h"
+	"oscpack/UdpSocket.h"
+	"ofxOscMessage.h"
+
+1294314385 /home/vinjn/Documents/vinjncode/_common/oscpack/OscPacketListener.h
+	"OscReceivedElements.h"
+	"PacketListener.h"
+
+1294314385 /home/vinjn/Documents/vinjncode/_common/oscpack/OscReceivedElements.h
+	<cstddef>
+	"OscTypes.h"
+	"OscException.h"
+
+1294314385 /home/vinjn/Documents/vinjncode/_common/oscpack/PacketListener.h
+
+1294314385 /home/vinjn/Documents/vinjncode/_common/oscpack/UdpSocket.h
+	"NetworkingUtils.h"
+	"IpEndpointName.h"
+
+1294314385 /home/vinjn/Documents/vinjncode/_common/oscpack/NetworkingUtils.h
+
+1294314385 /home/vinjn/Documents/vinjncode/_common/oscpack/IpEndpointName.h
+
+1294397909 source:/home/vinjn/Documents/vinjncode/CamServer/source/VideoApp.cpp
+	"AppConfig.h"
+	"UI.h"
+
+1294399727 source:/home/vinjn/Documents/CamServer/CamServer/source/AppConfig.cpp
+	"AppConfig.h"
+	"ofxArgs.h"
+	<stdio.h>
+	<opencv/cv.h>
+
+1294399727 /home/vinjn/Documents/CamServer/CamServer/source/AppConfig.h
+	<opencv/cxcore.h>
+	<string>
+
+1294399727 /home/vinjn/Documents/CamServer/_common/ofxArgs.h
+	<stdio.h>
+	<iostream>
+	<vector>
+	<map>
+	<string>
+
+1294399727 source:/home/vinjn/Documents/CamServer/CamServer/source/UI.cpp
+	"UI.h"
+	"AppConfig.h"
+	"VideoApp.h"
+
+1294399727 /home/vinjn/Documents/CamServer/CamServer/source/UI.h
+
+1294399727 /home/vinjn/Documents/CamServer/CamServer/source/VideoApp.h
+	"vOpenCV/OpenCV.h"
+	"vOpenCV/cvButtons.h"
+	"vOpenCV/BlobTracker.h"
+	"ofxThread.h"
+	"ofxOsc/ofxOsc.h"
+
+1294408951 /home/vinjn/Documents/CamServer/_common/vOpenCV/OpenCV.h
+	<opencv/cv.h>
+	<opencv/highgui.h>
+	<opencv/cvaux.h>
+	<stdio.h>
+	<stdarg.h>
+	<time.h>
+	<vector>
+	<map>
+	"vector2d.h"
+	"OpenCV/OpenCV.h"
+
+1294399727 /home/vinjn/Documents/CamServer/_common/vOpenCV/vector2d.h
+
+1294399727 /home/vinjn/Documents/CamServer/_common/vOpenCV/cvButtons.h
+	<opencv/cv.h>
+	<vector>
+
+1294400431 /home/vinjn/Documents/CamServer/_common/vOpenCV/BlobTracker.h
+	<map>
+	<vector>
+	"Blob.h"
+
+1294399727 /home/vinjn/Documents/CamServer/_common/vOpenCV/Blob.h
+	"OpenCV.h"
+	"vector2d.h"
+
+1294401903 /home/vinjn/Documents/CamServer/_common/ofxThread.h
+	<windows.h>
+	<process.h>
+	<pthread.h>
+	<semaphore.h>
+	<stdio.h>
+
+1294399727 /home/vinjn/Documents/CamServer/_common/ofxOsc/ofxOsc.h
+	"ofxOscArg.h"
+	"ofxOscMessage.h"
+	"ofxOscSender.h"
+	"ofxOscReceiver.h"
+
+1294401977 /home/vinjn/Documents/CamServer/_common/ofxOsc/ofxOscArg.h
+	<string>
+	<stdint.h>
+
+1294399727 /home/vinjn/Documents/CamServer/_common/ofxOsc/ofxOscMessage.h
+	"ofxOscArg.h"
+	<vector>
+	<string>
+
+1294399727 /home/vinjn/Documents/CamServer/_common/ofxOsc/ofxOscSender.h
+	<string>
+	"oscpack/OscTypes.h"
+	"oscpack/OscOutboundPacketStream.h"
+	"ofxOscBundle.h"
+	"ofxOscMessage.h"
+
+1294399727 /home/vinjn/Documents/CamServer/_common/oscpack/OscTypes.h
+
+1294399727 /home/vinjn/Documents/CamServer/_common/oscpack/OscOutboundPacketStream.h
+	"OscTypes.h"
+	"OscException.h"
+
+1294399727 /home/vinjn/Documents/CamServer/_common/oscpack/OscException.h
+	<exception>
+
+1294399727 /home/vinjn/Documents/CamServer/_common/ofxOsc/ofxOscBundle.h
+	<vector>
+	"ofxOscMessage.h"
+
+1294400419 /home/vinjn/Documents/CamServer/_common/ofxOsc/ofxOscReceiver.h
+	<deque>
+	<windows.h>
+	<pthread.h>
+	"oscpack/OscTypes.h"
+	"oscpack/OscPacketListener.h"
+	"oscpack/UdpSocket.h"
+	"ofxOscMessage.h"
+
+1294399727 /home/vinjn/Documents/CamServer/_common/oscpack/OscPacketListener.h
+	"OscReceivedElements.h"
+	"PacketListener.h"
+
+1294399727 /home/vinjn/Documents/CamServer/_common/oscpack/OscReceivedElements.h
+	<cstddef>
+	"OscTypes.h"
+	"OscException.h"
+
+1294399727 /home/vinjn/Documents/CamServer/_common/oscpack/PacketListener.h
+
+1294399727 /home/vinjn/Documents/CamServer/_common/oscpack/UdpSocket.h
+	"NetworkingUtils.h"
+	"IpEndpointName.h"
+
+1294399727 /home/vinjn/Documents/CamServer/_common/oscpack/NetworkingUtils.h
+
+1294399727 /home/vinjn/Documents/CamServer/_common/oscpack/IpEndpointName.h
+
+1294410321 source:/home/vinjn/Documents/CamServer/CamServer/source/VideoApp.cpp
+	"AppConfig.h"
+	"UI.h"
+	"MiniTimer.h"
+
+1294408727 /home/vinjn/Documents/CamServer/_common/MiniTimer.h
+	<windows.h>
+	<time.h>
+	"FloDebug.h"
+	<stdio.h>
+
+1294399727 /home/vinjn/Documents/CamServer/_common/FloDebug.h
+	<stdio.h>
+	<stdlib.h>
+	<assert.h>
+	<stdarg.h>
+	<time.h>
+	<math.h>
+
+1294401884 source:/home/vinjn/Documents/CamServer/CamServer/source/VideoApp.run.cpp
+	"AppConfig.h"
+	"UI.h"
+	"MiniTimer.h"
+
+1294407282 source:/home/vinjn/Documents/CamServer/CamServer/source/main.cpp
+	"VideoApp.h"
+	<crtdbg.h>
+
+1294399727 source:/home/vinjn/Documents/CamServer/_common/FloDebug.cpp
+	"FloDebug.h"
+
+1294399727 source:/home/vinjn/Documents/CamServer/_common/ofxArgs.cpp
+	"ofxArgs.h"
+
+1294399727 source:/home/vinjn/Documents/CamServer/_common/ofxOsc/ofxOscBundle.cpp
+	"ofxOscBundle.h"
+
+1294399727 source:/home/vinjn/Documents/CamServer/_common/ofxOsc/ofxOscMessage.cpp
+	"ofxOscMessage.h"
+	<stdio.h>
+	<assert.h>
+
+1294399727 source:/home/vinjn/Documents/CamServer/_common/ofxOsc/ofxOscReceiver.cpp
+	"ofxOscReceiver.h"
+	<pthread.h>
+	<iostream>
+	<assert.h>
+
+1294399727 source:/home/vinjn/Documents/CamServer/_common/ofxOsc/ofxOscSender.cpp
+	"ofxOscSender.h"
+	"oscpack/UdpSocket.h"
+	<assert.h>
+
+1294399727 source:/home/vinjn/Documents/CamServer/_common/oscpack/IpEndpointName.cpp
+	"IpEndpointName.h"
+	<stdio.h>
+	"NetworkingUtils.h"
+
+1294399727 source:/home/vinjn/Documents/CamServer/_common/oscpack/OscOutboundPacketStream.cpp
+	"OscOutboundPacketStream.h"
+	<string.h>
+	<stdlib.h>
+	<assert.h>
+	<malloc.h>
+	"OscHostEndianness.h"
+
+1294407582 /home/vinjn/Documents/CamServer/_common/oscpack/OscHostEndianness.h
+
+1294399727 source:/home/vinjn/Documents/CamServer/_common/oscpack/OscPrintReceivedElements.cpp
+	"OscPrintReceivedElements.h"
+	<iostream>
+	<iomanip>
+	<ctime>
+	<cstring>
+
+1294399727 /home/vinjn/Documents/CamServer/_common/oscpack/OscPrintReceivedElements.h
+	<iosfwd>
+	"OscReceivedElements.h"
+
+1294399727 source:/home/vinjn/Documents/CamServer/_common/oscpack/OscReceivedElements.cpp
+	"OscReceivedElements.h"
+	<cassert>
+	"OscHostEndianness.h"
+
+1294399727 source:/home/vinjn/Documents/CamServer/_common/oscpack/OscTypes.cpp
+	"OscTypes.h"
+
+1294407965 source:/home/vinjn/Documents/CamServer/_common/oscpack/posix/NetworkingUtils.cpp
+	"oscpack/NetworkingUtils.h"
+	<netdb.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<string.h>
+	<stdio.h>
+
+1294399727 source:/home/vinjn/Documents/CamServer/_common/oscpack/posix/UdpSocket.cpp
+	"..//UdpSocket.h"
+	<vector>
+	<algorithm>
+	<stdexcept>
+	<assert.h>
+	<signal.h>
+	<math.h>
+	<errno.h>
+	<string.h>
+	<pthread.h>
+	<unistd.h>
+	<stdlib.h>
+	<stdio.h>
+	<netdb.h>
+	<sys/types.h>
+	<sys/socket.h>
+	<sys/time.h>
+	<netinet/in.h>
+	"../PacketListener.h"
+	"../TimerListener.h"
+
+1294399727 /home/vinjn/Documents/CamServer/_common/oscpack//UdpSocket.h
+	"NetworkingUtils.h"
+	"IpEndpointName.h"
+
+1294399727 /home/vinjn/Documents/CamServer/_common/oscpack//NetworkingUtils.h
+
+1294399727 /home/vinjn/Documents/CamServer/_common/oscpack//IpEndpointName.h
+
+1294399727 /home/vinjn/Documents/CamServer/_common/oscpack/TimerListener.h
+
+1294399727 source:/home/vinjn/Documents/CamServer/_common/vOpenCV/BlobTracker.cpp
+	"BlobTracker.h"
+	"vector2d.h"
+	<list>
+
+1294408798 source:/home/vinjn/Documents/CamServer/_common/vOpenCV/OpenCV.cpp
+	"OpenCV.h"
+	<set>
+
+1294399727 source:/home/vinjn/Documents/CamServer/_common/vOpenCV/cvButtons.cpp
+	<opencv/highgui.h>
+	"cvButtons.h"
+
+1294399727 source:/home/vinjn/Documents/CamServer/_common/ofxThread.cpp
+	"ofxThread.h"
+

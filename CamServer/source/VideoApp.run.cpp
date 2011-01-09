@@ -3,30 +3,14 @@
 #include "UI.h"
 #include "MiniTimer.h"
 
-const int demo_expire_time = 10*60;//10 minutes
-
 void VideoApp::run()
 {	
 	MiniTimer timer;
 	MiniTimer timer_total;
-	MiniTimer timer_demo;//for demo usage, expire in 10 minutes
 
 	while (true)
 	{ 
 		FloWriteLn();
-
-		if (theConfig.isDemo && timer_demo.getTimeElapsed() > demo_expire_time)
-		{
-			cvDestroyAllWindows();
-			for (int k=0;k<7;k++)
-				printf("CamServer is now running as a ten-minutes demo\n");
-			system("pause");
-			printf("If you like it and want to use it at commercial activities\n"); 
-			for (int k=0;k<7;k++)
-				printf("Contact me via  vinjn.z@gmail.com\n");
-			system("pause");
-			break;
-		}
 
 		timer.resetStartTime();
 		timer_total.resetStartTime();

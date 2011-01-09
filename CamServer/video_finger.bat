@@ -1,2 +1,2 @@
-cd release
-VideoServer ../media/finger.mp4 -vinjn
+cd bin/Win32-VisualStudio
+VideoServer ../media/finger.mp4

@@ -1,3 +1,2 @@
-cd release
-cls
-VideoServer 0
+cd bin/Win32-VisualStudio
+CamServer 0

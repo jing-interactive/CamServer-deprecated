@@ -176,7 +176,7 @@ VideoInput::VideoInput()
 	_InputType = From_Count;
 }
 
-#ifndef CUSTOM_OPENCV_LIB
+#ifndef CV_CAP_PROP_AUTO_EXPOSURE
 #define CV_CAP_PROP_AUTO_EXPOSURE	100
 #define CV_CAP_PROP_SHOW_DIALOG		101
 #endif

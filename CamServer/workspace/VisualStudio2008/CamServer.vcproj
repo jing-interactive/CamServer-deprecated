@@ -249,38 +249,38 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="OpenCV"
+			Name="vOpenCV"
 			>
 			<File
-				RelativePath="..\..\..\_common\OpenCV\Blob.h"
+				RelativePath="..\..\..\_common\vOpenCV\Blob.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\OpenCV\BlobTracker.cpp"
+				RelativePath="..\..\..\_common\vOpenCV\BlobTracker.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\OpenCV\BlobTracker.h"
+				RelativePath="..\..\..\_common\vOpenCV\BlobTracker.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\OpenCV\cvButtons.cpp"
+				RelativePath="..\..\..\_common\vOpenCV\cvButtons.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\OpenCV\cvButtons.h"
+				RelativePath="..\..\..\_common\vOpenCV\cvButtons.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\OpenCV\OpenCV.cpp"
+				RelativePath="..\..\..\_common\vOpenCV\OpenCV.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\OpenCV\OpenCV.h"
+				RelativePath="..\..\..\_common\vOpenCV\OpenCV.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\OpenCV\vector2d.h"
+				RelativePath="..\..\..\_common\vOpenCV\vector2d.h"
 				>
 			</File>
 		</Filter>

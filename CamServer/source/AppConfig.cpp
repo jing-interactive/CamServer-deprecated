@@ -1,7 +1,7 @@
 #include "AppConfig.h"
 #include "ofxArgs.h"
 
-#include <cv.h>
+#include <opencv/cv.h>
 
 using cv::FileStorage;
 

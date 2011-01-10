@@ -1,4 +1,4 @@
-#include <highgui.h>
+#include <opencv/highgui.h>
 #include "cvButtons.h"
 
 

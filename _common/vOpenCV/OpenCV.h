@@ -9,9 +9,9 @@
 #pragma warning( disable: 4099 )
 #pragma warning( disable: 4819 )
 
-#include <cv.h>
-#include <highgui.h>
-#include <cvaux.h>
+#include <opencv/cv.h>
+#include <opencv/highgui.h>
+#include <opencv/cvaux.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <time.h>

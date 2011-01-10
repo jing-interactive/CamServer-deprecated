@@ -176,6 +176,11 @@ VideoInput::VideoInput()
 	_InputType = From_Count;
 }
 
+#ifndef CUSTOM_OPENCV_LIB
+#define CV_CAP_PROP_AUTO_EXPOSURE	100
+#define CV_CAP_PROP_SHOW_DIALOG		101
+#endif
+
 void VideoInput::setAutoExplosure(bool is)
 {
 	if (_capture)
@@ -190,16 +195,16 @@ bool VideoInput::getAutoExplosure()
 		return false;
 }
 
-void VideoInput::setParamExplosure(int value)
-{
-	if (_capture)
-		cvSetCaptureProperty(_capture,CV_CAP_PROP_EXPOSURE,(double)value);
-}
-
 void VideoInput::showSettingsDialog()
 {
 	if (_capture)
 		cvSetCaptureProperty(_capture,CV_CAP_PROP_SHOW_DIALOG, true);
+}
+
+void VideoInput::setParamExplosure(int value)
+{
+	if (_capture)
+		cvSetCaptureProperty(_capture,CV_CAP_PROP_EXPOSURE,(double)value);
 }
 
 bool VideoInput::init(int cam_idx)

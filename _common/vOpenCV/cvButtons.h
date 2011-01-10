@@ -1,7 +1,7 @@
 #ifndef CVBUTTONS_H_
 #define CVBUTTONS_H_
 
-#include <cv.h>
+#include <opencv/cv.h>
 #include <vector>
 using namespace std;
 

@@ -1,7 +1,7 @@
-#define VERSION 0.4
+﻿#define VERSION 0.4
 
-#ifdef _DEBUG
-#define _CRTDBG_MAP_ALLOC 
+#if defined _DEBUG && defined _MSC_VER
+#define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
 #endif
@@ -31,7 +31,7 @@ void exit_beep(void *)
 {
 	printf("CamServer %.1f  vinjn @ RoboPeak\n", VERSION);
 	for (int b=8;b>1;b--)
-	{		
+	{
 		for (int j=0;j<8-b;j++)
 			printf("\t");
 		printf("bye~\n");
@@ -40,24 +40,11 @@ void exit_beep(void *)
 }
 bool using_debug_file = true;
 
-#if 1
 int main(int argc, char** argv )
 {
-#else
-int WINAPI WinMain(      
-				   HINSTANCE hInstance,
-				   HINSTANCE hPrevInstance,
-				   LPSTR lpCmdLine,
-				   int nCmdShow
-				   )
-{	
-	int argc = __argc;
-	char ** argv = __argv;
-#endif
-
-#ifdef _DEBUG
+#if defined _DEBUG && defined _MSC_VER
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_LEAK_CHECK_DF );
-#endif	
+#endif
 	_beginthread(startup_beep, 0, 0);
 
 	if (theApp.init(argc, argv))

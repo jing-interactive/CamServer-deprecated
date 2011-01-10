@@ -2,365 +2,6 @@
 #include "vector2d.h"
 #include <list>
 
-#define MAX_TRACKABLE 10
-
-vBlobTracker::vBlobTracker() {
-	listener = NULL;
-	currentID = 1;
-	extraIDs = 0;
-	reject_distance_threshold = 150;
-	minimumDisplacementThreshold = 2.0f;
-	ghost_frames = 2;
-}
-
-void vBlobTracker::setListener( vBlobListener* _listener ) {
-	listener = _listener;
-}
-
-int vBlobTracker::findOrder( int id ) {
-	// This is a bit inefficient but ok when
-	// assuming low numbers of trackedBlobs
-	// a better way would be to use a hash table
-	int count = 0;
-	for( int i=0; i<trackedBlobs.size(); i++ ) {
-		if( trackedBlobs[i].id < id ) {
-			count++;
-		}
-	}
-	return count;
-}
-
-vTrackedBlob&  vBlobTracker::getById( int id ) {
-	// This is a bit inefficient but ok when
-	// assuming low numbers of trackedBlobs
-	// a better way would be to use a hash table
-	return trackedBlobs[0];
-	//for( int i=0; i<trackedBlobs.size(); i++ ) {
-	//	if( trackedBlobs[i].id == id ) {
-	//		return trackedBlobs[i];
-	//	}
-	//}
-}
- 
-
-
-extern std::vector<float>* g_error_array= NULL;
-bool cmp_vblob_error(const int a, const int b)
-{
-	return (*g_error_array)[a] < (*g_error_array)[b];
-}
-
-/**
-* Assign ids to trackedBlobs and fire blob events.
-* This method tracks by proximity and best fit.
-*/
-void vBlobTracker::trackBlobs( const vector<vBlob>& newBlobs ) {
-	unsigned int i, j;
-
-	// Push to history, clear
-	history.push_back( trackedBlobs );
-	if( history.size() > 4 ) {
-		history.erase( history.begin() );
-	}
-	trackedBlobs.clear();
-	leaveBlobs.clear();
-
-	// Load new trackedBlobs
-	int nTrack = MIN(MAX_TRACKABLE, newBlobs.size());
-	for( i=0; i<nTrack; i++ ) {
-		trackedBlobs.push_back( vTrackedBlob(newBlobs[i]) );
-	}
-
-	vector<vTrackedBlob> *prev = &history[history.size()-1];
-
-	int cursize = trackedBlobs.size();
-	int prevsize = (*prev).size();
-
-	// now figure out the 'error' (distance) to all trackedBlobs in the previous
-	// frame. We are optimizing for the least change in distance.
-	// While this works really well we could also optimize for lowest
-	// deviation from predicted position, change in size etc...
-
-	for( i=0; i<cursize; i++ ) {
-		trackedBlobs[i].distance.clear();
-		trackedBlobs[i].neighbors.clear();
-
-		for( j=0; j<prevsize; j++ ) {
-			//calc error - distance to blob in prev frame
-			float dx = trackedBlobs[i].center.x - (*prev)[j].center.x;
-			float dy = trackedBlobs[i].center.y - (*prev)[j].center.y;
-			float dist = (float)sqrt( dx*dx	+ dy*dy );
-
-			trackedBlobs[i].distance.push_back( dist );
-			trackedBlobs[i].neighbors.push_back( j );
-		}
-	}
-
-	// sort so we can make a list of the closest trackedBlobs in the previous frame..
-	for( i=0; i<cursize; i++ ) {
-		g_error_array = &(trackedBlobs[i].distance);//dirty hack to make std::sort work
-		std::sort(trackedBlobs[i].neighbors.begin(), trackedBlobs[i].neighbors.end(), cmp_vblob_error);
-	}
-	// Generate a matrix of all the possible choices.
-	// Then we will calculate the errors for every possible match
-	// and pick the matrix that has the lowest error.
-	// This is an NP complete approach and exponentially increases in complexity
-	// with the number of trackedBlobs. To remedy for each blob we will only
-	// consider the 4 closest trackedBlobs of the previous frame.
-
-	ids.clear();
-
-	// collect id's..
-	for( i=0; i<cursize; i++ ) {
-		ids.push_back( -1 );
-	}
-
-	extraIDs = cursize - prevsize;
-	if( extraIDs < 0 ) {
-		extraIDs = 0;
-	}
-	matrix.clear();
-	// FIXME: we could scale numcheck depending on how many trackedBlobs there are
-	// if we are tracking a lot of trackedBlobs, we could check less..
-
-	if( cursize <= 4 ) {
-		numcheck = 4;
-	} else if( cursize <= 6 ) {
-		numcheck = 3;
-	} else if( cursize <= 10 ) {
-		numcheck = 2;
-	} else {
-		numcheck = 1;
-	}
-
-	if( prevsize < numcheck ) {
-		numcheck = prevsize;
-	}
-
-	if( trackedBlobs.size() > 0 ) {
-		permute(0);
-	}
-
-	unsigned int num_results = matrix.size();
-	// loop through all the potential
-	// ID configurations and find one with lowest error
-
-	float best_error = 99999, error;
-	int best_error_ndx = -1;
-
-	for( j=0; j<num_results; j++ ) {
-		error = 0;
-		// get the error for each blob and sum
-		for( i=0; i<cursize; i++ ) {
-			//vTrackedBlob *f = 0;
-
-			if( matrix[j][i] != -1 ) {
-				error += trackedBlobs[i].distance[matrix[j][i]];
-			}
-		}
-
-		if( error < best_error)	{
-			best_error = error;
-			best_error_ndx = j;
-		}
-	}
-
-
-	// now that we know the optimal configuration,
-	// set the IDs and calculate some things..
-
-	if( best_error_ndx != -1 ) {
-		for( i=0; i<cursize; i++ ) {
-			if( matrix[best_error_ndx][i] != -1 ) {
-				trackedBlobs[i].id = (*prev)[matrix[best_error_ndx][i]].id;
-			} else {
-				trackedBlobs[i].id = -1;
-			}
-
-			if( trackedBlobs[i].id != -1 ) {
-				vTrackedBlob *oldblob = &(*prev)[matrix[best_error_ndx][i]];
-
-				trackedBlobs[i].deltaLoc.x = (trackedBlobs[i].center.x - oldblob->center.x);
-				trackedBlobs[i].deltaLoc.y = (trackedBlobs[i].center.y - oldblob->center.y);
-
-				trackedBlobs[i].deltaArea = trackedBlobs[i].area - oldblob->area;
-
-				trackedBlobs[i].predictedPos.x = trackedBlobs[i].center.x + trackedBlobs[i].deltaLoc.x;
-				trackedBlobs[i].predictedPos.y = trackedBlobs[i].center.y + trackedBlobs[i].deltaLoc.y;
-
-				trackedBlobs[i].deltaLocTotal.x = oldblob->deltaLocTotal.x + trackedBlobs[i].deltaLoc.x;
-				trackedBlobs[i].deltaLocTotal.y = oldblob->deltaLocTotal.y + trackedBlobs[i].deltaLoc.y;
-			} else {
-				trackedBlobs[i].deltaLoc = Point( 0.0f, 0.0f );
-				trackedBlobs[i].deltaArea = 0;
-				trackedBlobs[i].predictedPos = trackedBlobs[i].center;
-				trackedBlobs[i].deltaLocTotal = Point( 0.0f, 0.0f );
-			}
-		}
-	}
-
-	// fire events
-	//
-
-	// assign ID's for any trackedBlobs that are new this frame (ones that didn't get
-	// matched up with a blob from the previous frame).
-	for( i=0; i<cursize; i++ ) {
-		if(trackedBlobs[i].id == -1)	{
-			trackedBlobs[i].id = currentID;
-			currentID ++;
-			if( currentID >= 65535 ) {
-				currentID = 0;
-			}
-
-			//doTouchEvent(trackedBlobs[i].getTouchData());
-			doBlobOn( trackedBlobs[i] );
-		} else {
-			float totalLength =
-				(float)sqrt( trackedBlobs[i].deltaLocTotal.x*trackedBlobs[i].deltaLocTotal.x
-				+ trackedBlobs[i].deltaLocTotal.y*trackedBlobs[i].deltaLocTotal.y );
-			if( totalLength >= minimumDisplacementThreshold ) {
-				//doUpdateEvent( trackedBlobs[i].getTouchData() );
-				doBlobMoved( trackedBlobs[i] );
-				trackedBlobs[i].deltaLocTotal = Point( 0.0f, 0.0f );
-			}
-		}
-	}
-
-	// if a blob disappeared this frame, send a blob off event
-	// for each one in the last frame, see if it still exists in the new frame.
-	for( i=0; i<prevsize; i++ ) {
-		bool found = false;
-		for( j=0; j<cursize; j++ ) {
-			if( trackedBlobs[j].id == (*prev)[i].id ) {
-				found = true;
-				break;
-			}
-		}
-
-		if( !found ) {
-			if( ghost_frames == 0 )	{
-				//doUntouchEvent((*prev)[i].getTouchData());
-				doBlobOff( (*prev)[i] );
-
-			} else if( (*prev)[i].markedForDeletion ) {
-				(*prev)[i].framesLeft -= 1;
-				if( (*prev)[i].framesLeft <= 0 ) {
-					//doUntouchEvent( (*prev)[i].getTouchData() );
-					doBlobOff( (*prev)[i] );
-				} else {
-					trackedBlobs.push_back( (*prev)[i] );  // keep it around
-					// until framesleft = 0
-				}
-			} else {
-				(*prev)[i].markedForDeletion = true;
-				(*prev)[i].framesLeft = ghost_frames;
-				trackedBlobs.push_back( (*prev)[i] );  // keep it around
-				// until framesleft = 0
-			}
-		}
-	}
-}
-
-
-// Delegate to Callbacks
-//
-//
-void vBlobTracker::doBlobOn( vTrackedBlob& b ) {
-	b.status = statusEnter;
-	if( listener != NULL ) {
-		listener->blobOn( b.center.x, b.center.y, b.id, findOrder(b.id) );
-	} else {
-		printf("blob: %d enter+\n" , b.id);
-	}
-}
-void vBlobTracker::doBlobMoved( vTrackedBlob& b ) {
-	b.status = statusMove;
-	if( listener != NULL ) {
-		listener->blobMoved( b.center.x, b.center.y, b.id, findOrder(b.id) );
-	} else {
-		printf("blob: %d move\n" , b.id);
-	}
-}
-void vBlobTracker::doBlobOff( vTrackedBlob& b ) {
-	b.status = statusLeave;
-	leaveBlobs.push_back(b);
-	if( listener != NULL ) {
-		listener->blobOff( b.center.x, b.center.y, b.id, findOrder(b.id) );
-	} else {
-		printf("blob: %d leave-\n" , b.id);
-	}
-}
-
-// Helper Methods
-//
-//
-inline void vBlobTracker::permute( int start ) {
-	if( start == ids.size() ) {
-		//for( int i=0; i<start; i++)
-		//{
-		//printf("%d, ", ids[i]);
-		//}
-		//printf("--------\n");
-		matrix.push_back( ids );
-
-	} else {
-		int numchecked = 0;
-
-		for( int i=0; i<trackedBlobs[start].neighbors.size(); i++ ) {
-			if( trackedBlobs[start].distance[trackedBlobs[start].neighbors[i]]
-		> reject_distance_threshold ) {
-
-			break;
-		}
-
-		ids[start] = trackedBlobs[start].neighbors[i];
-		if( checkValid(start) ) {
-			permute( start+1 );
-			numchecked++;
-		}
-
-		if( numchecked >= numcheck ) {
-			break;
-		}
-		}
-
-		if( extraIDs > 0 ) {
-			ids[start] = -1;		// new ID
-			if( checkValidNew(start) ) {
-				permute(start+1);
-			}
-		}
-	}
-}
-
-inline bool vBlobTracker::checkValidNew( int start ) {
-	int newidcount = 0;
-	newidcount ++;
-	for( int i=0; i<start; i++ ) {
-		if(ids[i] == -1) {
-			newidcount ++;
-		}
-	}
-
-	if( newidcount > extraIDs ) {
-		return false;
-	}
-
-	return true;
-}
-
-inline bool vBlobTracker::checkValid( int start ) {
-	for(int i=0; i<start; i++) {
-		// check to see whether this ID exists already
-		if(ids[i] == ids[start]) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-
 //Just some convienience macros
 #define CV_CVX_WHITE	CV_RGB(0xff,0xff,0xff)
 #define CV_CVX_BLACK	CV_RGB(0x00,0x00,0x00)
@@ -370,7 +11,7 @@ bool cmp_blob_area(const vBlob& a, const vBlob& b)
 	return a.area > b.area;
 }
 
-#define CVCONTOUR_APPROX_LEVEL  1   // Approx.threshold - the bigger it is, the simpler is the boundary 
+#define CVCONTOUR_APPROX_LEVEL  1   // Approx.threshold - the bigger it is, the simpler is the boundary
 
 void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea, int maxArea, bool convexHull, bool (*sort_func)(const vBlob& a, const vBlob& b))
 {
@@ -399,7 +40,7 @@ void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea, int maxArea, b
 			{
 				CvSeq* approx;
 				if(convexHull) //Convex Hull of the segmentation
-					approx = cvConvexHull2(c,mem_storage,CV_CLOCKWISE,1);	
+					approx = cvConvexHull2(c,mem_storage,CV_CLOCKWISE,1);
 				else //Polygonal approximation of the segmentation
 					approx = cvApproxPoly(c,sizeof(CvContour),mem_storage,CV_POLY_APPROX_DP, CVCONTOUR_APPROX_LEVEL,0);
 
@@ -410,7 +51,7 @@ void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea, int maxArea, b
 				blobs.push_back(vBlob());
 
 				vBlob& obj = blobs[blobs.size()-1];
-				//fill the blob structure		
+				//fill the blob structure
 				obj.area	= fabs(area);
 				obj.length =  cvArcLength(approx);
 				obj.isHole	= isHole;
@@ -446,15 +87,15 @@ void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea, int maxArea, b
 				c = c->v_next;//one_contour->h_next is one_hole
 			isHole = true;
 		}//END while (c != NULL)
-	} 
+	}
 
 	// sort the pointers based on size
-	//int nBlobs = pBlobList.size();	
+	//int nBlobs = pBlobList.size();
 	//if( nBlobs > 0 ) {
 	//	qsort( (void*)pBlobList[0], nBlobs, sizeof(CvSeq*), qsort_carea_compare);
 	//}
     if (!sort_func) sort_func = &cmp_blob_area;
-	std::sort(blobs.begin(), blobs.end(), sort_func); 
+	std::sort(blobs.begin(), blobs.end(), sort_func);
 }
 
 
@@ -479,12 +120,12 @@ void vFindBlobs(IplImage *src, int minArea, int maxArea, bool convexHull)
 			if(convexHull) //Polygonal approximation of the segmentation
 				contour = cvApproxPoly(c,sizeof(CvContour),mem_storage,CV_POLY_APPROX_DP, CVCONTOUR_APPROX_LEVEL,0);
 			else //Convex Hull of the segmentation
-				contour = cvConvexHull2(c,mem_storage,CV_CLOCKWISE,1); 
+				contour = cvConvexHull2(c,mem_storage,CV_CLOCKWISE,1);
 
 			cvDrawContours(src,contour,CV_CVX_WHITE,CV_CVX_WHITE,-1,CV_FILLED,8); //draw to src
 		}
 	}
-	cvEndFindContours( &scanner );	
+	cvEndFindContours( &scanner );
 }
 
 // various tracking parameters (in seconds)
@@ -508,7 +149,7 @@ vector<vBlob>  vUpdateMhi( IplImage* silh, IplImage* dst )
 	double count;
 	double angle;
 	CvPoint center;
-	double magnitude;          
+	double magnitude;
 	CvScalar color;
 
 	vector<vBlob> result;
@@ -621,7 +262,7 @@ bool vFingerDetector::findFingers (const vBlob& blob, int k/* = 10*/)
 	point2df	v1,v2;
 
 	for(int i=k; i<nPts-k; i++)
-	{		
+	{
 		//calculating angre between vectors
 		v1.set(blob.pts[i].x-blob.pts[i-k].x,	blob.pts[i].y-blob.pts[i-k].y);
 		v2.set(blob.pts[i].x-blob.pts[i+k].x,	blob.pts[i].y-blob.pts[i+k].y);
@@ -635,7 +276,7 @@ bool vFingerDetector::findFingers (const vBlob& blob, int k/* = 10*/)
 		v2.normalize();
 		teta=v1.getAngleWith(v2);
 
-		//control conditions 
+		//control conditions
 		if(fabs(teta) < 40)
 		{	//pik?
 			if(vxv[2] > 0)
@@ -651,10 +292,10 @@ bool vFingerDetector::findFingers (const vBlob& blob, int k/* = 10*/)
 	{
 		return true;
 	}
-	else 
+	else
 	{
 		return false;
-	}	
+	}
 }
 
 bool vFingerDetector::findHands(const vBlob& smblob, int k)
@@ -662,27 +303,27 @@ bool vFingerDetector::findHands(const vBlob& smblob, int k)
 	//smppico.clear();
 	//kpointcurv.clear();
 	//lhand.clear();
-	//rhand.clear();	
-	//	
+	//rhand.clear();
+	//
 	//cv::Point hcenter=smblob.center;
 
 	//int nPts = smblob.pts.size();
 	//for(int i=k; i<nPts-k; i++)
 	//{
-	//	
+	//
 	//	v1 = Vec2f(smblob.pts[i].x-smblob.pts[i-k].x,	smblob.pts[i].y-smblob.pts[i-k].y);
 	//	v2 = Vec2f(smblob.pts[i].x-smblob.pts[i+k].x,	smblob.pts[i].y-smblob.pts[i+k].y);
-	//	
+	//
 	//	v1D = Vec3f(smblob.pts[i].x-smblob.pts[i-k].x,	smblob.pts[i].y-smblob.pts[i-k].y,	0);
 	//	v2D = Vec3f(smblob.pts[i].x-smblob.pts[i+k].x,	smblob.pts[i].y-smblob.pts[i+k].y,	0);
-	//	
+	//
 	//	vxv = v1D.cross(v2D);
-	//	
+	//
 	//	v1.normalize();
 	//	v2.normalize();
-	//	
+	//
 	//	teta=v1.angle(v2);
-	//	
+	//
 	//	if(fabs(teta) < 30)
 	//	{	//pik?
 	//		if(vxv.z > 0)
@@ -702,9 +343,9 @@ bool vFingerDetector::findHands(const vBlob& smblob, int k)
 	//	{
 	//		aux1.set(smppico[i].x-smppico[0].x,smppico[i].y-smppico[0].y);
 	//		dlh=aux1.length();
-	//	
-	//		//we detect left and right hand and 
-	//	
+	//
+	//		//we detect left and right hand and
+	//
 	//		if(dlh<100)
 	//		{
 	//			lhand.push_back(smppico[i]);
@@ -717,7 +358,7 @@ bool vFingerDetector::findHands(const vBlob& smblob, int k)
 	//}
 	////try to find for each hand the point wich is farder to the center of the Blob
 	//if(lhand.size()>0)
-	//{		
+	//{
 	//	aux1.set(lhand[0].x-hcenter.x,lhand[0].y-hcenter.y);
 	//	lhd=aux1.length();
 	//	max=lhd;
@@ -760,14 +401,14 @@ bool vFingerDetector::findHands(const vBlob& smblob, int k)
 vHaarFinder::vHaarFinder()
 {
 	cascade = NULL;
-	storage = NULL; 
+	storage = NULL;
 	scale = 1.2;
 }
 
 vHaarFinder::~vHaarFinder()
 {
 	if (cascade) cvReleaseHaarClassifierCascade(&this->cascade);
-	if (storage) cvReleaseMemStorage(&this->storage); 
+	if (storage) cvReleaseMemStorage(&this->storage);
 }
 
 bool vHaarFinder::init(char* cascade_name)
@@ -796,7 +437,7 @@ void vHaarFinder::find(IplImage* img, int minArea, bool findAllFaces)
 	cvClearMemStorage( storage );
 
 	CvSeq* found = cvHaarDetectObjects( tiny, cascade, storage,
-		1.2, 2, 
+		1.2, 2,
 		findAllFaces ? CV_HAAR_FIND_BIGGEST_OBJECT|CV_HAAR_DO_CANNY_PRUNING : CV_HAAR_DO_CANNY_PRUNING
 		//|CV_HAAR_FIND_BIGGEST_OBJECT
 		//|CV_HAAR_DO_ROUGH_SEARCH
@@ -826,10 +467,10 @@ void vHaarFinder::find(IplImage* img, int minArea, bool findAllFaces)
 		blobs[i].box			= r;
 		blobs[i].center.x		= (int) centerx;
 		blobs[i].center.y		= (int) centery;
-	} 
+	}
 
 	if (findAllFaces)
-		std::sort(blobs.begin(), blobs.end(), cmp_blob_area); 
+		std::sort(blobs.begin(), blobs.end(), cmp_blob_area);
 }
 
 vOpticalFlowLK::vOpticalFlowLK(IplImage* gray, int blocksize)
@@ -908,19 +549,19 @@ bool vOpticalFlowLK::flowInRegion(int x, int y, int w, int h, cv::point2df& vec)
 
 
 
-vBlobTracker2::vBlobTracker2()
+vBlobTracker::vBlobTracker()
 {
 	IDCounter = 0;
 }
 
 //Setup a listener
-void vBlobTracker2::setListener( vBlobListener* _listener ) 
+void vBlobTracker::setListener( vBlobListener* _listener )
 {
 	listener = _listener;
 }
 
 //assigns IDs to each blob in the contourFinder
-void vBlobTracker2::trackBlobs(const vector<vBlob>& _newBlobs)
+void vBlobTracker::trackBlobs(const vector<vBlob>& _newBlobs)
 {
 	leaveBlobs.clear();
 
@@ -966,7 +607,7 @@ void vBlobTracker2::trackBlobs(const vector<vBlob>& _newBlobs)
 				if(j==trackedBlobs.size())//got to end without finding it
 				{
 					newBlobs[winner].id = trackedBlobs[i].id;
-					trackedBlobs[i] = newBlobs[winner];				
+					trackedBlobs[i] = newBlobs[winner];
 				}
 				else //found it, compare with current blob
 				{
@@ -995,7 +636,7 @@ void vBlobTracker2::trackBlobs(const vector<vBlob>& _newBlobs)
 
 						//SEND BLOB OFF EVENT
 						doBlobOff( trackedBlobs[j] );
-						//------------------------------------------------------------------------------						
+						//------------------------------------------------------------------------------
 					}
 					else //delete
 					{
@@ -1022,7 +663,7 @@ void vBlobTracker2::trackBlobs(const vector<vBlob>& _newBlobs)
 			trackedBlobs.erase(trackedBlobs.begin()+i,
 				trackedBlobs.begin()+i+1);
 
-			i--; //decrement one since we removed an element	
+			i--; //decrement one since we removed an element
 		}
 		else //living, so update it's data
 		{
@@ -1034,10 +675,10 @@ void vBlobTracker2::trackBlobs(const vector<vBlob>& _newBlobs)
 					trackedBlobs[i]=newBlobs[j];
 
 					//SEND BLOB MOVED EVENT
-					doBlobMoved( trackedBlobs[i] ); 
+					doBlobMoved( trackedBlobs[i] );
 				}
 			}
-		}		
+		}
 	}
 
 	//--Add New Living Tracks
@@ -1069,7 +710,7 @@ void vBlobTracker2::trackBlobs(const vector<vBlob>& _newBlobs)
 * thresh	= threshold for optimization
 **************************************************************************/
 
-int vBlobTracker2::trackKnn(const vector<vTrackedBlob>& newBlobs, vTrackedBlob& track, int k, double thresh)
+int vBlobTracker::trackKnn(const vector<vTrackedBlob>& newBlobs, vTrackedBlob& track, int k, double thresh)
 {
 	int winner = -1; //initially label track as '-1'=dead
 	if((k%2)==0) k++; //if k is not an odd number, add 1 to it
@@ -1106,7 +747,7 @@ int vBlobTracker2::trackKnn(const vector<vTrackedBlob>& newBlobs, vTrackedBlob& 
 		****************************************************************/
 
 		//search the list for the first point with a longer distance
-		//insert sort by new blobs' distance		
+		//insert sort by new blobs' distance
 		for(iter=nbors.begin(); iter!=nbors.end()
 			&& dist>=iter->second; iter++);
 
@@ -1141,7 +782,7 @@ int vBlobTracker2::trackKnn(const vector<vTrackedBlob>& newBlobs, vTrackedBlob& 
 
 		/* check for a possible tie and break with distance */
 		if(count > votes[winner].first || count == votes[winner].first
-			&& total_dist < votes[winner].second) 
+			&& total_dist < votes[winner].second)
 		{
 			winner = iter->first;
 		}
@@ -1155,7 +796,7 @@ int vBlobTracker2::trackKnn(const vector<vTrackedBlob>& newBlobs, vTrackedBlob& 
 * Delegate to Callbacks
 *************************************/
 
-void vBlobTracker2::doBlobOn( vTrackedBlob& b ) {
+void vBlobTracker::doBlobOn( vTrackedBlob& b ) {
 	b.status = statusEnter;
 	if( listener != NULL ) {
 		listener->blobOn( b.center.x, b.center.y, b.id, 0/*findOrder(b.id)*/ );
@@ -1164,7 +805,7 @@ void vBlobTracker2::doBlobOn( vTrackedBlob& b ) {
 	}
 }
 
-void vBlobTracker2::doBlobMoved( vTrackedBlob& b ) {
+void vBlobTracker::doBlobMoved( vTrackedBlob& b ) {
 	b.status = statusMove;
 	if( listener != NULL ) {
 		listener->blobMoved( b.center.x, b.center.y, b.id, 0/*findOrder(b.id)*/ );
@@ -1172,7 +813,7 @@ void vBlobTracker2::doBlobMoved( vTrackedBlob& b ) {
 		printf("blob: %d move\n" , b.id);
 	}
 }
-void vBlobTracker2::doBlobOff( vTrackedBlob& b ) {
+void vBlobTracker::doBlobOff( vTrackedBlob& b ) {
 	b.status = statusLeave;
 	leaveBlobs.push_back(b);
 	if( listener != NULL ) {
@@ -1180,6 +821,6 @@ void vBlobTracker2::doBlobOff( vTrackedBlob& b ) {
 	} else {
 		printf("blob: %d leave-\n" , b.id);
 	}
-	b.id = vTrackedBlob::BLOB_TO_DELETE;	
+	b.id = vTrackedBlob::BLOB_TO_DELETE;
 }
 

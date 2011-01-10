@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="CamServer" />
+		<Option execution_dir="D:\_SVN\vinjncode\CamServer\workspace\VisualStudio2008\" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Script file="lib_finder.script" />
+			<Target title="Debug Win32">
+				<Option output="..\..\bin\Win32-gcc\CamServer_d" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Debug Win32" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-D_CRT_SECURE_NO_WARNINGS" />
+					<Add option="-DWIN32" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_CONSOLE" />
+					<Add option="-DUSING_FLO_DEBUG" />
+					<Add option="-W" />
+					<Add option="-g" />
+					<Add option="-O0" />
+					<Add directory="..\..\..\_common" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="..\..\..\_common" />
+				</ResourceCompiler>
+			</Target>
+			<Target title="Release Win32">
+				<Option output="..\..\bin\Win32-gcc\CamServer" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Release Win32" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-D_CRT_SECURE_NO_WARNINGS" />
+					<Add option="-DWIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_CONSOLE" />
+					<Add option="-DUSING_FLO_DEBUG" />
+					<Add option="-W" />
+					<Add option="-O2" />
+					<Add directory="..\..\..\_common" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="..\..\..\_common" />
+				</ResourceCompiler>
+			</Target>
+		</Build>
+		<Unit filename="..\..\doc\manual.txt">
+			<Option target="Release Win32" />
+		</Unit>
+		<Unit filename="..\..\doc\osc_protocol.txt">
+			<Option target="Release Win32" />
+		</Unit>
+		<Unit filename="..\..\doc\todo.txt">
+			<Option target="Release Win32" />
+		</Unit>
+		<Unit filename="..\..\source\AppConfig.cpp" />
+		<Unit filename="..\..\source\AppConfig.h" />
+		<Unit filename="..\..\source\UI.cpp" />
+		<Unit filename="..\..\source\UI.h" />
+		<Unit filename="..\..\source\VideoApp.cpp" />
+		<Unit filename="..\..\source\VideoApp.h" />
+		<Unit filename="..\..\source\VideoApp.run.cpp" />
+		<Unit filename="..\..\source\main.cpp" />
+		<Unit filename="..\..\source\res\icon.ico" />
+		<Unit filename="..\..\source\res\resource.h" />
+		<Unit filename="..\..\..\_common\FloDebug.cpp" />
+		<Unit filename="..\..\..\_common\FloDebug.h" />
+		<Unit filename="..\..\..\_common\MiniTimer.h" />
+		<Unit filename="..\..\..\_common\ofxArgs.cpp" />
+		<Unit filename="..\..\..\_common\ofxArgs.h" />
+		<Unit filename="..\..\..\_common\ofxOsc\ofxOsc.h" />
+		<Unit filename="..\..\..\_common\ofxOsc\ofxOscArg.h" />
+		<Unit filename="..\..\..\_common\ofxOsc\ofxOscBundle.cpp" />
+		<Unit filename="..\..\..\_common\ofxOsc\ofxOscBundle.h" />
+		<Unit filename="..\..\..\_common\ofxOsc\ofxOscMessage.cpp" />
+		<Unit filename="..\..\..\_common\ofxOsc\ofxOscMessage.h" />
+		<Unit filename="..\..\..\_common\ofxOsc\ofxOscReceiver.cpp" />
+		<Unit filename="..\..\..\_common\ofxOsc\ofxOscReceiver.h" />
+		<Unit filename="..\..\..\_common\ofxOsc\ofxOscSender.cpp" />
+		<Unit filename="..\..\..\_common\ofxOsc\ofxOscSender.h" />
+		<Unit filename="..\..\..\_common\oscpack\IpEndpointName.cpp" />
+		<Unit filename="..\..\..\_common\oscpack\IpEndpointName.h" />
+		<Unit filename="..\..\..\_common\oscpack\MessageMappingOscPacketListener.h" />
+		<Unit filename="..\..\..\_common\oscpack\NetworkingUtils.h" />
+		<Unit filename="..\..\..\_common\oscpack\OscException.h" />
+		<Unit filename="..\..\..\_common\oscpack\OscHostEndianness.h" />
+		<Unit filename="..\..\..\_common\oscpack\OscOutboundPacketStream.cpp" />
+		<Unit filename="..\..\..\_common\oscpack\OscOutboundPacketStream.h" />
+		<Unit filename="..\..\..\_common\oscpack\OscPacketListener.h" />
+		<Unit filename="..\..\..\_common\oscpack\OscPrintReceivedElements.cpp" />
+		<Unit filename="..\..\..\_common\oscpack\OscPrintReceivedElements.h" />
+		<Unit filename="..\..\..\_common\oscpack\OscReceivedElements.cpp" />
+		<Unit filename="..\..\..\_common\oscpack\OscReceivedElements.h" />
+		<Unit filename="..\..\..\_common\oscpack\OscTypes.cpp" />
+		<Unit filename="..\..\..\_common\oscpack\OscTypes.h" />
+		<Unit filename="..\..\..\_common\oscpack\PacketListener.h" />
+		<Unit filename="..\..\..\_common\oscpack\TimerListener.h" />
+		<Unit filename="..\..\..\_common\oscpack\UdpSocket.h" />
+		<Unit filename="..\..\..\_common\oscpack\win32\NetworkingUtils.cpp" />
+		<Unit filename="..\..\..\_common\oscpack\win32\UdpSocket.cpp" />
+		<Unit filename="..\..\..\_common\vOpenCV\Blob.h" />
+		<Unit filename="..\..\..\_common\vOpenCV\BlobTracker.cpp" />
+		<Unit filename="..\..\..\_common\vOpenCV\BlobTracker.h" />
+		<Unit filename="..\..\..\_common\vOpenCV\OpenCV.cpp" />
+		<Unit filename="..\..\..\_common\vOpenCV\OpenCV.h" />
+		<Unit filename="..\..\..\_common\vOpenCV\cvButtons.cpp" />
+		<Unit filename="..\..\..\_common\vOpenCV\cvButtons.h" />
+		<Unit filename="..\..\..\_common\vOpenCV\vector2d.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

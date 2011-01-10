@@ -23,7 +23,7 @@ flip_param -> flip_mode
 1 -> 0	:	horizontal
 2 -> 1	:	vertical
 3 -> -1	:	both
-*/ 
+*/
 void vFlip(const CvArr* src, int flipX, int flipY)
 {
 	int flip_param = flipX*2 + flipY;
@@ -48,7 +48,7 @@ static bool IsEdgeIn(int ind1, int ind2,
 {
 	for (int i = 0; i < edges.size (); i++)
 	{
-		if ((edges[i][0] == ind1 && edges[i][1] == ind2) || 
+		if ((edges[i][0] == ind1 && edges[i][1] == ind2) ||
 			(edges[i][0] == ind2 && edges[i][1] == ind1) )
 			return true;
 	}
@@ -56,7 +56,7 @@ static bool IsEdgeIn(int ind1, int ind2,
 }
 
 //============================================================================
-static bool IsTriangleNotIn(const std::vector<int>& one_tri, 
+static bool IsTriangleNotIn(const std::vector<int>& one_tri,
 							const std::vector<std::vector<int> > &tris)
 {
 	std::set<int> tTriangle;
@@ -108,11 +108,11 @@ void vDrawText(IplImage* img, int x,int y,char* str, CvScalar clr)
 		font = new CvFont();
 		cvInitFont(font,CV_FONT_VECTOR0,0.5,0.5, 0, 1);
 	}
-	cvPutText(img, str, cvPoint(x,y),font, clr); 
+	cvPutText(img, str, cvPoint(x,y),font, clr);
 }
 
 
-CvScalar default_colors[] = 
+CvScalar default_colors[] =
 {
 	{{255,128,0}},
 	{{255,255,0}},
@@ -156,22 +156,22 @@ void feature_out(IplImage* img, IplImage* mask, int thresh)
 	uchar* data   = (uchar *)img->imageData;
 	uchar* mdata   = (uchar *)mask->imageData;
 
-	for(int i=0;i<h;i++) 
-		for(int j=0;j<w;j++) 
+	for(int i=0;i<h;i++)
+		for(int j=0;j<w;j++)
 			for(int k=0;k<channels;k++)
 			{
 				if (mdata[i*mask->widthStep+j] < thresh)
 					data[i*step+j*channels+k] = 0;
 			}
 
-} 
+}
 
 
 
 VideoInput::VideoInput()
 {
 	_fps = 0;
-	_capture = NULL; 
+	_capture = NULL;
 	_frame = NULL;
 	_InputType = From_Count;
 }
@@ -186,12 +186,12 @@ void VideoInput::setAutoExplosure(bool is)
 	if (_capture)
 		cvSetCaptureProperty(_capture,CV_CAP_PROP_AUTO_EXPOSURE,(double)is);
 }
- 
+
 bool VideoInput::getAutoExplosure()
 {
 	if (_capture)
 		return cvGetCaptureProperty(_capture,CV_CAP_PROP_AUTO_EXPOSURE);
-	else 
+	else
 		return false;
 }
 
@@ -265,7 +265,7 @@ bool VideoInput::init(char* file_name)
 }
 
 bool VideoInput::init(int argc, char** argv)
-{	
+{
 	_argc = argc;
 	_argv = argv;
 	if( argc == 1 || (argc == 2 && strlen(argv[1]) == 1 && ::isdigit(argv[1][0])))
@@ -347,8 +347,8 @@ void vBackCodeBook::init(CvSize size)
 {
 	model = cvCreateBGCodeBookModel();
 	//Set color thresholds to default values
-	model->modMin[0] = model->modMin[1] = model->modMin[2] = 3;			
-	model->modMax[0] = model->modMax[1] = model->modMax[2] = 10;			
+	model->modMin[0] = model->modMin[1] = model->modMin[2] = 3;
+	model->modMax[0] = model->modMax[1] = model->modMax[2] = 10;
 	model->cbBounds[0] = model->cbBounds[1] = model->cbBounds[2] = 10;
 	// CODEBOOK METHOD ALLOCATION
 	yuvImage = cvCreateImage( size, IPL_DEPTH_8U, 3 );
@@ -386,7 +386,7 @@ IplImage* vBackCodeBook::getForeground(IplImage* image)
 	// Find foreground by codebook method
 	cvBGCodeBookDiff( model, yuvImage, ImaskCodeBook );
 	// This part just to visualize bounding boxes and centers if desired
-	cvCopy(ImaskCodeBook,ImaskCodeBookCC);	
+	cvCopy(ImaskCodeBook,ImaskCodeBookCC);
 	//cvSegmentFGMask( ImaskCodeBookCC );
 
 	return ImaskCodeBookCC;
@@ -400,7 +400,7 @@ void vBackCodeBook::release()
 
 
 void vHighPass(IplImage* src, IplImage* dst, int blurLevel/* = 10*/, int noiseLevel/* = 3*/)
-{	
+{
 	if (blurLevel > 0 && noiseLevel > 0)
 	{
 		// create the unsharp mask using a linear average filter
@@ -417,8 +417,8 @@ void vHighPass(IplImage* src, IplImage* dst, int blurLevel/* = 10*/, int noiseLe
 
 void vGetPerspectiveMatrix(CvMat*& warp_matrix, cv::Point2f xsrcQuad[4], cv::Point2f xdstQuad[4])
 {
-	static CvPoint2D32f srcQuad[4]; 
-	static CvPoint2D32f dstQuad[4]; 
+	static CvPoint2D32f srcQuad[4];
+	static CvPoint2D32f dstQuad[4];
 	for (int i=0;i<4;i++)
 	{
 		srcQuad[i] = xsrcQuad[i];
@@ -427,13 +427,13 @@ void vGetPerspectiveMatrix(CvMat*& warp_matrix, cv::Point2f xsrcQuad[4], cv::Poi
 
 	if (warp_matrix == NULL)
 		warp_matrix = cvCreateMat(3, 3, CV_32FC1);
-	cvGetPerspectiveTransform(srcQuad, dstQuad, warp_matrix); 
+	cvGetPerspectiveTransform(srcQuad, dstQuad, warp_matrix);
 }
 
 void vPerspectiveTransform(const CvArr* src, CvArr* dst, cv::Point xsrcQuad[4], cv::Point xdstQuad[4])
 {
-	static CvPoint2D32f srcQuad[4]; 
-	static CvPoint2D32f dstQuad[4]; 
+	static CvPoint2D32f srcQuad[4];
+	static CvPoint2D32f dstQuad[4];
 	for (int i=0;i<4;i++)
 	{
 		srcQuad[i] = xsrcQuad[i];
@@ -534,7 +534,7 @@ void vBackGrayDiff::update(IplImage* image, int mode/* = 0*/){
 	{
 		cvSub(Frame, Bg, Fore);
 		vThresh(Fore, thresh);
-	}	
+	}
 }
 
 
@@ -609,7 +609,7 @@ void vBackColorDiff::update(IplImage* image, int mode/* = 0*/){
 	{
 		cvSub(Frame, Bg, Fore);
 		vThresh(Fore, thresh);
-	}	
+	}
 }
 
 void vThreeFrameDiff::init(IplImage* initial, void* param/* = NULL*/)
@@ -704,7 +704,7 @@ static void draw_facet( CvSubdiv2D * subdiv, IplImage * dst, IplImage * src, CvS
 	int i, count = 0;
 	vector<CvPoint> buf;
 
-	// count number of edges in facet 
+	// count number of edges in facet
 	do
 	{
 		count++;
@@ -721,16 +721,16 @@ static void draw_facet( CvSubdiv2D * subdiv, IplImage * dst, IplImage * src, CvS
 
 		if( !pt )
 			break;
-		assert( fabs( pt->pt.x ) < 10000 && fabs( pt->pt.y ) < 10000 );		
+		assert( fabs( pt->pt.x ) < 10000 && fabs( pt->pt.y ) < 10000 );
 		buf.push_back(cvPoint( cvRound( pt->pt.x ), cvRound( pt->pt.y )));
 
-		e = cvSubdiv2DGetEdge( e, CV_NEXT_AROUND_LEFT );		
+		e = cvSubdiv2DGetEdge( e, CV_NEXT_AROUND_LEFT );
 	}
 
 	if( i == count )
 	{
 		CvSubdiv2DPoint *pt = cvSubdiv2DEdgeDst( cvSubdiv2DRotateEdge( edge, 1 ));
-		if (!pt) 
+		if (!pt)
 			pt = cvSubdiv2DEdgeOrg( cvSubdiv2DRotateEdge( edge, 0 ));
 		CvPoint ip = cvPoint( cvRound( pt->pt.x ), cvRound( pt->pt.y ));
 		CvScalar color = {{0,0,0,0}};
@@ -752,7 +752,7 @@ static void draw_facet( CvSubdiv2D * subdiv, IplImage * dst, IplImage * src, CvS
 				cvDrawLine(dst, buf[i], buf[i-1], CV_RGB(30,30,30),1);
 			}
 		}
-	} 
+	}
 }
 
 
@@ -811,7 +811,7 @@ void vDrawVoroni( CvSubdiv2D * subdiv, IplImage * src, IplImage * dst, bool draw
 DelaunaySubdiv::DelaunaySubdiv(int w, int h)
 {
 	storage = cvCreateMemStorage();
-	rect = cvRect(0, 0, w, h); 
+	rect = cvRect(0, 0, w, h);
 
 	subdiv = cvCreateSubdivDelaunay2D(rect, storage);
 }
@@ -821,7 +821,7 @@ void DelaunaySubdiv::insert(float x, float y)
 	Point2f pt(x,y);
 	cvSubdivDelaunay2DInsert(subdiv, pt);
 	pt_map.insert(std::make_pair(point2di(x, y), points.size() ) );
-	points.push_back(Point(x,y));	
+	points.push_back(Point(x,y));
 }
 
 void DelaunaySubdiv::clear()
@@ -829,7 +829,7 @@ void DelaunaySubdiv::clear()
 	cvClearMemStorage(storage);
 	subdiv = cvCreateSubdivDelaunay2D(rect, storage);
 	pt_map.clear();
-	points.clear();	
+	points.clear();
 }
 
 void DelaunaySubdiv::intoEdge(CvSubdiv2DEdge edge)
@@ -839,7 +839,7 @@ void DelaunaySubdiv::intoEdge(CvSubdiv2DEdge edge)
 	const int count = 3;
 	Point triple[count];
 
-	//// count number of edges in facet 
+	//// count number of edges in facet
 	//do
 	//{
 	//	count++;
@@ -857,7 +857,7 @@ void DelaunaySubdiv::intoEdge(CvSubdiv2DEdge edge)
 			break;
 
 		triple[i] = Point(pt->pt.x ,  pt->pt.y);
-		e = cvSubdiv2DGetEdge( e, CV_NEXT_AROUND_LEFT );		
+		e = cvSubdiv2DGetEdge( e, CV_NEXT_AROUND_LEFT );
 	}
 
 	if( i == count )
@@ -877,7 +877,7 @@ void DelaunaySubdiv::intoEdge(CvSubdiv2DEdge edge)
 }
 
 int  DelaunaySubdiv::getIndex(float x, float y)
-{	
+{
 	int ret = -1;
 	map<point2di, int>::const_iterator it =  pt_map.find(point2di(x,y));
 	if (it != pt_map.end())
@@ -917,7 +917,7 @@ void DelaunaySubdiv::build()
 
 	return;
 
-	cv_try_begin(); 
+	cv_try_begin();
 
 	int count = points.size();
 	int __n = count;
@@ -926,7 +926,7 @@ void DelaunaySubdiv::build()
 
 	//CvPoint* _points =new CvPoint[count];
 	//int* _hull = new int[count];
-	cv::Mat pointMat( 1, count, CV_32SC2, &points[0] ); 
+	cv::Mat pointMat( 1, count, CV_32SC2, &points[0] );
 	//	 CvMat hullMat = cvMat( 1, count, CV_32SC1, &hull[0]);
 	//  for(int  i = 0; i < count; i++ )
 	//  {
@@ -941,21 +941,21 @@ void DelaunaySubdiv::build()
 
 	CvMat ConvexHull = cvMat (1, __n, CV_32SC2, &hull[0]);
 
-	//	cv::Mat pointMat(1, count, CV_32SC2, &points[0] );	 
+	//	cv::Mat pointMat(1, count, CV_32SC2, &points[0] );
 
 	//		cv::convexHull(pointMat, hullMat);
 	//	convexHull(pointMat, hull);
 	//
 	////	CvMat* pointMa = cvCreateMat(1, count, CV_32SC2);
 	//	cvConvexHull2(&(CvMat)pointMat, ConvexHull, CV_CLOCKWISE, 0);
-	//	cv::Mat hullMat(1, hull.size(), CV_32SC2, &hull[0] ); 
+	//	cv::Mat hullMat(1, hull.size(), CV_32SC2, &hull[0] );
 	//
 	//	doDelaunay(subdiv,  &ConvexHull);
 	//	cvReleaseMat(&pointMa);
 
 	cv_try_end();
-} 
- 
+}
+
 
 void DelaunaySubdiv::drawDelaunay( IplImage* src,IplImage * dst , bool drawLine)
 {
@@ -1331,63 +1331,65 @@ void convertHSVtoRGB(const IplImage *imageHSV, IplImage *imageRGB)
 }
 
 void cvSkinSegment(IplImage* img, IplImage* mask)
-{  
-	CvSize imageSize = cvSize(img->width, img->height);  
-	IplImage *imgY = cvCreateImage(imageSize, IPL_DEPTH_8U, 1);  
-	IplImage *imgCr = cvCreateImage(imageSize, IPL_DEPTH_8U, 1);  
-	IplImage *imgCb = cvCreateImage(imageSize, IPL_DEPTH_8U, 1);  
+{
+	CvSize imageSize = cvSize(img->width, img->height);
+	IplImage *imgY = cvCreateImage(imageSize, IPL_DEPTH_8U, 1);
+	IplImage *imgCr = cvCreateImage(imageSize, IPL_DEPTH_8U, 1);
+	IplImage *imgCb = cvCreateImage(imageSize, IPL_DEPTH_8U, 1);
 
 
-	IplImage *imgYCrCb = cvCreateImage(imageSize, img->depth, img->nChannels);  
-	cvCvtColor(img,imgYCrCb,CV_BGR2YCrCb);  
-	cvSplit(imgYCrCb, imgY, imgCr, imgCb, 0);  
-	int y, cr, cb, l, x1, y1, value;  
-	unsigned char *pY, *pCr, *pCb, *pMask;  
+	IplImage *imgYCrCb = cvCreateImage(imageSize, img->depth, img->nChannels);
+	cvCvtColor(img,imgYCrCb,CV_BGR2YCrCb);
+	cvSplit(imgYCrCb, imgY, imgCr, imgCb, 0);
+	int y, cr, cb, l, x1, y1, value;
+	unsigned char *pY, *pCr, *pCb, *pMask;
 
-	pY = (unsigned char *)imgY->imageData;  
-	pCr = (unsigned char *)imgCr->imageData;  
-	pCb = (unsigned char *)imgCb->imageData;  
-	pMask = (unsigned char *)mask->imageData;  
-	cvSetZero(mask);  
-	l = img->height * img->width;  
-	for (int i = 0; i < l; i++){  
-		y  = *pY;  
-		cr = *pCr;  
-		cb = *pCb;  
-		cb -= 109;  
-		cr -= 152  
-			;  
-		x1 = (819*cr-614*cb)/32 + 51;  
-		y1 = (819*cr+614*cb)/32 + 77;  
-		x1 = x1*41/1024;  
-		y1 = y1*73/1024;  
-		value = x1*x1+y1*y1;  
-		if(y<100)    (*pMask)=(value<700) ? 255:0;  
-		else        (*pMask)=(value<850)? 255:0;  
-		pY++;  
-		pCr++;  
-		pCb++;  
-		pMask++;  
-	}  
-	cvReleaseImage(&imgY);  
-	cvReleaseImage(&imgCr);  
-	cvReleaseImage(&imgCb);  
-	cvReleaseImage(&imgYCrCb);  
-}  
+	pY = (unsigned char *)imgY->imageData;
+	pCr = (unsigned char *)imgCr->imageData;
+	pCb = (unsigned char *)imgCb->imageData;
+	pMask = (unsigned char *)mask->imageData;
+	cvSetZero(mask);
+	l = img->height * img->width;
+	for (int i = 0; i < l; i++){
+		y  = *pY;
+		cr = *pCr;
+		cb = *pCb;
+		cb -= 109;
+		cr -= 152
+			;
+		x1 = (819*cr-614*cb)/32 + 51;
+		y1 = (819*cr+614*cb)/32 + 77;
+		x1 = x1*41/1024;
+		y1 = y1*73/1024;
+		value = x1*x1+y1*y1;
+		if(y<100)    (*pMask)=(value<700) ? 255:0;
+		else        (*pMask)=(value<850)? 255:0;
+		pY++;
+		pCr++;
+		pCb++;
+		pMask++;
+	}
+	cvReleaseImage(&imgY);
+	cvReleaseImage(&imgCr);
+	cvReleaseImage(&imgCb);
+	cvReleaseImage(&imgYCrCb);
+}
 
 
 void vFillPoly(IplImage* img, const vector<Point>& pt_list, const Scalar& clr/* = Scalar(255,255,255)*/)
 {
 	const Point* pts = &pt_list[0];
 	const int npts = pt_list.size();
-	cv::fillPoly(Mat(img), &pts, &npts, 1, clr);
+	Mat mat(img);
+	cv::fillPoly(mat, &pts, &npts, 1, clr);
 }
 
 void vLinePoly(IplImage* img, const vector<Point>& pt_list, const Scalar& clr/* = Scalar(255,255,255)*/, int thick/* = 1*/)
 {
 	const Point* pts = &pt_list[0];
 	const int npts = pt_list.size();
-	cv::polylines(Mat(img), &pts, &npts, 1, true, clr, thick);
+	Mat mat(img);
+	cv::polylines(mat, &pts, &npts, 1, true, clr, thick);
 }
 
 void vLinePoly(IplImage* img, const vector<Point2f>& pt_list, const Scalar& clr/* = Scalar(255,255,255)*/, int thick/* = 1*/)
@@ -1397,7 +1399,8 @@ void vLinePoly(IplImage* img, const vector<Point2f>& pt_list, const Scalar& clr/
 	for (int i=0;i<npts;i++)
 		pts[i] = pt_list[i];
 
-	cv::polylines(Mat(img), (const Point**)&pts, &npts, 1, true, clr, thick);
+    Mat mat(img);
+	cv::polylines(mat, (const Point**)&pts, &npts, 1, true, clr, thick);
 
 	delete[] pts;
 }

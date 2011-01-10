@@ -20,7 +20,7 @@
  */
 
 #include "ofxOscMessage.h"
-#include <iostream>
+#include <stdio.h>
 #include <assert.h>
 
 ofxOscMessage::ofxOscMessage()

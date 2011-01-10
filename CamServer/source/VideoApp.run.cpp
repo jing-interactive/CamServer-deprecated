@@ -1,4 +1,4 @@
-#include "VideoApp.h"
+﻿#include "VideoApp.h"
 #include "AppConfig.h"
 #include "UI.h"
 #include "MiniTimer.h"

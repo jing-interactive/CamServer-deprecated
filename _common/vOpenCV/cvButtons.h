@@ -3,7 +3,8 @@
 
 #include <opencv/cv.h>
 #include <vector>
-using namespace std;
+
+using std::vector;
 
 /**
 	Global OpenCV mouse button callback.
@@ -117,7 +118,7 @@ private:
     /**
         The last event (mouse state)
     */
-	int me, mx, my, mf; 
+	int me, mx, my, mf;
 
     /**
         The font to draw the buttons

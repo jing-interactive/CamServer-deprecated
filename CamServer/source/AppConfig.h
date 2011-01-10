@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <opencv/cxcore.h>
 #include <string>

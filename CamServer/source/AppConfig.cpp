@@ -1,5 +1,6 @@
 #include "AppConfig.h"
 #include "ofxArgs.h"
+#include <stdio.h>
 
 #include <opencv/cv.h>
 
@@ -15,9 +16,9 @@ using cv::FileStorage;
 AppConfig theConfig;
 
 AppConfig::AppConfig():CLIENT("localhost")
-{	
+{
 	PORT = 3333;
-	fixed_back_mode = TRUE; 
+	fixed_back_mode = TRUE;
 	detailed_mode = TRUE;
 	face_track = FALSE;
 	hand_track = FALSE;
@@ -25,7 +26,7 @@ AppConfig::AppConfig():CLIENT("localhost")
 	hull_mode = FALSE;
 	gray_detect_mode = FALSE;
 	minim_window = FALSE;
-	delay_for_run= 0; 
+	delay_for_run= 0;
 
 	auto_explosure = TRUE;
 
@@ -60,7 +61,7 @@ void AppConfig::parse_args(int argc, char** argv)
 
 	no_osc = args.contains("-noosc");
 
-	//	detailed_mode = args.contains("-detail"); 
+	//	detailed_mode = args.contains("-detail");
 
 	//	using_debug_file = args.contains("-log");
 	// face_track = args.contains("-face");
@@ -137,5 +138,5 @@ bool AppConfig::save_to(char* filename)
 		WRITE_FS(gray_detect_mode);
 		printf("config.xml saved.\n");
 		return true;
-	}	
+	}
 }

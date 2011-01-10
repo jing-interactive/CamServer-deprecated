@@ -14,6 +14,7 @@
 #ifndef _OFXARGS
 #define _OFXARGS
 
+#include <stdio.h>
 #include <iostream>
 #include <vector>
 #include <map>
@@ -29,25 +30,25 @@ private:
 	int argc;
 	vector<std::string> args;
 	map<std::string,std::string> opts;
-	
+
 	int strToInt(std::string value);
 	float strToFloat(std::string value);
-	
+
 public:
 	ofxArgs(int argc, char* argv[]);
-	
+
 	int getCount();
-	
+
 	bool contains(std::string key);
 
 	float getFloat(std::string key);
 	int getInt(std::string key);
 	std::string getString(std::string key);
-	
+
 	float getFloat(int index);
 	int getInt(int index);
 	std::string getString(int index);
-	
+
 	void printArgs();
 	void printOpts();
 };

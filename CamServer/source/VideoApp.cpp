@@ -6,6 +6,7 @@ VideoApp theApp;//global
 
 VideoApp::~VideoApp()
 {
+	cvReleaseMat(&warp_matrix);
 }
 
 VideoApp::VideoApp()

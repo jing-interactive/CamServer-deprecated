@@ -1,13 +1,16 @@
 ﻿#define VERSION 0.4
 
-#if defined _DEBUG && defined _MSC_VER
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
-#endif
-
 #include <process.h>
 #include "VideoApp.h"
+
+inline void enableMemleakCheck()
+{
+	#if defined _DEBUG && defined _MSC_VER
+	#include <crtdbg.h>
+	_CrtSetBreakAlloc(272);
+	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
+	#endif
+}
 
 void startup_beep(void *)
 {
@@ -42,9 +45,7 @@ bool using_debug_file = true;
 
 int main(int argc, char** argv )
 {
-#if defined _DEBUG && defined _MSC_VER
-	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_LEAK_CHECK_DF );
-#endif
+	enableMemleakCheck(); 
 	_beginthread(startup_beep, 0, 0);
 
 	if (theApp.init(argc, argv))

@@ -241,7 +241,8 @@ struct IBackGround
 	virtual IplImage* getBackground(){
 		return bg_model->background;
 	}
-	~IBackGround(){
+
+	virtual ~IBackGround(){
 		if (bg_model)
 			cvReleaseBGStatModel(&bg_model);
 	}
@@ -433,7 +434,7 @@ struct DelaunaySubdiv
 	int getIndex(float x, float y);
 
 	CvRect rect;
-	CvMemStorage* storage;
+	MemStorage storage;
 	CvSubdiv2D* subdiv;
 
 	std::vector<Point> points;

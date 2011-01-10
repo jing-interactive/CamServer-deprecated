@@ -77,6 +77,13 @@ int CFloDebug::Close(void){
 
 }
 
+static struct DebugHelper
+{
+	~DebugHelper()
+	{
+		delete CFloDebug::GetItself();
+	}
+}_singleton_helper;
 
 CFloDebug* CFloDebug:: GetItself(void){
 	//

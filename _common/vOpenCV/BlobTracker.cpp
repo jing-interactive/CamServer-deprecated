@@ -15,10 +15,10 @@ bool cmp_blob_area(const vBlob& a, const vBlob& b)
 
 void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea, int maxArea, bool convexHull, bool (*sort_func)(const vBlob& a, const vBlob& b))
 {
-	static CvMemStorage*	mem_storage	= NULL;
+	static MemStorage	mem_storage	= NULL;
 	static CvMoments myMoments;
 
-	if( mem_storage==NULL ) mem_storage = cvCreateMemStorage(0);
+	if( mem_storage.empty() ) mem_storage = cvCreateMemStorage(0);
 	else cvClearMemStorage(mem_storage);
 
 	blobs.clear();
@@ -102,10 +102,10 @@ void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea, int maxArea, b
 
 void vFindBlobs(IplImage *src, int minArea, int maxArea, bool convexHull)
 {
-	static CvMemStorage*	mem_storage	= NULL;
+	static MemStorage	mem_storage	= NULL;
 
 	//FIND CONTOURS AROUND ONLY BIGGER REGIONS
-	if( mem_storage==NULL ) mem_storage = cvCreateMemStorage(0);
+	if( mem_storage.empty() ) mem_storage = cvCreateMemStorage(0);
 	else cvClearMemStorage(mem_storage);
 
 	CvContourScanner scanner = cvStartFindContours(src,mem_storage,sizeof(CvContour),CV_RETR_LIST,CV_CHAIN_APPROX_SIMPLE);

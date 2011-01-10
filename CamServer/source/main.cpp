@@ -1,20 +1,21 @@
-﻿#define VERSION 0.4
+﻿#define VERSION "0.4.1"
 
 #include <process.h>
 #include "VideoApp.h"
 
-inline void enableMemleakCheck()
+void enableMemleakCheck(int breakpt = 0)
 {
 	#if defined _DEBUG && defined _MSC_VER
 	#include <crtdbg.h>
-	_CrtSetBreakAlloc(272);
+	if (breakpt > 0)
+		_CrtSetBreakAlloc(breakpt);
 	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
 	#endif
 }
 
 void startup_beep(void *)
 {
-	printf("CamServer %.1f  vinjn @ RoboPeak\n", VERSION);
+	printf("CamServer %s  vinjn @ RoboPeak\n", VERSION);
 	for (int b=0;b<8;b++)
 	{
 		for (int i=0;i<10;i++)

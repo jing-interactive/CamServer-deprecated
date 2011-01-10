@@ -33,6 +33,7 @@ ofxOscSender::ofxOscSender()
 
 ofxOscSender::~ofxOscSender()
 {
+	delete socket;
 }
 
 void ofxOscSender::setup( std::string hostname, int port )

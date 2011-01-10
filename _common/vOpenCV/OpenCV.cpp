@@ -1,8 +1,6 @@
 #include "OpenCV.h"
 
-#define _I_REALLY_NEED_DEBUG
-
-#if defined _I_REALLY_NEED_DEBUG && _DEBUG
+#if defined _DEBUG
 #pragma comment(lib,"cv210d.lib")
 #pragma comment(lib,"cvaux210d.lib")
 #pragma comment(lib,"cxcore210d.lib")
@@ -98,19 +96,16 @@ void vCopyImageTo(CvArr* tiny_image, IplImage* big_image, const CvRect& region)
 	// Reset the ROI in order to display the next image
 	cvResetImageROI(big_image);
 }
-
 void vDrawText(IplImage* img, int x,int y,char* str, CvScalar clr)
 {
-	static CvFont* font = NULL;
-
-	if (!font)
+	static Ptr<CvFont> font = NULL;
+	if (font.empty())
 	{
 		font = new CvFont();
 		cvInitFont(font,CV_FONT_VECTOR0,0.5,0.5, 0, 1);
 	}
 	cvPutText(img, str, cvPoint(x,y),font, clr);
 }
-
 
 CvScalar default_colors[] =
 {
@@ -177,8 +172,8 @@ VideoInput::VideoInput()
 }
 
 #ifndef CV_CAP_PROP_AUTO_EXPOSURE
-#define CV_CAP_PROP_AUTO_EXPOSURE	100
-#define CV_CAP_PROP_SHOW_DIALOG		101
+#define CV_CAP_PROP_AUTO_EXPOSURE 19
+#define CV_CAP_PROP_SHOW_DIALOG 20
 #endif
 
 void VideoInput::setAutoExplosure(bool is)

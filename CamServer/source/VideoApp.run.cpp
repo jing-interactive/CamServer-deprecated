@@ -46,9 +46,18 @@ void VideoApp::run()
 
 		vFlip(half_raw, g_Fx, g_Fy);
 		timer.profileFunction("cvFlip");
-		cvWarpPerspective(half_raw, frame, warp_matrix);
 
-		timer.profileFunction("vPerspectiveTransform");
+		if (theConfig.corners[0] == cv::Point2f(0,0) && theConfig.corners[1] == cv::Point2f(HalfWidth,0)
+			&& theConfig.corners[3] == cv::Point2f(0,HalfHeight) && theConfig.corners[2] == cv::Point2f(HalfWidth,HalfHeight)
+			)
+		{//original ROI (region of interest)
+			cvCopyImage(half_raw, frame);
+		}
+		else
+		{//needs perspective transform
+			cvWarpPerspective(half_raw, frame, warp_matrix);
+		}
+		timer.profileFunction("vPerspectiveTransform");	
 
 		if (to_reset_back)
 		{

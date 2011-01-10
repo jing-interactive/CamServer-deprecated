@@ -304,15 +304,15 @@
 			Name="res"
 			>
 			<File
+				RelativePath="..\..\source\res\CamServer.rc"
+				>
+			</File>
+			<File
 				RelativePath="..\..\source\res\icon.ico"
 				>
 			</File>
 			<File
 				RelativePath="..\..\source\res\resource.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\source\res\CamServer.rc"
 				>
 			</File>
 		</Filter>

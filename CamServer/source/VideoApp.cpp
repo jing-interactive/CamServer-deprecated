@@ -205,12 +205,12 @@ void VideoApp::send_osc_msg()
 			//	continue;
 
 			if (obj.isHole)
-				vPolyLine(frame, obj.pts, cv::Scalar(0,0,0), 4);
+				vPolyLine(frame, obj.pts, cv::Scalar(0,0,0), 1);
 			else
-				vPolyLine(frame, obj.pts, vDefaultColor(obj.id), 2);
+				vPolyLine(frame, obj.pts, vDefaultColor(obj.id), 1);
 			//	vDrawRect(frame, obj.box, CV_RGB(0,122,255));
 			sprintf(g_buffer, "#%d", obj.id);
-			vDrawText(frame, obj.center.x, obj.center.y, g_buffer);
+			vDrawText(frame, obj.center.x, obj.center.y, g_buffer, vDefaultColor(obj.id));
 
 			int id = obj.id;
 			int cx = obj.center.x;

@@ -4,9 +4,8 @@
 #include "vOpenCV/cvButtons.h"
 #include "vOpenCV/BlobTracker.h"
 
+#include "ofxThread.h"
 #include "ofxOsc/ofxOsc.h"
-
-class ofxThread;
 
 #ifdef WIN32 
 #define SLEEP(ms) ::Sleep((ms))
@@ -25,7 +24,7 @@ struct VideoApp
 	struct VideoGrabThread: public ofxThread
 	{
 		bool is_new_frame;
-		IplImage* frame;
+		bool is_inited;
 
 		VideoInput input;
 		int _argc;
@@ -36,7 +35,7 @@ struct VideoApp
 	};
 
 	//thread
-	Ptr<VideoGrabThread> grag_thread;
+	Ptr<VideoGrabThread> grab_thread;
 
 	//the important objects
 	vHaarFinder haar;
@@ -46,6 +45,8 @@ struct VideoApp
 
 	//
 	char g_buffer[256];
+	bool app_running;
+	bool input_inited;
 
 	cv::Point2f* selected;
 	cv::Point2f dstQuad[4];
@@ -65,6 +66,7 @@ struct VideoApp
 	Ptr<IplImage> grayBuffer;
 
 	cv::Size size;
+	int channels;
 	cv::Size half;
 	bool monitorVisible;
 

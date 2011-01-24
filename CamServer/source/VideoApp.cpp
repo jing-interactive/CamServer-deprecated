@@ -1,45 +1,46 @@
 ﻿#include "VideoApp.h"
 #include "AppConfig.h"
 #include "UI.h"
-#include "ofxThread.h"
+#include "MiniTimer.h"
 
 VideoApp theApp;//global
 
-struct VideoGrabThread: public ofxThread
+VideoApp::VideoGrabThread::VideoGrabThread(int argc, char** argv)
 {
-	bool is_new_frame;
-	IplImage* frame;
+	_argc = argc;
+	_argv = argv;
+	is_new_frame = false;
+	is_inited = false;
+}
 
-	VideoInput input;
-	int _argc;
-	char** _argv;
-
-	VideoGrabThread(int argc, char** argv)
+void VideoApp::VideoGrabThread::threadedFunction()
+{
+	lock();
+	if (!input.init(_argc, _argv))
 	{
-		_argc = argc;
-		_argv = argv;
-		is_new_frame = false;		
-	}
-
-	void threadedFunction()
-	{
-		lock();
-		if (!input.init(_argc, _argv))
-		{
-			unlock();
-			return;
-		}
-		is_new_frame = true;
 		unlock();
-		while(true)
-		{
-			
-			is_new_frame = false;
-			frame = input.get_frame();
-			is_new_frame = true;
-		}		
+		return;
 	}
-};
+	unlock();
+	theApp.input_inited = true;
+	MiniTimer timer;
+	while(true)
+	{
+		timer.resetStartTime();
+		is_new_frame = false;
+		if (!theApp.app_running)
+			return;
+		input.get_frame();
+		is_new_frame = true;
+		if (input._InputType == input.From_Video)
+		{
+			DWORD elapse = timer.getTimeElapsedMS();
+			if (elapse < 40)
+				SLEEP(40 - elapse);
+		}
+		timer.profileFunction("thread : input.get_frame()");
+	}		
+} 
 
 VideoApp::~VideoApp()
 {
@@ -56,7 +57,11 @@ VideoApp::VideoApp()
 	using_black_bg = false;
 	using_white_bg = false;
 
+	app_running = true;
+	input_inited = false;
+
 	g_Fx = g_Fy = g_prevFx = g_prevFy = 0;
+	channels = 3;
 }
 
 bool VideoApp::init(int argc, char** argv)
@@ -75,13 +80,27 @@ bool VideoApp::init(int argc, char** argv)
 	if (argc > 2)
 		argc = 2;//hack the _input.init
 
-	grag_thread = new VideoGrabThread(argc,argv);
-	grag_thread->startThread();
-
+	grab_thread = new VideoGrabThread(argc,argv);
+#ifdef _DEBUG
+	grab_thread->startThread(true, true);//debug mode is noisy
+#else
+	grab_thread->startThread(true, false);
+#endif
+	
+	//grab unrelated
 	sender.setup( theConfig.CLIENT, theConfig.PORT );
 	printf("[OSC] setup client as %s : %d\n", theConfig.CLIENT.c_str(), theConfig.PORT);
+	
+	//theConfig.auto_explosure = _input.getAutoExplosure();
+	/*if (face_track)*/
+	haar.init("../../data/haarcascade_frontalface_alt.xml");
+	param_gui::show(true);
+	param_gui::init();
 
-	size = grag_thread->input._size;
+	//grab related
+	grab_thread->lock();//wait for VideoInput::init() returns
+	size = grab_thread->input._size;
+	channels = grab_thread->input._channel;
 
 	if (size.width < 400)
 	{
@@ -116,18 +135,14 @@ bool VideoApp::init(int argc, char** argv)
 
 	onParamFlip(theConfig.paramFlipX, theConfig.paramFlipY);
 
-	theConfig.auto_explosure = _input.getAutoExplosure();
-	/*if (face_track)*/
-	haar.init("../../data/haarcascade_frontalface_alt.xml");
-
-	half_raw = cvCreateImage(half, 8, _input._channel);
-	half_flip = cvCreateImage(half, 8, _input._channel);
+	half_raw = cvCreateImage(half, 8, channels);
+	half_flip = cvCreateImage(half, 8, channels);
 	grayBlob = cvCreateImage(half, 8, 1);
-	frame = cvCreateImage(half, 8, _input._channel);
-	black_frame = cvCreateImage(half, 8, _input._channel);
-	white_frame = cvCreateImage(half, 8, _input._channel);
+	frame = cvCreateImage(half, 8, channels);
+	black_frame = cvCreateImage(half, 8, channels);
+	white_frame = cvCreateImage(half, 8, channels);
 	grayBuffer = cvCreateImage(half, 8, 1);
-	prevBg = cvCreateImage(half, 8, _input._channel);
+	prevBg = cvCreateImage(half, 8, channels);
 
 	cvSet(black_frame, CV_BLACK);
 	cvSet(white_frame, CV_WHITE);
@@ -135,12 +150,10 @@ bool VideoApp::init(int argc, char** argv)
 	if (theConfig.delay_for_run > 0)
 		SLEEP(theConfig.delay_for_run * 1000);
 
-	if (_input._InputType == _input.From_Camera)
-		_input.wait(5);
+	if (grab_thread->input._InputType == grab_thread->input.From_Camera)
+		grab_thread->input.wait(5);
 
 	monitor_gui::show(true);
-	param_gui::show(true);
-	param_gui::init();
 
 	onRefreshBack();
 

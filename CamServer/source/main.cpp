@@ -22,13 +22,16 @@ struct StartThread: public ofxThread
 		printf("CamServer %s  vinjn @ RoboPeak\n", VERSION);
 		for (int b=0;b<8;b++)
 		{
+			if (theApp.input_inited)//if VideoInput is already inited
+				break;				//exit the thread now
 			for (int i=0;i<10;i++)
 				printf("%c ", rand()%3+1);
 			printf("\n");
 			BEEP(sin(b/20.0f*3.14)*300,100);
 		}
+		printf("\n\n");
 	}
-}start_thread;
+};
 
 struct ReadyThread: public ofxThread
 {
@@ -37,34 +40,34 @@ struct ReadyThread: public ofxThread
 		for (int b=0;b<1;b++)
 			BEEP(cos(b/20.0f*3.14)*100,100);
 	}
-}ready_thread;
+};
 
-struct ExitThread: public ofxThread
+
+void say_byebye()
 {
-	void threadedFunction()
+	printf("CamServer %s  vinjn @ RoboPeak\n", VERSION);
+	for (int b=8;b>1;b--)
 	{
-		printf("CamServer %.1f  vinjn @ RoboPeak\n", VERSION);
-		for (int b=8;b>1;b--)
-		{
-			for (int j=0;j<8-b;j++)
-				printf("\t");
-			printf("bye~\n");
-			BEEP(sin(b/20.0f*3.14)*300,100);
-		}
+		for (int j=0;j<8-b;j++)
+			printf("\t");
+		printf("bye~\n");
+		BEEP(sin(b/20.0f*3.14)*300,100);
 	}
-}exit_thread;
+}
 
 int main(int argc, char** argv )
 {
 	enableMemleakCheck(); 
-	start_thread.startThread();
+	StartThread start_thread;
+	start_thread.startThread(false, false);
 
 	if (theApp.init(argc, argv))
 	{
-		ready_thread.startThread();
+		ReadyThread ready_thread;
+		ready_thread.startThread(false, false);
 		theApp.run();
 	}
-	exit_thread.startThread();
+	say_byebye();
 
 	return 0;
 }

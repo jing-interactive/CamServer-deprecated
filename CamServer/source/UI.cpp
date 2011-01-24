@@ -113,7 +113,7 @@ namespace param_gui
 
 	void on_expo(int t)
 	{
-		theApp._input.setAutoExplosure(t == 1);
+		theApp.grab_thread->input.setAutoExplosure(t == 1);
 		theConfig.auto_explosure = t;
 	}
 
@@ -124,7 +124,7 @@ namespace param_gui
 
 	void on_dialog(int )
 	{
-		theApp._input.showSettingsDialog();
+		theApp.grab_thread->input.showSettingsDialog();
 	}
 
 	void on_mode(int t)

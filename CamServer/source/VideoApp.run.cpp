@@ -8,22 +8,30 @@ void VideoApp::run()
 	MiniTimer timer;
 	MiniTimer timer_total;
 
-	while (true)
+	while (app_running)
 	{ 
 		FloWriteLn();
 
 		timer.resetStartTime();
 		timer_total.resetStartTime();
 
-		IplImage* raw = input.get_frame();
+		IplImage* raw = grab_thread->input._frame;
 		if (!raw)
 			break;
 
-		timer.profileFunction("get_frame");
+		if (grab_thread->is_new_frame)
+		{
+			//raw->half_raw->frame
+			//grab_thread->lock();
+			cvResize(raw, half_raw);
+			//grab_thread->unlock();
+			timer.profileFunction("cvResize");
+		}
 
 		int key = cvWaitKey(1);
 		if (key == VK_ESCAPE)
-			break; 
+			app_running = false;
+
 		if (key == VK_BACK)
 		{//reset four corner points
 			theConfig.corners[0] = cv::Point2f(0,0);
@@ -41,8 +49,7 @@ void VideoApp::run()
 			monitor_gui::show(monitorVisible);
 		}
 
-		//raw->half_raw->frame
-		cvResize(raw, half_raw);
+
 
 		vFlip(half_raw, g_Fx, g_Fy);
 		timer.profileFunction("cvFlip");
@@ -155,13 +162,6 @@ void VideoApp::run()
 			cvShowImage(MAIN_WINDOW,total);
 
 			timer.profileFunction("show Monitor");
-		}
-
-		if (input._InputType == input.From_Video)
-		{
-			DWORD elapse = timer_total.getTimeElapsedMS();
-			if (elapse < 40)
-				SLEEP(40 - elapse);
 		}
 
 		if (theConfig.face_track)

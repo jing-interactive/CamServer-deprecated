@@ -6,10 +6,39 @@
 
 #include "ofxOsc/ofxOsc.h"
 
+class ofxThread;
+
+#ifdef WIN32 
+#define SLEEP(ms) ::Sleep((ms))
+#else
+#define SLEEP(ms)	usleep(ms)
+#endif
+
+#ifdef WIN32 
+#define BEEP(freq, ms) ::Beep((freq), (ms))
+#else
+#define BEEP(freq, ms)
+#endif
+
 struct VideoApp
 {
+	struct VideoGrabThread: public ofxThread
+	{
+		bool is_new_frame;
+		IplImage* frame;
+
+		VideoInput input;
+		int _argc;
+		char** _argv;
+
+		VideoGrabThread(int argc, char** argv);
+		void threadedFunction();
+	};
+
+	//thread
+	Ptr<VideoGrabThread> grag_thread;
+
 	//the important objects
-	VideoInput _input;
 	vHaarFinder haar;
 	vFingerDetector finger;
 	vBlobTracker blobTracker;

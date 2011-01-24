@@ -203,6 +203,14 @@
 				RelativePath="..\..\..\_common\ofxArgs.h"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\_common\ofxThread.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\_common\ofxThread.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="ofxOsc"

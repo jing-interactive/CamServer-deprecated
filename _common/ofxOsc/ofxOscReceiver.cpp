@@ -21,7 +21,7 @@
 
 #include "ofxOscReceiver.h"
 
-#ifndef TARGET_WIN32
+#ifndef WIN32
         #include <pthread.h>
 #endif
 #include <iostream>
@@ -29,7 +29,7 @@
 
 ofxOscReceiver::ofxOscReceiver()
 {
-#ifdef TARGET_WIN32
+#ifdef WIN32
 		mutex = CreateMutexA( NULL, FALSE, NULL );
 	#else
 	pthread_mutex_init( &mutex, NULL );
@@ -39,7 +39,7 @@ ofxOscReceiver::ofxOscReceiver()
 void ofxOscReceiver::setup( int listen_port )
 {
 	listen_socket = new UdpListeningReceiveSocket( IpEndpointName( IpEndpointName::ANY_ADDRESS, listen_port ), this );
-#ifdef TARGET_WIN32
+#ifdef WIN32
 	thread	= CreateThread(
 							   NULL,              // default security attributes
 							   0,                 // use default stack size
@@ -64,14 +64,14 @@ ofxOscReceiver::~ofxOscReceiver()
 /*
 #if defined TARGET_OSX
 #error target-osx
-#elif defined TARGET_WIN32
+#elif defined WIN32
 #error target-win32
 #else
 #error no target
 #endif
  */
 
-#ifdef TARGET_WIN32
+#ifdef WIN32
 DWORD WINAPI
 #else
 void*
@@ -81,7 +81,7 @@ void*
 {
 	UdpListeningReceiveSocket* socket = (UdpListeningReceiveSocket*)_socket;
 	socket->Run();
-    #ifdef TARGET_WIN32
+    #ifdef WIN32
     	return 0;
     #else
 	return NULL;
@@ -182,7 +182,7 @@ bool ofxOscReceiver::getNextMessage( ofxOscMessage* message )
 
 void ofxOscReceiver::grabMutex()
 {
-#ifdef TARGET_WIN32
+#ifdef WIN32
 	WaitForSingleObject( mutex, INFINITE );
 #else
 	pthread_mutex_lock( &mutex );
@@ -191,7 +191,7 @@ void ofxOscReceiver::grabMutex()
 
 void ofxOscReceiver::releaseMutex()
 {
-#ifdef TARGET_WIN32
+#ifdef WIN32
 	ReleaseMutex( mutex );
 #else
 	pthread_mutex_unlock( &mutex );

@@ -24,10 +24,8 @@
 #define _ofxOscRECEIVER_H
 
 #include <deque>
-//#include <ofMain.h>
-#define TARGET_WIN32
 
-#ifdef TARGET_WIN32
+#ifdef WIN32
 // threads
 #include <windows.h>
 #else
@@ -66,7 +64,7 @@ protected:
 private:
 
 	// start the listening thread
-#ifdef TARGET_WIN32
+#ifdef WIN32
 	static DWORD WINAPI startThread( void* listen_socket );
 #else
 	static void* startThread( void* listen_socket );
@@ -81,7 +79,7 @@ private:
 	void grabMutex();
 	void releaseMutex();
 
-#ifdef TARGET_WIN32
+#ifdef WIN32
 	// thread to listen with
 	HANDLE thread;
 	// mutex for the thread queue

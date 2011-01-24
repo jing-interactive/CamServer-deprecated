@@ -32,8 +32,7 @@ struct AppConfig
 	int paramMinArea;
 	int paramMaxArea;
 
-	int auto_explosure;
-	bool no_osc;	
+	int auto_explosure; 
 	bool isDemo;
 
 	cv::Point2f corners[4];

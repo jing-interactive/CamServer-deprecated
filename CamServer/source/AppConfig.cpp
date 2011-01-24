@@ -39,8 +39,7 @@ AppConfig::AppConfig():CLIENT("localhost")
 	paramBlur2 = 1;
 	paramNoise = 0;
 	paramMinArea = 10;
-	paramMaxArea = 800;
-	no_osc = false;
+	paramMaxArea = 800; 
 };
 
 void AppConfig::parse_args(int argc, char** argv)
@@ -58,8 +57,7 @@ void AppConfig::parse_args(int argc, char** argv)
 
 	if (args.contains("-delay"))
 		delay_for_run = args.getInt("-delay");
-
-	no_osc = args.contains("-noosc");
+ 
 
 	//	detailed_mode = args.contains("-detail");
 

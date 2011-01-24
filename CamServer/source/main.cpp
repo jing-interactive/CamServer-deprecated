@@ -1,7 +1,7 @@
-﻿#define VERSION "0.4.1"
-
-#include <process.h>
+﻿#include "ofxThread.h"
 #include "VideoApp.h"
+
+#define VERSION "0.4.1"
 
 void enableMemleakCheck(int breakpt = 0)
 {
@@ -13,48 +13,58 @@ void enableMemleakCheck(int breakpt = 0)
 	#endif
 }
 
-void startup_beep(void *)
-{
-	printf("CamServer %s  vinjn @ RoboPeak\n", VERSION);
-	for (int b=0;b<8;b++)
-	{
-		for (int i=0;i<10;i++)
-			printf("%c ", rand()%3+1);
-		printf("\n");
-		::Beep(sin(b/20.0f*3.14)*300,100);
-	}
-}
-
-void ready_beep(void *)
-{
-	for (int b=0;b<1;b++)
-		::Beep(cos(b/20.0f*3.14)*100,100);
-}
-
-void exit_beep(void *)
-{
-	printf("CamServer %.1f  vinjn @ RoboPeak\n", VERSION);
-	for (int b=8;b>1;b--)
-	{
-		for (int j=0;j<8-b;j++)
-			printf("\t");
-		printf("bye~\n");
-		::Beep(sin(b/20.0f*3.14)*300,100);
-	}
-}
 bool using_debug_file = true;
+
+struct StartThread: public ofxThread
+{
+	void threadedFunction()
+	{
+		printf("CamServer %s  vinjn @ RoboPeak\n", VERSION);
+		for (int b=0;b<8;b++)
+		{
+			for (int i=0;i<10;i++)
+				printf("%c ", rand()%3+1);
+			printf("\n");
+			BEEP(sin(b/20.0f*3.14)*300,100);
+		}
+	}
+}start_thread;
+
+struct ReadyThread: public ofxThread
+{
+	void threadedFunction()
+	{
+		for (int b=0;b<1;b++)
+			BEEP(cos(b/20.0f*3.14)*100,100);
+	}
+}ready_thread;
+
+struct ExitThread: public ofxThread
+{
+	void threadedFunction()
+	{
+		printf("CamServer %.1f  vinjn @ RoboPeak\n", VERSION);
+		for (int b=8;b>1;b--)
+		{
+			for (int j=0;j<8-b;j++)
+				printf("\t");
+			printf("bye~\n");
+			BEEP(sin(b/20.0f*3.14)*300,100);
+		}
+	}
+}exit_thread;
 
 int main(int argc, char** argv )
 {
 	enableMemleakCheck(); 
-	_beginthread(startup_beep, 0, 0);
+	start_thread.startThread();
 
 	if (theApp.init(argc, argv))
 	{
-		_beginthread(ready_beep, 0, 0);
+		ready_thread.startThread();
 		theApp.run();
 	}
-	exit_beep(NULL);
+	exit_thread.startThread();
 
 	return 0;
 }

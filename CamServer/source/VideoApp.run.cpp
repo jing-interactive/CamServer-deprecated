@@ -15,9 +15,9 @@ void VideoApp::run()
 		timer.resetStartTime();
 		timer_total.resetStartTime();
 
-		IplImage* raw = _input.get_frame();
+		IplImage* raw = input.get_frame();
 		if (!raw)
-			break;			
+			break;
 
 		timer.profileFunction("get_frame");
 
@@ -157,11 +157,11 @@ void VideoApp::run()
 			timer.profileFunction("show Monitor");
 		}
 
-		if (_input._InputType == _input.From_Video)
+		if (input._InputType == input.From_Video)
 		{
 			DWORD elapse = timer_total.getTimeElapsedMS();
 			if (elapse < 40)
-				::Sleep(40 - elapse);
+				SLEEP(40 - elapse);
 		}
 
 		if (theConfig.face_track)

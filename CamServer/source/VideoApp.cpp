@@ -1,8 +1,45 @@
 ﻿#include "VideoApp.h"
 #include "AppConfig.h"
 #include "UI.h"
+#include "ofxThread.h"
 
 VideoApp theApp;//global
+
+struct VideoGrabThread: public ofxThread
+{
+	bool is_new_frame;
+	IplImage* frame;
+
+	VideoInput input;
+	int _argc;
+	char** _argv;
+
+	VideoGrabThread(int argc, char** argv)
+	{
+		_argc = argc;
+		_argv = argv;
+		is_new_frame = false;		
+	}
+
+	void threadedFunction()
+	{
+		lock();
+		if (!input.init(_argc, _argv))
+		{
+			unlock();
+			return;
+		}
+		is_new_frame = true;
+		unlock();
+		while(true)
+		{
+			
+			is_new_frame = false;
+			frame = input.get_frame();
+			is_new_frame = true;
+		}		
+	}
+};
 
 VideoApp::~VideoApp()
 {
@@ -28,26 +65,23 @@ bool VideoApp::init(int argc, char** argv)
 
 	if (theConfig.minim_window)
 	{
+#ifdef WIN32
 		keybd_event(VK_LWIN, 0, 0, 0);
 		keybd_event('D', 0, 0, 0);
 		keybd_event(VK_LWIN, 0, KEYEVENTF_KEYUP, 0);
+#endif
 	}
-	//cvNamedWindow("hsv");
-	//cvResizeWindow(PARAM_WINDOW,400,480);
 
 	if (argc > 2)
 		argc = 2;//hack the _input.init
 
-	if (!_input.init(argc,argv))
-	{
-		system("pause");
-		return false;
-	}
+	grag_thread = new VideoGrabThread(argc,argv);
+	grag_thread->startThread();
 
 	sender.setup( theConfig.CLIENT, theConfig.PORT );
 	printf("[OSC] setup client as %s : %d\n", theConfig.CLIENT.c_str(), theConfig.PORT);
 
-	size = _input._size;
+	size = grag_thread->input._size;
 
 	if (size.width < 400)
 	{
@@ -99,7 +133,7 @@ bool VideoApp::init(int argc, char** argv)
 	cvSet(white_frame, CV_WHITE);
 
 	if (theConfig.delay_for_run > 0)
-		::Sleep(theConfig.delay_for_run * 1000);
+		SLEEP(theConfig.delay_for_run * 1000);
 
 	if (_input._InputType == _input.From_Camera)
 		_input.wait(5);

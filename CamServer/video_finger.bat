@@ -1,2 +1,2 @@
 cd bin/Win32-VisualStudio
-VideoServer ../media/finger.mp4
+CamServer ../../data/finger.mp4

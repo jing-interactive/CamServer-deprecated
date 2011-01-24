@@ -15,11 +15,11 @@ void VideoApp::run()
 		timer.resetStartTime();
 		timer_total.resetStartTime();
 
-		IplImage* raw = grab_thread->input._frame;
+		IplImage* raw = input._frame;
 		if (!raw)
 			break;
 
-		if (grab_thread->is_new_frame)
+		if (grab_thread->count == input._frame_num)
 		{
 			//raw->half_raw->frame
 			//grab_thread->lock();
@@ -49,15 +49,13 @@ void VideoApp::run()
 			monitor_gui::show(monitorVisible);
 		}
 
-
-
 		vFlip(half_raw, g_Fx, g_Fy);
 		timer.profileFunction("cvFlip");
 
 		if (theConfig.corners[0] == cv::Point2f(0,0) && theConfig.corners[1] == cv::Point2f(HalfWidth,0)
 			&& theConfig.corners[3] == cv::Point2f(0,HalfHeight) && theConfig.corners[2] == cv::Point2f(HalfWidth,HalfHeight)
 			)
-		{//original ROI (region of interest)
+		{//original ROI (region of interest), it saves time
 			cvCopyImage(half_raw, frame);
 		}
 		else
@@ -70,13 +68,13 @@ void VideoApp::run()
 		{
 			to_reset_back = false;
 
-			if (using_black_bg)
+			if (theConfig.bg_mode == BLACK_BG)
 			{
 				backModel->init(black_frame, (void*)&paramMoG);
 				cvCopyImage(black_frame, prevBg);
 			}
 			else
-				if (using_white_bg)
+				if (theConfig.bg_mode == WHITE_BG)
 				{
 					backModel->init(white_frame, (void*)&paramMoG);
 					cvCopyImage(white_frame, prevBg);
@@ -176,6 +174,7 @@ void VideoApp::run()
 
 		timer_total.profileFunction("total"); 
 	}
+
 	theConfig.save_to("config.xml");
 	cvDestroyAllWindows();
 }

@@ -5,40 +5,29 @@
 
 VideoApp theApp;//global
 
-VideoApp::VideoGrabThread::VideoGrabThread(int argc, char** argv)
+VideoApp::VideoGrabThread::VideoGrabThread(VideoInput& input):_input(input)
 {
-	_argc = argc;
-	_argv = argv;
-	is_new_frame = false;
-	is_inited = false;
+	count = -1;
 }
 
 void VideoApp::VideoGrabThread::threadedFunction()
 {
-	lock();
-	if (!input.init(_argc, _argv))
-	{
-		unlock();
-		return;
-	}
-	unlock();
 	theApp.input_inited = true;
 	MiniTimer timer;
 	while(true)
 	{
 		timer.resetStartTime();
-		is_new_frame = false;
 		if (!theApp.app_running)
 			return;
-		input.get_frame();
-		is_new_frame = true;
-		if (input._InputType == input.From_Video)
+		_input.get_frame();
+		count = _input._frame_num;
+		if (_input._InputType == _input.From_Video)
 		{
 			DWORD elapse = timer.getTimeElapsedMS();
 			if (elapse < 40)
 				SLEEP(40 - elapse);
 		}
-		timer.profileFunction("thread : input.get_frame()");
+		timer.profileFunction("<<thread>>input.get_frame()");
 	}		
 } 
 
@@ -54,8 +43,6 @@ VideoApp::VideoApp()
 	warp_matrix = cvCreateMat(3, 3, CV_32FC1);
 
 	to_reset_back = false;
-	using_black_bg = false;
-	using_white_bg = false;
 
 	app_running = true;
 	input_inited = false;
@@ -80,7 +67,12 @@ bool VideoApp::init(int argc, char** argv)
 	if (argc > 2)
 		argc = 2;//hack the _input.init
 
-	grab_thread = new VideoGrabThread(argc,argv);
+	if (!input.init(argc,argv))
+	{
+		system("pause");
+		return false;
+	}
+	grab_thread = new VideoGrabThread(input);
 #ifdef _DEBUG
 	grab_thread->startThread(true, true);//debug mode is noisy
 #else
@@ -94,13 +86,11 @@ bool VideoApp::init(int argc, char** argv)
 	//theConfig.auto_explosure = _input.getAutoExplosure();
 	/*if (face_track)*/
 	haar.init("../../data/haarcascade_frontalface_alt.xml");
-	param_gui::show(true);
-	param_gui::init();
 
 	//grab related
 	grab_thread->lock();//wait for VideoInput::init() returns
-	size = grab_thread->input._size;
-	channels = grab_thread->input._channel;
+	size = input._size;
+	channels = input._channel;
 
 	if (size.width < 400)
 	{
@@ -147,13 +137,12 @@ bool VideoApp::init(int argc, char** argv)
 	cvSet(black_frame, CV_BLACK);
 	cvSet(white_frame, CV_WHITE);
 
-	if (theConfig.delay_for_run > 0)
-		SLEEP(theConfig.delay_for_run * 1000);
-
-	if (grab_thread->input._InputType == grab_thread->input.From_Camera)
-		grab_thread->input.wait(5);
+	if (theConfig.delay_for_run > 0)					// if necessary
+		SLEEP(theConfig.delay_for_run * 1000);	// sleep before the app shows up
 
 	monitor_gui::show(true);
+	param_gui::show(true);
+	param_gui::init();
 
 	onRefreshBack();
 
@@ -165,11 +154,8 @@ void VideoApp::onParamFlip(int fx, int fy)
 	g_Fx = fx;
 	g_Fy = fy;
 
-	if (using_black_bg || using_white_bg)
+	if (theConfig.bg_mode == REAL_BG)
 	{
-
-	}
-	else
 		if (prevBg.empty())//if not initialized
 			onRefreshBack();
 		else
@@ -179,6 +165,7 @@ void VideoApp::onParamFlip(int fx, int fy)
 			vFlip(temp, abs(fx-g_prevFx), abs(fy-g_prevFy));
 			backModel->init(temp);
 		}
+	}
 }
 
 void VideoApp::onParamAuto(int v)
@@ -266,7 +253,6 @@ void VideoApp::send_osc_msg()
 			int y = obj.box.y;
 			int w = obj.box.width;
 			int h = obj.box.height;
-
 
 			{
 				ofxOscMessage m;

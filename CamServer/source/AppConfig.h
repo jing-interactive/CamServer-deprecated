@@ -10,6 +10,11 @@ struct AppConfig
 	bool load_from(char* filename);
 	bool save_to(char* filename);
 
+#define		BLACK_BG 0		//black
+#define		WHITE_BG 1		//white
+#define		REAL_BG	2		//realtime background
+	int bg_mode;
+
 	std::string CLIENT;
 	int PORT;
 	int fixed_back_mode;	

@@ -28,6 +28,8 @@ AppConfig::AppConfig():CLIENT("localhost")
 	minim_window = FALSE;
 	delay_for_run= 0;
 
+	bg_mode = REAL_BG;
+
 	auto_explosure = TRUE;
 
 	paramFlipX = 0;
@@ -100,6 +102,7 @@ bool AppConfig::load_from(char* filename)
 		READ_FS(paramMaxArea);
 		READ_FS(hull_mode);
 		READ_FS(gray_detect_mode);
+		READ_FS(bg_mode);
 		printf("config.xml loaded.\n");
 
 		return true;
@@ -134,6 +137,7 @@ bool AppConfig::save_to(char* filename)
 		WRITE_FS(paramMaxArea);
 		WRITE_FS(hull_mode);
 		WRITE_FS(gray_detect_mode);
+		WRITE_FS(bg_mode);
 		printf("config.xml saved.\n");
 		return true;
 	}

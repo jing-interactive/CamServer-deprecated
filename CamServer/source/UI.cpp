@@ -27,7 +27,7 @@ namespace monitor_gui
 		if(theConfig.fixed_back_mode &&  Event == CV_EVENT_RBUTTONUP)
 		{
 			theApp.onRefreshBack();
-			theApp.using_black_bg = theApp.using_white_bg = false;
+			theConfig.bg_mode = REAL_BG;
 			param_gui::update();
 		}
 		else
@@ -113,7 +113,7 @@ namespace param_gui
 
 	void on_expo(int t)
 	{
-		theApp.grab_thread->input.setAutoExplosure(t == 1);
+	//	theApp.input.setAutoExplosure(t == 1);
 		theConfig.auto_explosure = t;
 	}
 
@@ -124,7 +124,7 @@ namespace param_gui
 
 	void on_dialog(int )
 	{
-		theApp.grab_thread->input.showSettingsDialog();
+		theApp.input.showSettingsDialog();
 	}
 
 	void on_mode(int t)
@@ -147,21 +147,19 @@ namespace param_gui
 
 	void on_realbg(int t)
 	{
-		theApp.onRefreshBack();
-		theApp.using_black_bg = theApp.using_white_bg = false;
+		theConfig.bg_mode = REAL_BG;
+		theApp.onRefreshBack();		
 	}
 
 	void on_whitebg(int t)
 	{
-		theApp.using_white_bg = true;
-		theApp.using_black_bg = false;
+		theConfig.bg_mode = WHITE_BG;
 		theApp.onRefreshBack();
 	}
 
 	void on_blackbg(int t)
 	{
-		theApp.using_black_bg = true;
-		theApp.using_white_bg = false;
+		theConfig.bg_mode = BLACK_BG;
 		theApp.onRefreshBack();
 	}
 
@@ -173,8 +171,8 @@ namespace param_gui
 		{ w+=dw, h,  "face", on_face, &theConfig.face_track},
 		{ w+=dw, h,  "hull", on_hull, &theConfig.hull_mode},
 		{ w+=dw, h,  "gray", on_mode, &theConfig.gray_detect_mode},
-		{ w=13, h+=dh,  "expo", on_expo, &theConfig.auto_explosure},
-		{ w+=dw, h,  "dialog", on_dialog, &negative_one},
+//		{ w=13, h+=dh,  "expo", on_expo, &theConfig.auto_explosure},
+		{ w=13+dw, h+=dh,  "dialog", on_dialog, &negative_one},
 		{ w+=dw*1.5, h,  "real", on_realbg, NULL},
 		{ w+=dw, h,  "white", on_whitebg, NULL},
 		{ w+=dw, h,  "black", on_blackbg, NULL},
@@ -190,9 +188,9 @@ namespace param_gui
 
 		const int x0 = 175;
 		const int y0 = 70;
-		if (theApp.using_black_bg)
+		if (theConfig.bg_mode == BLACK_BG)
 			cvRectangle(setting, cvPoint(x0+dw*2,y0), cvPoint(x0+dw*2+_w,y0+_h), CV_RGB(10,10,122), 3);
-		else 	if (theApp.using_white_bg)
+		else 	if (theConfig.bg_mode == WHITE_BG)
 			cvRectangle(setting, cvPoint(x0+dw,y0), cvPoint(x0+dw+_w,y0+_h), CV_RGB(10,10,122), 3);
 		else
 			cvRectangle(setting, cvPoint(x0,y0), cvPoint(x0+_w,y0+_h), CV_RGB(10,10,122), 3);

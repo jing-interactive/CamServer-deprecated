@@ -23,19 +23,17 @@ struct VideoApp
 {
 	struct VideoGrabThread: public ofxThread
 	{
-		bool is_new_frame;
-		bool is_inited;
+		int count;
 
-		VideoInput input;
-		int _argc;
-		char** _argv;
+		VideoInput& _input;
 
-		VideoGrabThread(int argc, char** argv);
+		VideoGrabThread(VideoInput& input);
 		void threadedFunction();
 	};
 
 	//thread
 	Ptr<VideoGrabThread> grab_thread;
+	VideoInput input;
 
 	//the important objects
 	vHaarFinder haar;
@@ -75,8 +73,6 @@ struct VideoApp
 
 	int HalfWidth, HalfHeight;
 	bool to_reset_back;
-	bool using_black_bg;
-	bool using_white_bg;
 	int g_Fx, g_Fy;
 	int g_prevFx, g_prevFy;
 

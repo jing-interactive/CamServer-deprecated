@@ -161,8 +161,6 @@ void feature_out(IplImage* img, IplImage* mask, int thresh)
 
 }
 
-
-
 VideoInput::VideoInput()
 {
 	_fps = 0;
@@ -218,6 +216,7 @@ bool VideoInput::init(int cam_idx)
 		else
 		{
 			printf("Reading from camera # %d.\n", cam_idx);
+			_post_init();
 			return true;
 		}
 	}

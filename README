@@ -1,2 +1,4 @@
-CamServer is a lightweight camera based interative system.
-It uses OpenCV and some libs from OpenFramworks.
+CamServer is a lightweight camera based interative system written in C++.
+It uses OpenCV and some libs from OpenFrameworks.
+Inside CamServer folder is the main application. 
+OSC protocol is employed to send reconginzed blob/face information to client softwares.

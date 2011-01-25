@@ -389,6 +389,8 @@ struct vBackCodeBook
 	void release();
 };
 
+void vRotateImage(IplImage* image, float angle, float centreX, float centreY);
+
 void vHighPass(IplImage* src, IplImage* dst, int blurLevel = 10, int noiseLevel = 3);
 
 void vPerspectiveTransform(const CvArr* src, CvArr* dst, cv::Point srcQuad[4], cv::Point dstQuad[4]);

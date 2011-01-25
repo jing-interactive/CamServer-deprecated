@@ -14,6 +14,18 @@
 
 #include <set>
 
+void vRotateImage(IplImage* image, float angle, float centreX, float centreY){
+   
+   CvPoint2D32f centre;
+   CvMat *translate = cvCreateMat(2, 3, CV_32FC1);
+   cvSetZero(translate);
+   centre.x = centreX;
+   centre.y = centreY;
+   cv2DRotationMatrix(centre, angle, 1.0, translate);
+   cvWarpAffine(image, image, translate, CV_INTER_LINEAR + CV_WARP_FILL_OUTLIERS, cvScalarAll(0));
+   cvReleaseMat(&translate);
+}
+
 #define NO_FLIP 1000
 /*
 flip_param -> flip_mode

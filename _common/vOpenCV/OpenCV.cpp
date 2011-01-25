@@ -210,7 +210,7 @@ bool VideoInput::init(int cam_idx)
 
 		if (!_capture)
 		{
-			printf("Could not initialize camera # %d\n", cam_idx);
+			printf("Failed to open camera # %d\n", cam_idx);
 			return false;
 		}
 		else

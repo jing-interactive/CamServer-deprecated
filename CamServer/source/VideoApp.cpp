@@ -12,7 +12,6 @@ VideoApp::VideoGrabThread::VideoGrabThread(VideoInput& input):_input(input)
 
 void VideoApp::VideoGrabThread::threadedFunction()
 {
-	theApp.input_inited = true;
 	MiniTimer timer;
 	while(true)
 	{
@@ -69,9 +68,11 @@ bool VideoApp::init(int argc, char** argv)
 
 	if (!input.init(argc,argv))
 	{
+		input_inited = true;
 		system("pause");
 		return false;
 	}
+	input_inited = true;
 	grab_thread = new VideoGrabThread(input);
 #ifdef _DEBUG
 	grab_thread->startThread(true, true);//debug mode is noisy

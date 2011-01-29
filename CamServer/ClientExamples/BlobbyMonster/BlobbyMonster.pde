@@ -79,7 +79,6 @@ class BlobbyMonster {
 
     // Put the joint thing in our world!
     box2d.world.createJoint(cvjd);
-
   }
 
 
@@ -169,7 +168,4 @@ class BlobbyMonster {
     }
   }
 }
-
-
-
 

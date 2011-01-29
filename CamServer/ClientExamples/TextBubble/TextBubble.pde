@@ -4,9 +4,7 @@
 import oscP5.*;
 import netP5.*;
 import java.util.Hashtable;
-import fullscreen.*;
 
-FullScreen fs; 
 PImage bg;
 
 PFont myFont;
@@ -14,7 +12,7 @@ String lines[];
 String one_line;
 
 OscP5 oscP5; 
-Hashtable infoTable = new Hashtable();
+Hashtable blobTable = new Hashtable();
 ArrayList blobList = new ArrayList();
 
 void setup() {
@@ -22,11 +20,6 @@ void setup() {
   frameRate(30);
   bg = loadImage("back.jpg");
 
-  // Create the fullscreen object
-  fs = new FullScreen(this); 
-
-  // enter fullscreen mode
-  //fs.enter(); 
   oscP5 = new OscP5(this,3333);
 
   myFont = createFont("黑体", 32);
@@ -58,37 +51,37 @@ void draw()
 {
   if (!ok_to_draw)
     return;
-    
+
   background(bg); 
 
-  /* // Get Hashtable Enumeration to get key and value
-   Enumeration em=blobTable.keys();
-   
-   while(em.hasMoreElements())
-   {
-   //nextElement is used to get key of Hashtable
-   int key = (Integer)em.nextElement();
-   
-   //get is used to get value of key in Hashtable
-   vBlob obj=(vBlob)blobTable.get(key);
-   obj.render(); 
-   println(obj.status);
-   }*/
-  for (int i=0;i<blobList.size();i++)
+  // Get Hashtable Enumeration to get key and value
+  Enumeration em=blobTable.keys();
+
+  while(em.hasMoreElements())
   {
-    vBlob obj = (vBlob)blobList.get(i);
-    obj.render();
+    //nextElement is used to get key of Hashtable
+    int key = (Integer)em.nextElement();
+
+    //get is used to get value of key in Hashtable
+    vBlob obj=(vBlob)blobTable.get(key);
+    obj.render(); 
+    println(obj.status);
   }
+  /*
+  for (int i=0;i<blobList.size();i++)
+   {
+   vBlob obj = (vBlob)blobList.get(i);
+   obj.render();
+   }
+   */
 }
-
-
 
 void oscEvent(OscMessage msg) {
   /* check if theOscMessage has the address pattern we are looking for. */
   if(msg.checkAddrPattern("/start")) {
     // println("");
     ok_to_draw = false;
-    blobList.clear();
+    //   blobList.clear();
   }
   else
   {
@@ -105,7 +98,7 @@ void oscEvent(OscMessage msg) {
 
       if (status.equals("leave"))
       {//just erase it, no need to check more
-        infoTable.remove(Key);
+        blobTable.remove(Key);
         println(" #"+id+": "+status);
       }
       else
@@ -115,29 +108,30 @@ void oscEvent(OscMessage msg) {
         float w = width*msg.get(6).floatValue();
         float h = height*msg.get(7).floatValue();
         println(" #"+id+": "+status+" "+cx+", "+cy+", "+w+", "+h);
-        vBlob obj = new vBlob(id, cx, cy, w, h);
-        obj.status = status;
 
-        if (infoTable.containsKey(Key) == false) {
+
+        if (blobTable.containsKey(Key) == false) 
+        { //insert new blob
+          vBlob obj = new vBlob(id, cx, cy, w, h);
+          obj.status = status;
           obj.info = getNextStr();
-          infoTable.put(Key, obj.info);
+          blobTable.put(Key, obj);
         } 
-        else {
-          String info = (String)infoTable.get(Key);
-          obj.info = info;
+        else 
+        {//update exsited blob
+          vBlob obj = (vBlob)blobTable.get(Key);
+          obj.tx = cx;
+          obj.ty = cy;
+          obj.w = w;
+          obj.h = h;
         }
-        blobList.add(obj);
-      }      
+      }
     }
-
     else if(msg.checkAddrPattern("/end"))
     {
       // println("");
       ok_to_draw = true;
-    }	
+    }
   }
 } 
-
-
-
 

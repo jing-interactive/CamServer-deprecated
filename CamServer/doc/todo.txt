@@ -12,4 +12,6 @@ to do
 [done]11.p5更新
 [done]12.UI多线程
 [done]13.预设背景[Black/White]，可切换
-14.高效的blob track算法
+[done]14.高效的blob track算法
+15.增加手势识别
+16.增加通用的姿势识别

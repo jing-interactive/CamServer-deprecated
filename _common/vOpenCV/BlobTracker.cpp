@@ -27,8 +27,6 @@ void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea, int maxArea, b
 	cvFindContours(src,mem_storage,&contour_list, sizeof(CvContour),
 		CV_RETR_CCOMP,CV_CHAIN_APPROX_SIMPLE);
 
-	//	std::vector<CvSeq*> pBlobList;
-
 	for (CvSeq* d = contour_list; d != NULL; d=d->h_next)
 	{
 		bool isHole = false;
@@ -38,13 +36,15 @@ void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea, int maxArea, b
 			double area = fabs(cvContourArea( c ));
 			if( area >= minArea && area <= maxArea)
 			{
+				int length = cvArcLength(c);
+
 				CvSeq* approx;
 				if(convexHull) //Convex Hull of the segmentation
 					approx = cvConvexHull2(c,mem_storage,CV_CLOCKWISE,1);
 				else //Polygonal approximation of the segmentation
-					approx = cvApproxPoly(c,sizeof(CvContour),mem_storage,CV_POLY_APPROX_DP, CVCONTOUR_APPROX_LEVEL,0);
+					approx = cvApproxPoly(c,sizeof(CvContour),mem_storage,CV_POLY_APPROX_DP, std::min(length*0.003,2.0));
 
-				float area = cvContourArea( approx, CV_WHOLE_SEQ );
+				area = cvContourArea( approx ); //update area
 				Rect box = cvBoundingRect(approx);
 				cvMoments( approx, &myMoments );
 
@@ -53,7 +53,7 @@ void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea, int maxArea, b
 				vBlob& obj = blobs[blobs.size()-1];
 				//fill the blob structure
 				obj.area	= fabs(area);
-				obj.length =  cvArcLength(approx);
+				obj.length =  length;
 				obj.isHole	= isHole;
 				obj.box	= box;
 
@@ -67,7 +67,6 @@ void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea, int maxArea, b
 					obj.center.x = myMoments.m10 / myMoments.m00;
 					obj.center.y = myMoments.m01 / myMoments.m00;
 				}
-
 
 				// get the points for the blob
 				CvPoint           pt;
@@ -89,11 +88,6 @@ void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea, int maxArea, b
 		}//END while (c != NULL)
 	}
 
-	// sort the pointers based on size
-	//int nBlobs = pBlobList.size();
-	//if( nBlobs > 0 ) {
-	//	qsort( (void*)pBlobList[0], nBlobs, sizeof(CvSeq*), qsort_carea_compare);
-	//}
     if (!sort_func) sort_func = &cmp_blob_area;
 	std::sort(blobs.begin(), blobs.end(), sort_func);
 }

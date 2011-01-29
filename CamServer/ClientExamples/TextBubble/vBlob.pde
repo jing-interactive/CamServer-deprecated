@@ -7,8 +7,8 @@ class vBlob
   public vBlob(int _id, float _cx, float _cy, float _w, float _h)
   {
     id = _id;
-    cx = _cx;
-    cy = _cy;
+    cx = tx = _cx;
+    cy = ty = _cy;
     w = _w;
     h = _h;
     isHole = false;
@@ -16,6 +16,7 @@ class vBlob
   int id;
   String status;
   float cx,cy;
+  float tx,ty;
   // float x,y;
   float w,h;
   boolean isHole;
@@ -24,6 +25,8 @@ class vBlob
 
   void render()
   {
+    cx = lerp(cx, tx, 0.3);
+    cy = lerp(cy, ty, 0.3);
     text(info, cx, cy+offset); 
   }
 }

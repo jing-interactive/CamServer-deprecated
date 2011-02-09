@@ -29,6 +29,7 @@ struct VideoApp
 
 		VideoGrabThread(VideoInput& input);
 		void threadedFunction();
+		bool is_dirty();
 	};
 
 	//thread

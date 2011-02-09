@@ -10,6 +10,11 @@ VideoApp::VideoGrabThread::VideoGrabThread(VideoInput& input):_input(input)
 	count = -1;
 }
 
+bool VideoApp::is_dirty()
+{
+	return count == _input._frame_num;
+}
+
 void VideoApp::VideoGrabThread::threadedFunction()
 {
 	MiniTimer timer;

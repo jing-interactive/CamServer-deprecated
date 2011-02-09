@@ -19,7 +19,7 @@ void VideoApp::run()
 		if (!raw)
 			break;
 
-		if (grab_thread->count == input._frame_num)
+		if (grab_thread->is_dirty())
 		{
 			//raw->half_raw->frame
 			//grab_thread->lock();
@@ -80,7 +80,7 @@ void VideoApp::run()
 					cvCopyImage(white_frame, prevBg);
 				}
 				else
-				{//only realtime background needs take care of flip
+				{//only real time background needs take care of flip
 					backModel->init(frame, (void*)&paramMoG);
 					g_prevFx = g_Fx;
 					g_prevFy = g_Fy;

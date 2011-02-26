@@ -24,6 +24,7 @@ struct VideoApp
 	struct VideoGrabThread: public ofxThread
 	{
 		int count;
+		int fps;
 
 		VideoInput& _input;
 
@@ -62,6 +63,11 @@ struct VideoApp
 	Ptr<IplImage> half_flip;
 	Ptr<IplImage> grayBlob;
 	Ptr<IplImage> grayBuffer;
+
+	//finger
+	Ptr<IplImage> finger_template;
+	Ptr<IplImage> finger_template2;
+	Ptr<IplImage> finger_template3;
 
 	cv::Size size;
 	int channels;

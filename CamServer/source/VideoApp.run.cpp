@@ -7,6 +7,9 @@ void VideoApp::run()
 {	
 	MiniTimer timer;
 	MiniTimer timer_total;
+	int ms_counter = 0;
+	int frame_counter = 0;
+	int fps=0;
 
 	while (app_running)
 	{ 
@@ -29,26 +32,37 @@ void VideoApp::run()
 		}
 
 		int key = cvWaitKey(1);
-		if (key == VK_ESCAPE)
+
+		switch (key)
+		{
+		case VK_ESCAPE:
 			app_running = false;
+			break;
 
-		if (key == VK_BACK)
-		{//reset four corner points
-			theConfig.corners[0] = cv::Point2f(0,0);
-			theConfig.corners[1] = cv::Point2f(HalfWidth,0);
-			theConfig.corners[3] = cv::Point2f(0,HalfHeight);
-			theConfig.corners[2] = cv::Point2f(HalfWidth,HalfHeight);
+		case VK_BACK:
+			{//reset four corner points
+				theConfig.corners[0] = cv::Point2f(0,0);
+				theConfig.corners[1] = cv::Point2f(HalfWidth,0);
+				theConfig.corners[3] = cv::Point2f(0,HalfHeight);
+				theConfig.corners[2] = cv::Point2f(HalfWidth,HalfHeight);
 
-			vGetPerspectiveMatrix(warp_matrix, theConfig.corners, dstQuad);
+				vGetPerspectiveMatrix(warp_matrix, theConfig.corners, dstQuad);
 
-			onRefreshBack();
+				onRefreshBack();
+			}break;
+
+		case VK_SPACE:
+			{//toggle big window visibility
+				monitorVisible = !monitorVisible;
+				monitor_gui::show(monitorVisible);
+			}break;
+		case 'b':
+			{
+				param_gui::on_realbg(0);
+				param_gui::update();
+			}break;
+		default:break;
 		}
-		if (key == VK_SPACE)
-		{//toggle big window visibility
-			monitorVisible = !monitorVisible;
-			monitor_gui::show(monitorVisible);
-		}
-
 		vFlip(half_raw, g_Fx, g_Fy);
 		timer.profileFunction("cvFlip");
 
@@ -115,6 +129,48 @@ void VideoApp::run()
 		vFindBlobs(grayBuffer, blobs, minArea ,maxArea, theConfig.hull_mode == 1);
 		timer.profileFunction("vFindBlobs");
 
+#ifdef FINGER_MATCH
+		//finger match
+		if (blobs.size() > 0)
+		{
+			vBlob& b = blobs[0];
+			Ptr<IplImage> finger = cvCreateImage(cvSize(b.box.width, b.box.height), 8, 1);
+			cvSetImageROI(fore, b.box);
+			cvCopyImage(fore, finger);
+			vThresh(finger, 10);
+			cvResetImageROI(fore);
+			show_image(finger);
+
+			double match = cvMatchShapes(finger, finger_template, CV_CONTOURS_MATCH_I2);
+			IplImage* matched = NULL;
+			if (match < 0.01 )
+			{
+				matched = finger_template;
+				printf("%s with %f\n", "match1" , match);
+			}
+			else
+			{
+				double match = cvMatchShapes(finger, finger_template2, CV_CONTOURS_MATCH_I2);
+				if (match < 0.04 )
+				{
+					matched = finger_template2;
+					printf("%s with %f\n", "match2" , match);
+				}
+				else
+				{
+					double match = cvMatchShapes(finger, finger_template3, CV_CONTOURS_MATCH_I2);
+					if (match < 0.02 )
+					{
+						matched = finger_template3;
+						printf("%s with %f\n", "match3" , match);
+					}
+				}
+			}
+			if (matched)
+				show_image(matched);
+		}
+#endif
+
 		if (theConfig.finger_track)
 		{
 			for (UINT i=0;i<blobs.size();i++)
@@ -162,10 +218,18 @@ void VideoApp::run()
 			timer.profileFunction("show Monitor");
 		}
 
+		frame_counter++;
+
+		if ((ms_counter += timer_total.getTimeElapsedMS()) > 1000)
+		{
+			fps = frame_counter;
+			frame_counter = 0;
+			ms_counter = 0;
+		}
+
+		sprintf(g_buffer, "FPS {Cam %d Server %d} %d object", grab_thread->fps, fps, blobs.size());
 		if (theConfig.face_track)
-			sprintf(g_buffer, "cost: %d ms, %d object  %d face", timer_total.getTimeElapsedMS(), blobs.size(), haar.blobs.size());
-		else
-			sprintf(g_buffer, "cost: %d ms, %d object", timer_total.getTimeElapsedMS(), blobs.size());
+			sprintf(g_buffer, "%s %d face", g_buffer, haar.blobs.size()); 
 		cvRectangle(param_gui::setting, Point(0,0), Point(400,30), CV_RGB(122,122,122), CV_FILLED);
 		vDrawText(param_gui::setting, 20,20, g_buffer);
 

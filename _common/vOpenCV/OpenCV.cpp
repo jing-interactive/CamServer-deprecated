@@ -34,7 +34,7 @@ flip_param -> flip_mode
 2 -> 1	:	vertical
 3 -> -1	:	both
 */
-void vFlip(const CvArr* src, int flipX, int flipY)
+void vFlip(CvArr* src, int flipX, int flipY)
 {
 	int flip_param = flipX*2 + flipY;
 	int mode = NO_FLIP;//NO FLIP

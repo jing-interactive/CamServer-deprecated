@@ -34,7 +34,7 @@ using std::map;
 //CV_FOURCC('I', '2', '6', '3') = H263I codec
 //CV_FOURCC('F', 'L', 'V', '1') = FLV1 codec
  
-void vFlip(const CvArr* src, int flipX, int flipY);
+void vFlip(CvArr* src, int flipX, int flipY);
 
 template<class T> class Image
 {

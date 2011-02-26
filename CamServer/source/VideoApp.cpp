@@ -8,11 +8,14 @@ VideoApp theApp;//global
 VideoApp::VideoGrabThread::VideoGrabThread(VideoInput& input):_input(input)
 {
 	count = -1;
+	fps = 0;
 }
 
 void VideoApp::VideoGrabThread::threadedFunction()
 {
 	MiniTimer timer;
+	int frame_counter = 0;
+	int ms_counter = 0;	
 	while(true)
 	{
 		timer.resetStartTime();
@@ -26,6 +29,15 @@ void VideoApp::VideoGrabThread::threadedFunction()
 			if (elapse < 40)
 				SLEEP(40 - elapse);
 		}
+
+		frame_counter++;
+		if ((ms_counter += timer.getTimeElapsedMS()) > 1000)
+		{
+			fps = frame_counter;
+			frame_counter = 0;
+			ms_counter = 0;
+		}
+
 		timer.profileFunction("<<thread>>input.get_frame()");
 	}		
 } 
@@ -88,6 +100,14 @@ bool VideoApp::init(int argc, char** argv)
 	/*if (face_track)*/
 	haar.init("../../data/haarcascade_frontalface_alt.xml");
 
+	finger_template = cvLoadImage("../../data/finger1.jpg", 0);
+	vThresh(finger_template, 50);
+
+	finger_template2 = cvLoadImage("../../data/finger2.jpg", 0);
+	vThresh(finger_template2, 50);
+
+	finger_template3 = cvLoadImage("../../data/finger3.jpg", 0);
+	vThresh(finger_template3, 50);
 	//grab related
 	grab_thread->lock();//wait for VideoInput::init() returns
 	size = input._size;

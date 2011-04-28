@@ -25,6 +25,7 @@ private:
 	
 	USHORT *depthData;
 	BYTE *colorData;
+	BYTE *depth8;
 	DWORD* depthColorData;
 	
 public:

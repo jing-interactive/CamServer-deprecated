@@ -14,17 +14,20 @@
 #define IMPORT(type) extern "C" __declspec(dllimport)## type __cdecl
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// NUIDevice  API
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+IMPORT(int) GetNUIDeviceCount();
+IMPORT(PCHAR) GetNUIDeviceSerial(int index);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CLNUIMotor  API
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Motor instance type
 typedef void *CLNUIMotor;
 
 // Library initialization
-IMPORT(CLNUIMotor) CreateNUIMotor();
+IMPORT(CLNUIMotor) CreateNUIMotor(PCHAR serial);
 IMPORT(bool) DestroyNUIMotor(CLNUIMotor mot);
-
-// Get device serial number
-IMPORT(PCHAR) GetNUIMotorSerial(CLNUIMotor mot);
 
 // Motor control
 IMPORT(bool) SetNUIMotorPosition(CLNUIMotor mot, SHORT position);
@@ -42,7 +45,7 @@ IMPORT(bool) SetNUIMotorLED(CLNUIMotor mot, BYTE value);
 typedef void *CLNUICamera;
 
 // Library initialization
-IMPORT(CLNUICamera) CreateNUICamera();
+IMPORT(CLNUICamera) CreateNUICamera(PCHAR serial);
 IMPORT(bool) DestroyNUICamera(CLNUICamera cam);
 
 // Camera capture control
@@ -56,5 +59,7 @@ IMPORT(bool) GetNUICameraColorFrameRGB32(CLNUICamera cam, PDWORD pData, int wait
 
 // Camera depth frame image data retrieval
 IMPORT(bool) GetNUICameraDepthFrameRAW(CLNUICamera cam, PUSHORT pData, int waitTimeout = 2000);
+IMPORT(bool) GetNUICameraDepthFrameCorrected12(CLNUICamera cam, PUSHORT pData, int waitTimeout = 2000);
+IMPORT(bool) GetNUICameraDepthFrameCorrected8(CLNUICamera cam, PBYTE pData, int waitTimeout = 2000);
 IMPORT(bool) GetNUICameraDepthFrameRGB32(CLNUICamera cam, PDWORD pData, int waitTimeout = 2000);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

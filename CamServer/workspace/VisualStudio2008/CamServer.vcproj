@@ -63,7 +63,7 @@
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)\$(ProjectName)_d.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="../../../_common/CLNUI"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -142,7 +142,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="../../../_common/CLNUI"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -416,10 +416,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\CLNUI\CLNUIDevice.lib"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\_common\CLNUI\ofxKinectCLNUI.cpp"
 				>
 			</File>
@@ -433,10 +429,6 @@
 			>
 			<File
 				RelativePath="..\..\..\_common\CLEye\CLEyeMulticam.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\_common\CLEye\CLEyeMulticam.lib"
 				>
 			</File>
 		</Filter>

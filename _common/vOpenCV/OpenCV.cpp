@@ -348,12 +348,12 @@ IplImage* VideoInput::get_frame()
 		{
 			bool b = _kinect.getDepthBW();
 			_frame = _kinect.bwImage;
-
+			_frame_num ++;
 		}break;
 #endif
 	case From_PS3:
 		{
-
+			_frame_num ++;
 		}break;
 	default:
 		break;
@@ -366,7 +366,7 @@ void VideoInput::_post_init()
 {
 	_frame = get_frame();
 
-	if (_InputType = From_Video)
+	if (_InputType == From_Video)
 	{
 		_fps = cvGetCaptureProperty(_capture, CV_CAP_PROP_FPS);
 		_codec = cvGetCaptureProperty(_capture, CV_CAP_PROP_FOURCC);
@@ -383,7 +383,7 @@ void VideoInput::_post_init()
 	_channel = _frame->nChannels;
 	_frame_num = 0;
 
-	printf("; Size: <%d,%d>\n",  _size.width, _size.height);
+	printf("Size: <%d,%d>\n",  _size.width, _size.height);
 }
 
 VideoInput::~VideoInput()
@@ -583,11 +583,17 @@ void vBackGrayDiff::init(IplImage* initial, void* param/* = NULL*/){
 	thresh = 50;
 	dark_thresh = 200;
 
-	vGrayScale(initial, Bg);
+	if (initial->nChannels == 1)
+		cvCopyImage(initial, Bg);
+	else
+		vGrayScale(initial, Bg);
 }
 
 void vBackGrayDiff::update(IplImage* image, int mode/* = 0*/){
-	vGrayScale(image, Frame);
+	if (image->nChannels == 1)
+		cvCopyImage(image, Frame);
+	else
+		vGrayScale(image, Frame); 
 	if (mode == DETECT_BOTH)
 	{
 		BwImage frame(Frame);

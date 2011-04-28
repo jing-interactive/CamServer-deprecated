@@ -22,7 +22,7 @@ void VideoApp::run()
 		if (!raw)
 			break;
 
-		if (grab_thread->count == input._frame_num)
+		if (grab_thread->is_dirty())
 		{
 			//raw->half_raw->frame
 			//grab_thread->lock();
@@ -37,7 +37,6 @@ void VideoApp::run()
 		{
 		case VK_ESCAPE:
 			app_running = false;
-			break;
 
 		case VK_BACK:
 			{//reset four corner points
@@ -128,48 +127,6 @@ void VideoApp::run()
 			maxArea = minArea*10;
 		vFindBlobs(grayBuffer, blobs, minArea ,maxArea, theConfig.hull_mode == 1);
 		timer.profileFunction("vFindBlobs");
-
-#ifdef FINGER_MATCH
-		//finger match
-		if (blobs.size() > 0)
-		{
-			vBlob& b = blobs[0];
-			Ptr<IplImage> finger = cvCreateImage(cvSize(b.box.width, b.box.height), 8, 1);
-			cvSetImageROI(fore, b.box);
-			cvCopyImage(fore, finger);
-			vThresh(finger, 10);
-			cvResetImageROI(fore);
-			show_image(finger);
-
-			double match = cvMatchShapes(finger, finger_template, CV_CONTOURS_MATCH_I2);
-			IplImage* matched = NULL;
-			if (match < 0.01 )
-			{
-				matched = finger_template;
-				printf("%s with %f\n", "match1" , match);
-			}
-			else
-			{
-				double match = cvMatchShapes(finger, finger_template2, CV_CONTOURS_MATCH_I2);
-				if (match < 0.04 )
-				{
-					matched = finger_template2;
-					printf("%s with %f\n", "match2" , match);
-				}
-				else
-				{
-					double match = cvMatchShapes(finger, finger_template3, CV_CONTOURS_MATCH_I2);
-					if (match < 0.02 )
-					{
-						matched = finger_template3;
-						printf("%s with %f\n", "match3" , match);
-					}
-				}
-			}
-			if (matched)
-				show_image(matched);
-		}
-#endif
 
 		if (theConfig.finger_track)
 		{

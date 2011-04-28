@@ -11,6 +11,11 @@ VideoApp::VideoGrabThread::VideoGrabThread(VideoInput& input):_input(input)
 	fps = 0;
 }
 
+bool VideoApp::VideoGrabThread::is_dirty()
+{
+	return count == _input._frame_num;
+}
+
 void VideoApp::VideoGrabThread::threadedFunction()
 {
 	MiniTimer timer;
@@ -100,14 +105,6 @@ bool VideoApp::init(int argc, char** argv)
 	/*if (face_track)*/
 	haar.init("../../data/haarcascade_frontalface_alt.xml");
 
-	finger_template = cvLoadImage("../../data/finger1.jpg", 0);
-	vThresh(finger_template, 50);
-
-	finger_template2 = cvLoadImage("../../data/finger2.jpg", 0);
-	vThresh(finger_template2, 50);
-
-	finger_template3 = cvLoadImage("../../data/finger3.jpg", 0);
-	vThresh(finger_template3, 50);
 	//grab related
 	grab_thread->lock();//wait for VideoInput::init() returns
 	size = input._size;

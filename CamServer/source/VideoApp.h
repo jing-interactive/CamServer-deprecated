@@ -30,6 +30,7 @@ struct VideoApp
 
 		VideoGrabThread(VideoInput& input);
 		void threadedFunction();
+		bool is_dirty();
 	};
 
 	//thread
@@ -63,11 +64,6 @@ struct VideoApp
 	Ptr<IplImage> half_flip;
 	Ptr<IplImage> grayBlob;
 	Ptr<IplImage> grayBuffer;
-
-	//finger
-	Ptr<IplImage> finger_template;
-	Ptr<IplImage> finger_template2;
-	Ptr<IplImage> finger_template3;
 
 	cv::Size size;
 	int channels;

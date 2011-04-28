@@ -243,6 +243,7 @@ namespace param_gui
 			}
 			cvCreateTrackbar("Blur",PARAM_WINDOW,&theConfig.paramBlur1,PARAM_BLUR1, NULL);
 			cvCreateTrackbar("Noise",PARAM_WINDOW,&theConfig.paramBlur2,PARAM_BLUR2, NULL);
+			//	cvCreateTrackbar("形态",PARAM_WINDOW,&paramNoise,PARAM_NOISE, NULL);
 
 			cvCreateTrackbar("MinArea",PARAM_WINDOW,&theConfig.paramMinArea, PARAM_MAXAREA, NULL);
 			cvCreateTrackbar("MaxArea",PARAM_WINDOW,&theConfig.paramMaxArea,PARAM_MAXAREA, NULL);

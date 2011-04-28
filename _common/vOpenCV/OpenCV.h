@@ -20,6 +20,14 @@
 
 #include "vector2d.h"
 
+#ifdef KINECT
+#include "../clnui/CLNUIDevice.h"
+#include "../clnui/ofxKinectCLNUI.h"
+#endif
+#ifdef PS3
+#include "../cleye/CLEyeMulticam.h"
+#endif
+
 using namespace cv;
 
 using std::vector;
@@ -34,7 +42,7 @@ using std::map;
 //CV_FOURCC('I', '2', '6', '3') = H263I codec
 //CV_FOURCC('F', 'L', 'V', '1') = FLV1 codec
  
-void vFlip(CvArr* src, int flipX, int flipY);
+void vFlip(const CvArr* src, int flipX, int flipY);
 
 template<class T> class Image
 {
@@ -176,6 +184,12 @@ struct VideoInput
 		From_Image = 0,
 		From_Video,
 		From_Camera,
+#ifdef KINECT
+		From_Kinect,
+#endif
+#ifdef PS3
+		From_PS3,
+#endif
 		From_Count,
 	}_InputType;
 
@@ -204,6 +218,13 @@ struct VideoInput
 	bool init(char* video_file);
 	bool init(int argc, char** argv);
 
+#ifdef KINECT
+	ofxKinectCLNUI _kinect;
+	bool init_kinect();
+#endif
+#ifdef PS3
+	bool init_ps3();
+#endif
 	void wait(int t);
 
 	IplImage* get_frame();

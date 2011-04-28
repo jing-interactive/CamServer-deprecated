@@ -243,25 +243,64 @@ bool VideoInput::init(int cam_idx)
 
 bool VideoInput::init(char* file_name)
 {
-	_frame = cvLoadImage(file_name);
-
-	if (_frame)
+	bool loaded = false;
+#ifdef KINECT
+	if (strcmp(file_name, "kinect")==0)
 	{
-		printf("Reading from image %s.\n", file_name);
-		_InputType = From_Image;
-	}
-	else
-	{
-		_capture = cvCaptureFromAVI(file_name);
-		if( _capture )
+		bool b = init_kinect();
+		if (b)
 		{
-			printf("Reading from video %s.\n", file_name);
-			_InputType = From_Video;
+			_InputType = From_Kinect;
+			loaded = true;
+			printf("Reading from kinect.\n");
 		}
 		else
 		{
-			printf("Could not open file %s.\n", file_name);
+			printf("Failed to open kinect.\n");
 			return false;
+		}
+	}
+#endif
+#ifdef PS3
+	if (strcmp(file_name, "ps3")==0)
+	{
+		bool b = init_ps3();
+		if (b)
+		{
+			_InputType = From_PS3;
+			loaded = true;
+			printf("Reading from ps3 camera.\n");
+		}
+		else
+		{
+			printf("Failed to open ps3 camera.\n");
+			return false;
+		}
+	}
+#endif
+
+	if (!loaded)
+	{
+		_frame = cvLoadImage(file_name);
+
+		if (_frame)
+		{
+			printf("Reading from image %s.\n", file_name);
+			_InputType = From_Image;
+		}
+		else
+		{
+			_capture = cvCaptureFromAVI(file_name);
+			if( _capture )
+			{
+				printf("Reading from video %s.\n", file_name);
+				_InputType = From_Video;
+			}
+			else
+			{
+				printf("Could not open file %s.\n", file_name);
+				return false;
+			}
 		}
 	}
 
@@ -291,24 +330,44 @@ void VideoInput::wait(int t)
 
 IplImage* VideoInput::get_frame()
 {
-	if (_InputType != From_Image)
+	switch (_InputType)
 	{
-		_frame = cvQueryFrame(_capture);
-		_frame_num ++;
-		if (_frame == NULL)
+	case From_Camera:
+	case From_Video:
 		{
-			cvReleaseCapture(&_capture);
-			init(_argc, _argv);
-		}
+			_frame = cvQueryFrame(_capture);
+			_frame_num ++;
+			if (_frame == NULL)
+			{
+				cvReleaseCapture(&_capture);
+				init(_argc, _argv);
+			}
+		}break;
+#ifdef KINECT
+	case From_Kinect:
+		{
+			bool b = _kinect.getDepthBW();
+			_frame = _kinect.bwImage;
+
+		}break;
+#endif
+	case From_PS3:
+		{
+
+		}break;
+	default:
+		break;
 	}
+
 	return _frame;
 }
 
 void VideoInput::_post_init()
 {
-	if (_InputType != From_Image)
+	_frame = get_frame();
+
+	if (_InputType = From_Video)
 	{
-		_frame = get_frame();
 		_fps = cvGetCaptureProperty(_capture, CV_CAP_PROP_FPS);
 		_codec = cvGetCaptureProperty(_capture, CV_CAP_PROP_FOURCC);
 		if (_fps == 0)
@@ -334,6 +393,19 @@ VideoInput::~VideoInput()
 	//	if (_frame != NULL)
 	//		cvReleaseImage(&_frame);
 }
+#ifdef KINECT
+bool VideoInput::init_kinect()
+{
+	return _kinect.initKinect(640, 480, 0, 0);
+}
+
+#endif
+#ifdef PS3
+bool VideoInput::init_ps3()
+{
+	return false;
+}
+#endif
 
 vBackCodeBook::vBackCodeBook()
 {

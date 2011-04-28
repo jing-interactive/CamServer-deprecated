@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../../../_common"
-				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;USING_FLO_DEBUG"
+				PreprocessorDefinitions="KINECT;PS3;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;USING_FLO_DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -123,7 +123,7 @@
 				OmitFramePointers="true"
 				EnableFiberSafeOptimizations="true"
 				AdditionalIncludeDirectories="../../../_common"
-				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;USING_FLO_DEBUG"
+				PreprocessorDefinitions="KINECT;PS3;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;USING_FLO_DEBUG"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -405,6 +405,38 @@
 			</File>
 			<File
 				RelativePath="..\..\..\_common\oscpack\UdpSocket.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Kinect"
+			>
+			<File
+				RelativePath="..\..\..\_common\CLNUI\CLNUIDevice.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\_common\CLNUI\CLNUIDevice.lib"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\_common\CLNUI\ofxKinectCLNUI.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\_common\CLNUI\ofxKinectCLNUI.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="PS3Camera"
+			>
+			<File
+				RelativePath="..\..\..\_common\CLEye\CLEyeMulticam.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\_common\CLEye\CLEyeMulticam.lib"
 				>
 			</File>
 		</Filter>

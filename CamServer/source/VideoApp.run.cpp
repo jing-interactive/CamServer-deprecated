@@ -93,7 +93,7 @@ void VideoApp::run()
 					cvCopyImage(white_frame, prevBg);
 				}
 				else
-				{//only realtime background needs take care of flip
+				{//only real time background needs take care of flip
 					backModel->init(frame, (void*)&paramMoG);
 					g_prevFx = g_Fx;
 					g_prevFy = g_Fy;

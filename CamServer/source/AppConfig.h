@@ -3,6 +3,11 @@
 #include <opencv/cxcore.h>
 #include <string>
 
+#define		BLACK_BG 0		//black
+#define		WHITE_BG 1		//white
+#define		GRAY_BG	2		//gray; especially for kinect
+#define		REAL_BG	3		//real time background
+
 struct AppConfig
 {
 	AppConfig();
@@ -10,9 +15,6 @@ struct AppConfig
 	bool load_from(char* filename);
 	bool save_to(char* filename);
 
-#define		BLACK_BG 0		//black
-#define		WHITE_BG 1		//white
-#define		REAL_BG	2		//realtime background
 	int bg_mode;
 
 	std::string CLIENT;

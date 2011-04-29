@@ -56,7 +56,7 @@ struct VideoApp
 
 	//the IplImages
 	Ptr<IplImage> total;
-	Ptr<IplImage> frame, black_frame, white_frame;
+	Ptr<IplImage> frame, black_frame, white_frame, gray_frame;
 	Ptr<IplImage> prevBg;
 
 	//

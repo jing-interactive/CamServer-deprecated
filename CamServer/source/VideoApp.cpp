@@ -16,11 +16,6 @@ bool VideoApp::VideoGrabThread::is_dirty()
 	return count == _input._frame_num;
 }
 
-bool VideoApp::is_dirty()
-{
-	return count == _input._frame_num;
-}
-
 void VideoApp::VideoGrabThread::threadedFunction()
 {
 	MiniTimer timer;
@@ -154,11 +149,13 @@ bool VideoApp::init(int argc, char** argv)
 	frame = cvCreateImage(half, 8, channels);
 	black_frame = cvCreateImage(half, 8, channels);
 	white_frame = cvCreateImage(half, 8, channels);
+	gray_frame = cvCreateImage(half, 8, channels);
 	grayBuffer = cvCreateImage(half, 8, 1);
 	prevBg = cvCreateImage(half, 8, channels);
 
 	cvSet(black_frame, CV_BLACK);
 	cvSet(white_frame, CV_WHITE);
+	cvSet(gray_frame, CV_GRAY);
 
 	if (theConfig.delay_for_run > 0)					// if necessary
 		SLEEP(theConfig.delay_for_run * 1000);	// sleep before the app shows up

@@ -163,6 +163,11 @@ namespace param_gui
 		theApp.onRefreshBack();
 	}
 
+	void on_graybg(int t)
+	{
+		theConfig.bg_mode = GRAY_BG;
+		theApp.onRefreshBack();
+	}
 	ButtonInfo btn_infs[]=
 	{
 		{ w=13, h=35,  "- X -", on_x, &theConfig.paramFlipX},
@@ -172,10 +177,11 @@ namespace param_gui
 		{ w+=dw, h,  "hull", on_hull, &theConfig.hull_mode},
 		{ w+=dw, h,  "gray", on_mode, &theConfig.gray_detect_mode},
 //		{ w=13, h+=dh,  "expo", on_expo, &theConfig.auto_explosure},
-		{ w=13+dw, h+=dh,  "dialog", on_dialog, &negative_one},
+		{ w=13, h+=dh,  "dialog", on_dialog, &negative_one},
 		{ w+=dw*1.5, h,  "real", on_realbg, NULL},
 		{ w+=dw, h,  "white", on_whitebg, NULL},
 		{ w+=dw, h,  "black", on_blackbg, NULL},
+		{ w+=dw, h,  "gray", on_graybg, NULL},
 	};
 
 	int num_btns = sizeof(btn_infs)/sizeof(ButtonInfo);
@@ -188,12 +194,14 @@ namespace param_gui
 
 		const int x0 = 175;
 		const int y0 = 70;
-		if (theConfig.bg_mode == BLACK_BG)
+		if (theConfig.bg_mode == GRAY_BG)
 			cvRectangle(setting, cvPoint(x0+dw*2,y0), cvPoint(x0+dw*2+_w,y0+_h), CV_RGB(10,10,122), 3);
-		else 	if (theConfig.bg_mode == WHITE_BG)
+		else 	if (theConfig.bg_mode == BLACK_BG)
 			cvRectangle(setting, cvPoint(x0+dw,y0), cvPoint(x0+dw+_w,y0+_h), CV_RGB(10,10,122), 3);
-		else
+		else 	if (theConfig.bg_mode == WHITE_BG)
 			cvRectangle(setting, cvPoint(x0,y0), cvPoint(x0+_w,y0+_h), CV_RGB(10,10,122), 3);
+		else
+			cvRectangle(setting, cvPoint(x0-dw,y0), cvPoint(x0-dw+_w,y0+_h), CV_RGB(10,10,122), 3);
 	}
 
 	void init()

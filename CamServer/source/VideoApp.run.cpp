@@ -93,6 +93,12 @@ void VideoApp::run()
 					cvCopyImage(white_frame, prevBg);
 				}
 				else
+					if (theConfig.bg_mode == GRAY_BG)
+					{
+						backModel->init(gray_frame, (void*)&paramMoG);
+						cvCopyImage(gray_frame, prevBg);
+					}
+				else
 				{//only real time background needs take care of flip
 					backModel->init(frame, (void*)&paramMoG);
 					g_prevFx = g_Fx;

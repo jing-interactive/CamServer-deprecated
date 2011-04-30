@@ -93,10 +93,10 @@ void VideoApp::run()
 					cvCopyImage(white_frame, prevBg);
 				}
 				else
-					if (theConfig.bg_mode == GRAY_BG)
+					if (theConfig.bg_mode == KINECT_BG)
 					{
-						backModel->init(gray_frame, (void*)&paramMoG);
-						cvCopyImage(gray_frame, prevBg);
+					//	backModel->init(kinect_frame, (void*)&paramMoG);
+					//	cvCopyImage(kinect_frame, prevBg);
 					}
 				else
 				{//only real time background needs take care of flip
@@ -113,12 +113,23 @@ void VideoApp::run()
 			timer.profileFunction("haar.find");
 		}
 
-		IplImage* back = backModel->getBackground();//for render only
+		IplImage* back = NULL;//for render only
 
-		backModel->setIntParam(0, theConfig.paramBright);
-		backModel->setIntParam(1, theConfig.paramDark);
-		backModel->update(frame, DETECT_BOTH);
-		IplImage* fore = backModel->getForeground();
+		IplImage* fore = NULL;
+		if (theConfig.bg_mode == KINECT_BG)
+		{
+			cvInRangeS( frame, cvScalar(theConfig.paramDark), cvScalar(theConfig.paramBright), kinect_frame );
+			fore = kinect_frame;
+			back = kinect_frame;
+		}
+		else
+		{
+			backModel->setIntParam(0, theConfig.paramBright);
+			backModel->setIntParam(1, theConfig.paramDark);
+			backModel->update(frame, DETECT_BOTH);
+			fore = backModel->getForeground();
+			back = backModel->getBackground();//for render only
+		}
 
 		timer.profileFunction("backModel->update");
 		//fore->blobs

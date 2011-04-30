@@ -3,8 +3,8 @@
 #define MAIN_WINDOW "Monitor"
 #define PARAM_WINDOW "Param Panel"
 
-#define PARAM_DARK 253
-#define PARAM_BRIGHT 253
+#define PARAM_DARK 255
+#define PARAM_BRIGHT 255
 #define PARAM_AUTO 40
 #define PARAM_BLUR1 80
 #define PARAM_BLUR2 7

@@ -163,9 +163,9 @@ namespace param_gui
 		theApp.onRefreshBack();
 	}
 
-	void on_graybg(int t)
+	void on_kinectbg(int t)
 	{
-		theConfig.bg_mode = GRAY_BG;
+		theConfig.bg_mode = KINECT_BG;
 		theApp.onRefreshBack();
 	}
 	ButtonInfo btn_infs[]=
@@ -181,7 +181,7 @@ namespace param_gui
 		{ w+=dw*1.5, h,  "real", on_realbg, NULL},
 		{ w+=dw, h,  "white", on_whitebg, NULL},
 		{ w+=dw, h,  "black", on_blackbg, NULL},
-		{ w+=dw, h,  "gray", on_graybg, NULL},
+		{ w+=dw, h,  "kinect", on_kinectbg, NULL},
 	};
 
 	int num_btns = sizeof(btn_infs)/sizeof(ButtonInfo);
@@ -194,7 +194,7 @@ namespace param_gui
 
 		const int x0 = 175;
 		const int y0 = 70;
-		if (theConfig.bg_mode == GRAY_BG)
+		if (theConfig.bg_mode == KINECT_BG)
 			cvRectangle(setting, cvPoint(x0+dw*2,y0), cvPoint(x0+dw*2+_w,y0+_h), CV_RGB(10,10,122), 3);
 		else 	if (theConfig.bg_mode == BLACK_BG)
 			cvRectangle(setting, cvPoint(x0+dw,y0), cvPoint(x0+dw+_w,y0+_h), CV_RGB(10,10,122), 3);

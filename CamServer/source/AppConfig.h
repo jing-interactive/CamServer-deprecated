@@ -5,7 +5,7 @@
 
 #define		BLACK_BG 0		//black
 #define		WHITE_BG 1		//white
-#define		GRAY_BG	2		//gray; especially for kinect
+#define		KINECT_BG	2		//for kinect
 #define		REAL_BG	3		//real time background
 
 struct AppConfig

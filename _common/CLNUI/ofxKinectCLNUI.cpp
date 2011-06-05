@@ -17,7 +17,7 @@ bool ofxKinectCLNUI::initKinect(int wid,int hei,double lowbound,double upbound)
 	camWidth = wid;
 	camHeight = hei;
 	int count = GetNUIDeviceCount();
-	if (count > 0)
+	if (count > 0) 
 	{
 		PCHAR serial = GetNUIDeviceSerial(0);
 		kinectCam= CreateNUICamera(serial);

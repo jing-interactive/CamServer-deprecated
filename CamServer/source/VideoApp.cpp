@@ -149,7 +149,7 @@ bool VideoApp::init(int argc, char** argv)
 	frame = cvCreateImage(half, 8, channels);
 	black_frame = cvCreateImage(half, 8, channels);
 	white_frame = cvCreateImage(half, 8, channels);
-	kinect_frame = cvCreateImage(half, 8, channels);
+	kinect_frame = cvCreateImage(half, 8, 1);
 	grayBuffer = cvCreateImage(half, 8, 1);
 	prevBg = cvCreateImage(half, 8, channels);
 

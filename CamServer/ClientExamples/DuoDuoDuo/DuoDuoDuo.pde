@@ -57,17 +57,6 @@ void setup() {
   initPhysics();
 }
 
-void vDrawPoly(ArrayList pt_list)
-{ 
-  beginShape();
-  for (int j=0; j<pt_list.size();j++ )
-  {
-    PVector pos = (PVector)pt_list.get(j);
-    vertex(pos.x, pos.y); 
-  }
-  endShape(CLOSE); 
-}
-
 int g_prevMonsterID = 0;
 
 void draw()

@@ -12,6 +12,13 @@
 #pragma comment(lib,"highgui210.lib")
 #endif
 
+#ifdef KINECT 
+#include "../clnui/ofxKinectCLNUI.h"
+#endif
+#ifdef PS3 
+#include "../CLEye/ofxCLeye.h"
+#endif
+
 #include <set>
 
 void vRotateImage(IplImage* image, float angle, float centreX, float centreY){
@@ -346,13 +353,15 @@ IplImage* VideoInput::get_frame()
 #ifdef KINECT
 	case From_Kinect:
 		{
-			bool b = _kinect.getDepthBW();
-			_frame = _kinect.bwImage;
+			bool b = _kinect->getDepthBW();
+			_frame = _kinect->bwImage;
 			_frame_num ++;
 		}break;
 #endif
 	case From_PS3:
 		{
+			bool b = _ps3_cam->getFrame();
+			_frame = _ps3_cam->frame;
 			_frame_num ++;
 		}break;
 	default:
@@ -396,14 +405,24 @@ VideoInput::~VideoInput()
 #ifdef KINECT
 bool VideoInput::init_kinect()
 {
-	return _kinect.initKinect(640, 480, 0, 0);
+	_kinect = new ofxKinectCLNUI;
+	return _kinect->initKinect(640, 480, 0, 0);
 }
 
 #endif
 #ifdef PS3
 bool VideoInput::init_ps3()
 {
-	return false;
+	_ps3_cam = new ofxCLeye;
+	int n_ps3 = _ps3_cam->listDevices();
+	if (n_ps3 > 0)
+	{
+		return _ps3_cam->init(320, 240, false);
+	}
+	else
+	{
+		return false;
+	}
 }
 #endif
 

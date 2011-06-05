@@ -21,11 +21,10 @@
 #include "vector2d.h"
 
 #ifdef KINECT
-#include "../clnui/CLNUIDevice.h"
-#include "../clnui/ofxKinectCLNUI.h"
+class ofxKinectCLNUI; 
 #endif
 #ifdef PS3
-#include "../cleye/CLEyeMulticam.h"
+class ofxCLeye;
 #endif
 
 using namespace cv;
@@ -219,10 +218,11 @@ struct VideoInput
 	bool init(int argc, char** argv);
 
 #ifdef KINECT
-	ofxKinectCLNUI _kinect;
+	Ptr<ofxKinectCLNUI> _kinect;
 	bool init_kinect();
 #endif
 #ifdef PS3
+    Ptr<ofxCLeye> _ps3_cam;
 	bool init_ps3();
 #endif
 	void wait(int t);

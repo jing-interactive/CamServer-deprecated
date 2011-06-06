@@ -103,7 +103,10 @@ bool VideoApp::init(int argc, char** argv)
 	
 	//theConfig.auto_explosure = _input.getAutoExplosure();
 	/*if (face_track)*/
-	haar.init("../../data/haarcascade_frontalface_alt.xml");
+	if (!haar.init("../../data/haarcascade_frontalface_alt.xml"))
+	{//try another folder
+		haar.init("../data/haarcascade_frontalface_alt.xml");
+	}
 
 	//grab related
 	grab_thread->lock();//wait for VideoInput::init() returns

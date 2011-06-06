@@ -108,7 +108,7 @@ bool ofxCLeye::init(int w, int h, bool isGrey)
 	if (bOk == true){
 		CLEyeCameraGetFrameDimensions(_cam, width, height); 
 
-		CLEyeSetCameraParameter(_cam, CLEYE_AUTO_GAIN, 0);
+		CLEyeSetCameraParameter(_cam, CLEYE_AUTO_GAIN, 1);
 		CLEyeSetCameraParameter(_cam, CLEYE_AUTO_EXPOSURE, 0);
 		CLEyeSetCameraParameter(_cam, CLEYE_AUTO_WHITEBALANCE, 1);
 

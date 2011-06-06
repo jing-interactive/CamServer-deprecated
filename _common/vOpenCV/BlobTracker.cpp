@@ -408,7 +408,10 @@ vHaarFinder::~vHaarFinder()
 bool vHaarFinder::init(char* cascade_name)
 {
 	cascade = (CvHaarClassifierCascade*)cvLoad( cascade_name, 0, 0, 0 );
-	storage = cvCreateMemStorage(0);
+	if (cascade)
+	{
+		storage = cvCreateMemStorage(0);
+	}
 
 	return cascade && storage;
 }

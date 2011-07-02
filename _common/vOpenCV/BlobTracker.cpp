@@ -604,7 +604,10 @@ void vBlobTracker::trackBlobs(const vector<vBlob>& _newBlobs)
 				if(j==trackedBlobs.size())//got to end without finding it
 				{
 					newBlobs[winner].id = trackedBlobs[i].id;
+					Point2f lastCenter = trackedBlobs[i].center;
 					trackedBlobs[i] = newBlobs[winner];
+					trackedBlobs[i].velocity.x = trackedBlobs[i].center.x - lastCenter.x;
+					trackedBlobs[i].velocity.y = trackedBlobs[i].center.y - lastCenter.y;
 				}
 				else //found it, compare with current blob
 				{
@@ -669,7 +672,10 @@ void vBlobTracker::trackBlobs(const vector<vBlob>& _newBlobs)
 				if(trackedBlobs[i].id==newBlobs[j].id)
 				{
 					//update track
-					trackedBlobs[i]=newBlobs[j];
+					Point2f lastCenter = trackedBlobs[i].center;
+					trackedBlobs[i] = newBlobs[j];
+					trackedBlobs[i].velocity.x = trackedBlobs[i].center.x - lastCenter.x;
+					trackedBlobs[i].velocity.y = trackedBlobs[i].center.y - lastCenter.y;
 
 					//SEND BLOB MOVED EVENT
 					doBlobMoved( trackedBlobs[i] );

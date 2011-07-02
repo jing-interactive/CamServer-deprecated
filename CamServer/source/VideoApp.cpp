@@ -316,6 +316,8 @@ void VideoApp::send_tuio_msg()
 	const float _W = HalfWidth;
 	const float _H = HalfHeight;
 
+	ofxOscBundle bundle;
+
 	ofxOscMessage alive;
 	{
 		alive.setAddress("/tuio/2Dcur");
@@ -349,15 +351,16 @@ void VideoApp::send_tuio_msg()
 		m.addIntArg(blob.id);				// id
 		addFloatX(blob.center.x);	// x
 		addFloatX(blob.center.y)	// y
-		m.addFloatArg(0);			// dX
-		m.addFloatArg(0);			// dY
-		m.addFloatArg(0);		// m
-		sender.sendMessage(m);
+		addFloatX(blob.velocity.x);			// dX
+		addFloatX(blob.velocity.y);			// dY
+		m.addFloatArg(0);		// maccel
+		bundle.addMessage(m);
 		alive.addIntArg(blob.id);				// add blob to list of ALL active IDs
 	}
 	
-	sender.sendMessage(alive);
-	sender.sendMessage(fseq);	
+	bundle.addMessage(alive);
+	bundle.addMessage(fseq);
+	sender.sendBundle(bundle);
 }
 
 void VideoApp::onRefreshBack()

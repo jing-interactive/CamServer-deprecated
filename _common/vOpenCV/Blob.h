@@ -23,15 +23,15 @@ struct vBlob
 		isHole = false;
 	}
 
-	vBlob(const vBlob& b)
+	vBlob(const vBlob& b):box(b.box),center(b.center),pts(b.pts)
 	{
-		box = b.box;
-		center = b.center;
+	//	box = b.box;
+	//	center = b.center;
 		area = b.area;
 		angle = b.angle;
 		isHole = b.isHole;
 		length = b.length;
-		pts = b.pts;
+	//	pts = b.pts;
 	}
 
 	vBlob(Rect rc, Point ct, float _area = 0, float _angle = 0, bool hole = false)
@@ -97,11 +97,7 @@ struct vTrackedBlob : public vBlob
 
 	E_status status;
 	int id;
-
-	Point2f deltaLoc;
-    Point2f deltaLocTotal;
-    Point2f predictedPos;
-    float deltaArea;
+	Point2f velocity;
 
     // Used only by BlobTracker
     //
@@ -114,21 +110,19 @@ struct vTrackedBlob : public vBlob
 	vTrackedBlob():vBlob() {
         id = BLOB_UN_NAMED;
 		status = statusStill;
-        deltaArea = 0.0f;
         markedForDeletion = false;
         framesLeft = 0;
     }
 
-    vTrackedBlob( const vBlob& b ) {
+	vTrackedBlob( const vBlob& b ):vBlob(b) {
         area = b.area;
-        box = b.box;
-        center = b.center;
+   //     box = b.box;
+     //   center = b.center;
         isHole = b.isHole;
-        pts = b.pts;
+       // pts = b.pts;
 
         id = BLOB_UN_NAMED;
 		status = statusStill;
-        deltaArea = 0.0f;
         markedForDeletion = false;
         framesLeft = 0;
     }

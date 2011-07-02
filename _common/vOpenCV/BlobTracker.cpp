@@ -299,7 +299,7 @@ bool vFingerDetector::findHands(const vBlob& smblob, int k)
 	//lhand.clear();
 	//rhand.clear();
 	//
-	//cv::Point hcenter=smblob.center;
+	//cv::Point hcenter=smobj.center;
 
 	//int nPts = smblob.pts.size();
 	//for(int i=k; i<nPts-k; i++)

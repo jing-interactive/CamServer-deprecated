@@ -207,16 +207,14 @@ void VideoApp::onParamAuto(int v)
 	onRefreshBack();
 }
 
+#define addFloatX(num) m.addFloatArg(num/_W);
+#define addFloatY(num) m.addFloatArg(num/_H);
 
 void VideoApp::send_osc_msg()
 {
-	UINT nBlobs = blobTracker.trackedBlobs.size(); 
-
 	const float _W = HalfWidth;
 	const float _H = HalfHeight;
 
-#define addFloatX(num) m.addFloatArg(num/_W);
-#define addFloatY(num) m.addFloatArg(num/_H);
 	//start
 	{
 		ofxOscMessage m;
@@ -279,17 +277,10 @@ void VideoApp::send_osc_msg()
 
 			{
 				ofxOscMessage m;
-				if (!theConfig.detailed_mode)
-				{
-					m.setAddress( "/blob");
-				}
+				if (obj.isHole)
+					m.setAddress( "/hole");
 				else
-				{
-					if (obj.isHole)
-						m.setAddress( "/hole");
-					else
-						m.setAddress( "/contour");
-				}
+					m.setAddress( "/contour");
 
 				m.addIntArg(id);
 				m.addStringArg(obj.getStatusString());
@@ -299,7 +290,7 @@ void VideoApp::send_osc_msg()
 				addFloatY(y);
 				addFloatX(w);
 				addFloatY(h);
-				if (theConfig.detailed_mode)
+				if (theConfig.tuio_mode)
 				{
 					int nPts = obj.pts.size();
 					m.addIntArg(nPts);
@@ -318,6 +309,55 @@ void VideoApp::send_osc_msg()
 		m.setAddress( "/end" );
 		sender.sendMessage( m );
 	}	
+}
+
+void VideoApp::send_tuio_msg()
+{
+	const float _W = HalfWidth;
+	const float _H = HalfHeight;
+
+	ofxOscMessage alive;
+	{
+		alive.setAddress("/tuio/2Dcur");
+		alive.addStringArg("alive");
+	}
+
+	ofxOscMessage fseq;
+	{
+		fseq.setAddress( "/tuio/2Dcur" );
+		fseq.addStringArg( "fseq" );
+		fseq.addIntArg(input._frame_num);
+	}
+
+	int n_blobs = blobTracker.trackedBlobs.size();
+	for(int i=0;i < n_blobs; i++)
+	{
+		vTrackedBlob& blob = blobTracker.trackedBlobs[i];
+
+		if (blob.isHole)
+			vPolyLine(frame, blob.pts, cv::Scalar(0,0,0), 1);
+		else
+			vPolyLine(frame, blob.pts, vDefaultColor(blob.id), 1);
+		//	vDrawRect(frame, obj.box, CV_RGB(0,122,255));
+		sprintf(g_buffer, "#%d", blob.id);
+		vDrawText(frame, blob.center.x, blob.center.y, g_buffer, vDefaultColor(blob.id));
+
+		//Set Message
+		ofxOscMessage m;
+		m.setAddress( "/tuio/2Dcur" );
+		m.addStringArg("set");
+		m.addIntArg(blob.id);				// id
+		addFloatX(blob.center.x);	// x
+		addFloatX(blob.center.y)	// y
+		m.addFloatArg(0);			// dX
+		m.addFloatArg(0);			// dY
+		m.addFloatArg(0);		// m
+		sender.sendMessage(m);
+		alive.addIntArg(blob.id);				// add blob to list of ALL active IDs
+	}
+	
+	sender.sendMessage(alive);
+	sender.sendMessage(fseq);	
 }
 
 void VideoApp::onRefreshBack()

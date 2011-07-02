@@ -164,8 +164,17 @@ void VideoApp::run()
 		blobTracker.trackBlobs(blobs);
 		timer.profileFunction("blobTracker");
 
-		send_osc_msg();
-		timer.profileFunction("send_osc_msg");
+		if (theConfig.tuio_mode)
+		{
+			send_tuio_msg();
+			timer.profileFunction("send_tuio_msg");
+		}
+		else
+		{
+
+			send_osc_msg();
+			timer.profileFunction("send_osc_msg");
+		}
 
 		if (monitorVisible)
 		{

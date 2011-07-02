@@ -20,7 +20,7 @@ struct AppConfig
 	std::string CLIENT;
 	int PORT;
 	int fixed_back_mode;	
-	int detailed_mode ;
+	int tuio_mode ;
 	int face_track;
 	int hand_track;
 	int finger_track;

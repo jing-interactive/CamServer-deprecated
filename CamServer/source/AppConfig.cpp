@@ -19,7 +19,7 @@ AppConfig::AppConfig():CLIENT("localhost")
 {
 	PORT = 3333;
 	fixed_back_mode = TRUE;
-	detailed_mode = TRUE;
+	tuio_mode = TRUE;
 	face_track = FALSE;
 	hand_track = FALSE;
 	finger_track = FALSE;

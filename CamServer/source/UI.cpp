@@ -106,9 +106,9 @@ namespace param_gui
 		theConfig.hull_mode = t;
 	}
 
-	void on_detail(int t)
+	void on_tuio(int t)
 	{
-		theConfig.detailed_mode = t;
+		theConfig.tuio_mode = t;
 	}
 
 	void on_expo(int t)
@@ -172,7 +172,7 @@ namespace param_gui
 	{
 		{ w=13, h=35,  "- X -", on_x, &theConfig.paramFlipX},
 		{ w+=dw, h,  "- Y -", on_y, &theConfig.paramFlipY},
-		{ w+=dw, h,  "detail", on_detail, &theConfig.detailed_mode},
+		{ w+=dw, h,  "tuio", on_tuio, &theConfig.tuio_mode},
 		{ w+=dw, h,  "face", on_face, &theConfig.face_track},
 		{ w+=dw, h,  "hull", on_hull, &theConfig.hull_mode},
 		{ w+=dw, h,  "gray", on_mode, &theConfig.gray_detect_mode},

@@ -7,8 +7,8 @@ void VideoApp::run()
 {	
 	MiniTimer timer;
 	MiniTimer timer_total;
-	int ms_counter = 0;
-	int frame_counter = 0;
+	int _ms_counter = 0;
+	int _frm_counter = 0;
 	int fps=0;
 
 	while (app_running)
@@ -22,14 +22,8 @@ void VideoApp::run()
 		if (!raw)
 			break;
 
-		if (grab_thread->is_dirty())
-		{
-			//raw->half_raw->frame
-			//grab_thread->lock();
-			cvResize(raw, half_raw);
-			//grab_thread->unlock();
-			timer.profileFunction("cvResize");
-		}
+		cvResize(raw, half_raw);
+		timer.profileFunction("cvResize");
 
 		int key = cvWaitKey(1);
 
@@ -75,37 +69,59 @@ void VideoApp::run()
 		{//needs perspective transform
 			cvWarpPerspective(half_raw, frame, warp_matrix);
 		}
+		if (grab_thread->is_dirty())
+		{ 
+			if (theConfig.bg_mode == DIFF_BG)
+			{
+				//prevFrame->diff_Bg
+				vBackGrayDiff* diff = (vBackGrayDiff*)(IBackGround*)backModel;
+				if (channels == 3)
+					vGrayScale(prevBg, diff->Bg);
+				else
+					cvCopyImage(prevBg, diff->Bg);
+				//clean frame->prevFrame
+				cvCopyImage(frame, prevBg);
+			}
+		}
 		timer.profileFunction("vPerspectiveTransform");	
 
 		if (to_reset_back)
 		{
 			to_reset_back = false;
 
-			if (theConfig.bg_mode == BLACK_BG)
+			switch (theConfig.bg_mode)
 			{
-				backModel->init(black_frame, (void*)&paramMoG);
-				cvCopyImage(black_frame, prevBg);
-			}
-			else
-				if (theConfig.bg_mode == WHITE_BG)
+			case REAL_BG:
 				{
-					backModel->init(white_frame, (void*)&paramMoG);
-					cvCopyImage(white_frame, prevBg);
-				}
-				else
-					if (theConfig.bg_mode == KINECT_BG)
-					{
-					//	backModel->init(kinect_frame, (void*)&paramMoG);
-					//	cvCopyImage(kinect_frame, prevBg);
-					}
-				else
-				{//only real time background needs take care of flip
+					//only real time background needs take care of flip
 					backModel->init(frame, (void*)&paramMoG);
 					g_prevFx = g_Fx;
 					g_prevFy = g_Fy;
 					cvCopyImage(frame, prevBg);
-				}
-		}
+				}break;
+			case BLACK_BG:
+				{
+					backModel->init(black_frame, (void*)&paramMoG);
+					cvCopyImage(black_frame, prevBg);
+				}break;
+			case WHITE_BG:
+				{
+					backModel->init(white_frame, (void*)&paramMoG);
+					cvCopyImage(white_frame, prevBg);
+				}break;
+			case DIFF_BG:
+				{
+					//copy it in case huge blobs generated
+					backModel->init(frame, (void*)&paramMoG);
+				}break;
+			case KINECT_BG:
+				{
+
+				}break;
+			default:
+				break;
+			}
+ 		}
 
 		if (theConfig.face_track)
 		{
@@ -114,8 +130,8 @@ void VideoApp::run()
 		}
 
 		IplImage* back = NULL;//for render only
-
 		IplImage* fore = NULL;
+
 		if (theConfig.bg_mode == KINECT_BG)
 		{
 			cvInRangeS( frame, cvScalar(theConfig.paramDark), cvScalar(theConfig.paramBright), kinect_frame );
@@ -191,7 +207,6 @@ void VideoApp::run()
 			if (selected)
 				cvRectangle(total, *selected - kk, *selected + kk, CV_RGB(0,0,255), CV_FILLED);
 
-			//show_image(total);
 			const int spac = HalfWidth*0.1;
 			cvLine(total, cvPoint(HalfWidth-spac, HalfHeight), cvPoint(HalfWidth+spac, HalfHeight), CV_BLUE);
 			cvLine(total, cvPoint(HalfWidth, HalfHeight-spac), cvPoint(HalfWidth, HalfHeight+spac), CV_BLUE);
@@ -200,13 +215,13 @@ void VideoApp::run()
 			timer.profileFunction("show Monitor");
 		}
 
-		frame_counter++;
+		_frm_counter++;
 
-		if ((ms_counter += timer_total.getTimeElapsedMS()) > 1000)
+		if ((_ms_counter += timer_total.getTimeElapsedMS()) > 1000)
 		{
-			fps = frame_counter;
-			frame_counter = 0;
-			ms_counter = 0;
+			fps = _frm_counter;
+			_frm_counter = 0;
+			_ms_counter = 0;
 		}
 
 		sprintf(g_buffer, "FPS {Cam %d Server %d} %d object", grab_thread->fps, fps, blobs.size());

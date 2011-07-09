@@ -3,10 +3,11 @@
 #include <opencv/cxcore.h>
 #include <string>
 
-#define		BLACK_BG 0		//black
+#define		REAL_BG	0		//real time background
 #define		WHITE_BG 1		//white
-#define		KINECT_BG	2		//for kinect
-#define		REAL_BG	3		//real time background
+#define		BLACK_BG 2		//black
+#define		DIFF_BG	3		//diff 
+#define		KINECT_BG	4		//for kinect
 
 struct AppConfig
 {
@@ -38,9 +39,6 @@ struct AppConfig
 	int paramNoise;
 	int paramMinArea;
 	int paramMaxArea;
-
-	int auto_explosure; 
-	bool isDemo;
 
 	cv::Point2f corners[4];
 };

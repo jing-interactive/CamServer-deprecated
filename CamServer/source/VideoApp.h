@@ -23,7 +23,6 @@ struct VideoApp
 {
 	struct VideoGrabThread: public ofxThread
 	{
-		int count;
 		int fps;
 
 		VideoInput& _input;
@@ -31,6 +30,8 @@ struct VideoApp
 		VideoGrabThread(VideoInput& input);
 		void threadedFunction();
 		bool is_dirty();
+	private:
+		bool _dirty;
 	};
 
 	//thread

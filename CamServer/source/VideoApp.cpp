@@ -7,13 +7,14 @@ VideoApp theApp;//global
 
 VideoApp::VideoGrabThread::VideoGrabThread(VideoInput& input):_input(input)
 {
-	count = -1;
 	fps = 0;
 }
 
 bool VideoApp::VideoGrabThread::is_dirty()
 {
-	return count == _input._frame_num;
+	bool ret = _dirty;
+	_dirty = false;
+	return ret;
 }
 
 void VideoApp::VideoGrabThread::threadedFunction()
@@ -27,7 +28,7 @@ void VideoApp::VideoGrabThread::threadedFunction()
 		if (!theApp.app_running)
 			return;
 		_input.get_frame();
-		count = _input._frame_num;
+		_dirty = true; 
 		if (_input._InputType == _input.From_Video)
 		{
 			DWORD elapse = timer.getTimeElapsedMS();
@@ -44,7 +45,7 @@ void VideoApp::VideoGrabThread::threadedFunction()
 		}
 
 		timer.profileFunction("<<thread>>input.get_frame()");
-	}		
+	}
 } 
 
 VideoApp::~VideoApp()

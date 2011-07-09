@@ -24,13 +24,11 @@ AppConfig::AppConfig():CLIENT("localhost")
 	hand_track = FALSE;
 	finger_track = FALSE;
 	hull_mode = FALSE;
-	gray_detect_mode = FALSE;
+	gray_detect_mode = TRUE;
 	minim_window = FALSE;
 	delay_for_run= 0;
 
-	bg_mode = REAL_BG;
-
-	auto_explosure = TRUE;
+	bg_mode = DIFF_BG;
 
 	paramFlipX = 0;
 	paramFlipY = 0;
@@ -82,10 +80,8 @@ bool AppConfig::load_from(char* filename)
 	}
 	else
 	{
-		cv::FileNodeIterator it;
 #define READ_(id, var) fs[id]>>var
 #define READ_FS(var) fs[#var]>>(var)
-#define READ_FS_Point2f(var) it = fs[#var].begin(); it >> var.x >> var.y;
 
 		READ_("corners0_x",corners[0].x);READ_("corners0_y",corners[0].y);
 		READ_("corners1_x",corners[1].x);READ_("corners1_y",corners[1].y);

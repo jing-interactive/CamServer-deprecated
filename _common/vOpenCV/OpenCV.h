@@ -94,17 +94,20 @@ CvScalar vDefaultColor(int idx);
 //在title窗口中，显示w * h个小图片(input)
 void vShowManyImages(char* title, CvImage& input, int w, int h);
 
-#define show_image(img_name) \
+#define show_image(img_name) do{\
 	cvNamedWindow(#img_name);\
-	cvShowImage(#img_name, img_name); 
+	cvShowImage(#img_name, img_name);}\
+	while(0);
 
-#define show_image2(img_name) \
+#define show_image2(img_name) do{\
 	cvNamedWindow(#img_name, 0);\
-	cvShowImage(#img_name, img_name); 
+	cvShowImage(#img_name, img_name);\
+	while(0);
 
-#define show_mat(img_name) \
+#define show_mat(img_name) do{\
 	cv::namedWindow(#img_name, 0);\
-	cv::imshow(#img_name, img_name); 
+	cv::imshow(#img_name, img_name);\
+	while(0);
 
 //mask is 8bit，掩板图片，mask中像素的值 > thresh，则img对应位置为原色，否则为0
 //img is 24bit
@@ -157,6 +160,12 @@ break;
 return 0;
 }
 */
+
+#define WRITE_(key, var) fs<<key<<var
+#define WRITE_FS(var) fs<<(#var)<<(var)
+
+#define READ_(key, var) fs[key]>>var
+#define READ_FS(var) fs[#var]>>(var)
 
 #define vGrayScale(clr, gray) cvCvtColor(clr, gray, CV_BGR2GRAY) 
 #define vColorFul(gray, clr) cvCvtColor(gray, clr , CV_GRAY2BGR) 
@@ -333,81 +342,6 @@ struct vThreeFrameDiff: public IBackGround
 	IplImage* getBackground(){
 		return grayDiff;
 	}
-};
-//
-//struct vBackColorDiff: public IBackGround
-//{
-//	Ptr<IplImage> colorBg;
-//	Ptr<IplImage> grayDiff; 
-//
-//	int w;
-//	int h;
-//	int step; 
-//	int step2;
-//
-//	void init(IplImage* initial, void* param = NULL){
-//		cv::Size size = cvGetSize(initial);
-//		colorBg.release();
-//		colorBg = cvCloneImage(initial);
-//
-//		grayDiff.release();
-//		grayDiff = cvCreateImage(size, 8, 1);
-//
-//		w = colorBg->width;
-//		h = colorBg->height;
-//		step = colorBg->widthStep; 
-//		step2 = grayDiff->widthStep;
-//	} 
-//
-//	void update(IplImage* image, int mode = 0){
-//
-//		cvZero(grayDiff);
-//		for(int y=0;y<h;y++) 
-//			for(int x=0;x<w;x++) 
-//			{
-//				uchar* pixel = &((uchar*)(image->imageData + step*y))[x*3];
-//				uchar* pixel2 = &((uchar*)(colorBg->imageData + step*y))[x*3];
-//				uchar* p = &((uchar*)(grayDiff->imageData + step2*y))[x];
-//
-//				uchar r = pixel[0] - pixel2[0];
-//				uchar g = pixel[1] - pixel2[1];
-//				uchar b = pixel[2] - pixel2[2];
-//
-//				if ((r*r+g*g+b*b) > thresh*thresh)						
-//					*p = 255;
-//				else
-//					*p = 0;
-//			}
-//	}
-//	IplImage* getForeground(){
-//		return grayDiff;
-//	}
-//	IplImage* getBackground(){
-//		return colorBg;
-//	}
-//};
-
-struct vBackCodeBook
-{
-	CvBGCodeBookModel* model;
-	Ptr<IplImage> yuvImage;
-	Ptr<IplImage> ImaskCodeBook;
-	Ptr<IplImage> ImaskCodeBookCC;
-	bool isLearning;
-
-	vBackCodeBook();
-
-	~vBackCodeBook();
-
-	void init(CvSize size);
-
-	bool learn(IplImage* image);
-	void finish_learn();
-
-	//!!!!never release the returned image
-	IplImage* getForeground(IplImage* image);
-
-	void release();
 };
 
 void vRotateImage(IplImage* image, float angle, float centreX, float centreY);

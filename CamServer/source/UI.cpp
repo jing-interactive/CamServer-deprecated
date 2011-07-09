@@ -111,12 +111,6 @@ namespace param_gui
 		theConfig.tuio_mode = t;
 	}
 
-	void on_expo(int t)
-	{
-	//	theApp.input.setAutoExplosure(t == 1);
-		theConfig.auto_explosure = t;
-	}
-
 	void on_face(int t)
 	{
 		theConfig.face_track = t;
@@ -157,6 +151,12 @@ namespace param_gui
 		theApp.onRefreshBack();
 	}
 
+	void on_diffbg(int t)
+	{
+		theConfig.bg_mode = DIFF_BG;
+		theApp.onRefreshBack();
+	}
+
 	void on_blackbg(int t)
 	{
 		theConfig.bg_mode = BLACK_BG;
@@ -175,33 +175,31 @@ namespace param_gui
 		{ w+=dw, h,  "tuio", on_tuio, &theConfig.tuio_mode},
 		{ w+=dw, h,  "face", on_face, &theConfig.face_track},
 		{ w+=dw, h,  "hull", on_hull, &theConfig.hull_mode},
-		{ w+=dw, h,  "gray", on_mode, &theConfig.gray_detect_mode},
+//		{ w+=dw, h,  "gray", on_mode, &theConfig.gray_detect_mode},
 //		{ w=13, h+=dh,  "expo", on_expo, &theConfig.auto_explosure},
-		{ w=13, h+=dh,  "dialog", on_dialog, &negative_one},
-		{ w+=dw*1.5, h,  "real", on_realbg, NULL},
+		{ w+=dw, h,  "dialog", on_dialog, &negative_one},
+		{ w=13, h+=dh,  "now", on_realbg, NULL},
 		{ w+=dw, h,  "white", on_whitebg, NULL},
 		{ w+=dw, h,  "black", on_blackbg, NULL},
+		{ w+=dw, h,  "diff", on_diffbg, NULL},
+#ifdef KINECT
 		{ w+=dw, h,  "kinect", on_kinectbg, NULL},
+#endif
 	};
-
-	int num_btns = sizeof(btn_infs)/sizeof(ButtonInfo);
+	
+	int num_btns = _countof(btn_infs);
 
 	void update()
 	{
 		cvSet(setting, CV_RGB(122,122,122));
 		buttons.paintButtons(setting);
-		cvRectangle(setting, cvPoint(168,100), cvPoint(364,104), CV_RGB(122,10,10), CV_FILLED);
+		cvRectangle(setting, cvPoint(13,100), cvPoint(387,104), CV_RGB(122,10,10), CV_FILLED);
 
-		const int x0 = 175;
+		const int x0 = 13;
 		const int y0 = 70;
-		if (theConfig.bg_mode == KINECT_BG)
-			cvRectangle(setting, cvPoint(x0+dw*2,y0), cvPoint(x0+dw*2+_w,y0+_h), CV_RGB(10,10,122), 3);
-		else 	if (theConfig.bg_mode == BLACK_BG)
-			cvRectangle(setting, cvPoint(x0+dw,y0), cvPoint(x0+dw+_w,y0+_h), CV_RGB(10,10,122), 3);
-		else 	if (theConfig.bg_mode == WHITE_BG)
-			cvRectangle(setting, cvPoint(x0,y0), cvPoint(x0+_w,y0+_h), CV_RGB(10,10,122), 3);
-		else
-			cvRectangle(setting, cvPoint(x0-dw,y0), cvPoint(x0-dw+_w,y0+_h), CV_RGB(10,10,122), 3);
+
+		int idx = theConfig.bg_mode;
+		cvRectangle(setting, cvPoint(x0+dw*idx,y0), cvPoint(x0+dw*idx+_w,y0+_h), CV_RGB(10,10,122), 3);
 	}
 
 	void init()

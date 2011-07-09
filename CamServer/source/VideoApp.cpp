@@ -97,11 +97,11 @@ bool VideoApp::init(int argc, char** argv)
 #else
 	grab_thread->startThread(true, false);
 #endif
-	
+
 	//grab unrelated
 	sender.setup( theConfig.CLIENT, theConfig.PORT );
 	printf("[OSC] setup client as %s : %d\n", theConfig.CLIENT.c_str(), theConfig.PORT);
-	
+
 	//theConfig.auto_explosure = _input.getAutoExplosure();
 	/*if (face_track)*/
 	if (!haar.init("../../data/haarcascade_frontalface_alt.xml"))
@@ -184,7 +184,7 @@ void VideoApp::onParamFlip(int fx, int fy)
 			onRefreshBack();
 		else
 		{
-/*			to_reset_back = false;		*/
+			/*			to_reset_back = false;		*/
 			Ptr<IplImage> temp = cvCloneImage(prevBg);
 			vFlip(temp, abs(fx-g_prevFx), abs(fy-g_prevFy));
 			backModel->init(temp);
@@ -208,8 +208,8 @@ void VideoApp::onParamAuto(int v)
 	onRefreshBack();
 }
 
-#define addFloatX(num) m.addFloatArg(num/_W);
-#define addFloatY(num) m.addFloatArg(num/_H);
+#define addFloatX(num) m.addFloatArg(num/_W)
+#define addFloatY(num) m.addFloatArg(num/_H)
 
 void VideoApp::send_osc_msg()
 {
@@ -291,15 +291,12 @@ void VideoApp::send_osc_msg()
 				addFloatY(y);
 				addFloatX(w);
 				addFloatY(h);
-				if (theConfig.tuio_mode)
+				int nPts = obj.pts.size();
+				m.addIntArg(nPts);
+				for (int k=0;k<nPts;k++)
 				{
-					int nPts = obj.pts.size();
-					m.addIntArg(nPts);
-					for (int k=0;k<nPts;k++)
-					{
-						addFloatX(obj.pts[k].x);
-						addFloatY(obj.pts[k].y);
-					}
+					addFloatX(obj.pts[k].x);
+					addFloatY(obj.pts[k].y);
 				}
 				sender.sendMessage( m );
 			}
@@ -351,14 +348,14 @@ void VideoApp::send_tuio_msg()
 		m.addStringArg("set");
 		m.addIntArg(blob.id);				// id
 		addFloatX(blob.center.x);	// x
-		addFloatX(blob.center.y)	// y
+		addFloatX(blob.center.y);	// y
 		addFloatX(blob.velocity.x);			// dX
 		addFloatX(blob.velocity.y);			// dY
 		m.addFloatArg(0);		// maccel
 		bundle.addMessage(m);
 		alive.addIntArg(blob.id);				// add blob to list of ALL active IDs
 	}
-	
+
 	bundle.addMessage(alive);
 	bundle.addMessage(fseq);
 	sender.sendBundle(bundle);

@@ -58,9 +58,6 @@ void AppConfig::parse_args(int argc, char** argv)
 	if (args.contains("-delay"))
 		delay_for_run = args.getInt("-delay");
  
-
-	//	detailed_mode = args.contains("-detail");
-
 	//	using_debug_file = args.contains("-log");
 	// face_track = args.contains("-face");
 
@@ -99,6 +96,7 @@ bool AppConfig::load_from(char* filename)
 		READ_FS(hull_mode);
 		READ_FS(gray_detect_mode);
 		READ_FS(bg_mode);
+		READ_FS(tuio_mode);
 		printf("config.xml loaded.\n");
 
 		return true;
@@ -134,6 +132,7 @@ bool AppConfig::save_to(char* filename)
 		WRITE_FS(hull_mode);
 		WRITE_FS(gray_detect_mode);
 		WRITE_FS(bg_mode);
+		WRITE_FS(tuio_mode);
 		printf("config.xml saved.\n");
 		return true;
 	}

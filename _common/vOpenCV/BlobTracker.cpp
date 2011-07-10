@@ -45,7 +45,6 @@ void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea, int maxArea, b
 					approx = cvApproxPoly(c,sizeof(CvContour),mem_storage,CV_POLY_APPROX_DP, std::min(length*0.003,2.0));
 
 				area = cvContourArea( approx ); //update area
-				Rect box = cvBoundingRect(approx);
 				cvMoments( approx, &myMoments );
 
 				blobs.push_back(vBlob());
@@ -55,7 +54,9 @@ void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea, int maxArea, b
 				obj.area	= fabs(area);
 				obj.length =  length;
 				obj.isHole	= isHole;
-				obj.box	= box;
+				obj.box	= cvBoundingRect(approx);
+				obj.rotBox = cvMinAreaRect2(approx);
+				obj.angle = (90-obj.rotBox.angle)*GRAD_PI2;//in radians
 
 				if (myMoments.m10 > -DBL_EPSILON && myMoments.m10 < DBL_EPSILON)
 				{

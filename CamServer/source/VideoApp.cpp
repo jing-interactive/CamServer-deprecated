@@ -211,7 +211,7 @@ void VideoApp::onParamAuto(int v)
 #define addFloatX(num) m.addFloatArg(num/_W)
 #define addFloatY(num) m.addFloatArg(num/_H)
 
-void VideoApp::send_osc_msg()
+void VideoApp::send_custom_msg()
 {
 	const float _W = HalfWidth;
 	const float _H = HalfHeight;
@@ -269,13 +269,20 @@ void VideoApp::send_osc_msg()
 			vDrawText(frame, obj.center.x, obj.center.y, g_buffer, vDefaultColor(obj.id));
 
 			int id = obj.id;
+#if 0
 			int cx = obj.center.x;
 			int cy = obj.center.y;
 			int x = obj.box.x;
 			int y = obj.box.y;
 			int w = obj.box.width;
 			int h = obj.box.height;
-
+#else
+			int cx = obj.rotBox.center.x;
+			int cy = obj.rotBox.center.y;
+			int w = obj.rotBox.size.width;
+			int h = obj.rotBox.size.height;
+			float angle = obj.angle;
+#endif
 			{
 				ofxOscMessage m;
 				if (obj.isHole)
@@ -287,10 +294,9 @@ void VideoApp::send_osc_msg()
 				m.addStringArg(obj.getStatusString());
 				addFloatX(cx);
 				addFloatY(cy);
-				addFloatX(x);
-				addFloatY(y);
 				addFloatX(w);
 				addFloatY(h);
+				m.addFloatArg(angle);
 				int nPts = obj.pts.size();
 				m.addIntArg(nPts);
 				for (int k=0;k<nPts;k++)

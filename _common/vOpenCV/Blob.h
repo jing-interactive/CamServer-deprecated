@@ -23,7 +23,7 @@ struct vBlob
 		isHole = false;
 	}
 
-	vBlob(const vBlob& b):box(b.box),center(b.center),pts(b.pts)
+	vBlob(const vBlob& b):box(b.box),center(b.center),pts(b.pts),rotBox(b.rotBox)
 	{
 	//	box = b.box;
 	//	center = b.center;
@@ -43,8 +43,11 @@ struct vBlob
 		isHole = hole;
 		length = 0;
 	}
-
+	
 	Rect box;
+	RotatedRect rotBox;
+	float angle;
+
 	Point2f center;
 
 	bool operator<(const vBlob& other) const 
@@ -72,7 +75,6 @@ struct vBlob
 		center.y = box.y + box.height/2;		
 	}
 
-	float angle;
 	float area;
 	float length;
 	vector<Point> pts;

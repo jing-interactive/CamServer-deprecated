@@ -187,7 +187,7 @@ void VideoApp::run()
 		}
 		else
 		{
-			send_osc_msg();
+			send_custom_msg();
 			timer.profileFunction("send_osc_msg");
 		}
 

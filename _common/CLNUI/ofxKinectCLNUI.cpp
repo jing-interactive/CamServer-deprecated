@@ -87,7 +87,7 @@ float raw_depth_to_meters(int raw_depth)
 {
   if (raw_depth < 2047)
   {
-   return 1.0f / (raw_depth * -0.0030711016 + 3.3309495161);
+   return 1.0f / (raw_depth * -0.0030711016f + 3.3309495161f);
   }
   return 0;
 }
@@ -97,9 +97,9 @@ void raw_depth_to_meters2(int raw_depth)
 {
 	for (size_t i=0; i<2048; i++) 
 	{ 
-		const float k1 = 1.1863; 
-		const float k2 = 2842.5; 
-		const float k3 = 0.1236; 
+		const float k1 = 1.1863f; 
+		const float k2 = 2842.5f; 
+		const float k3 = 0.1236f; 
 		const float depth = k3 * tanf(i/k2 + k1); 
 	//	t_gamma[i] = depth; 
 	} 
@@ -162,4 +162,9 @@ ofxKinectCLNUI::~ofxKinectCLNUI()
 	delete[] depthData;
 	delete[] colorData;
 	delete[] depthColorData;
+}
+
+int ofxKinectCLNUI::getCount()
+{
+	return GetNUIDeviceCount();
 }

@@ -42,6 +42,8 @@ AppConfig::AppConfig():CLIENT("localhost")
 	paramMaxArea = 800; 
 };
 
+bool using_debug_file = true;
+
 void AppConfig::parse_args(int argc, char** argv)
 {
 	ofxArgs args(argc, argv);
@@ -53,13 +55,14 @@ void AppConfig::parse_args(int argc, char** argv)
 	if (args.contains("-client"))
 		CLIENT = args.getString("-client");
 
+#ifndef _DEBUG
+	using_debug_file = args.contains("-log");
+#endif
+
 	minim_window = args.contains("-minim");
 
 	if (args.contains("-delay"))
 		delay_for_run = args.getInt("-delay");
- 
-	//	using_debug_file = args.contains("-log");
-	// face_track = args.contains("-face");
 
 	finger_track = args.contains("-finger");
 	hand_track = args.contains("-hand");

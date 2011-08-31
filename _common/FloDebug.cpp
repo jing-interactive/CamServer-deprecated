@@ -1,6 +1,13 @@
 #include "FloDebug.h"
 
-
+//this trick is learned from CSK :)
+static struct DebugHelper
+{
+	~DebugHelper()
+	{
+		delete CFloDebug::GetItself();
+	}
+}_singleton_helper;
 
 CFloDebug*	CFloDebug:: m_pItslef;
 FILE*		CFloDebug:: m_fpDebug;
@@ -76,14 +83,6 @@ int CFloDebug::Close(void){
 	   return(0);
 
 }
-
-static struct DebugHelper
-{
-	~DebugHelper()
-	{
-		delete CFloDebug::GetItself();
-	}
-}_singleton_helper;
 
 CFloDebug* CFloDebug:: GetItself(void){
 	//

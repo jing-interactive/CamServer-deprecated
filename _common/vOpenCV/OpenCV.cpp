@@ -414,7 +414,7 @@ bool VideoInput::init_kinect()
 bool VideoInput::init_ps3()
 {
 	_ps3_cam = new ofxCLeye;
-	int n_ps3 = _ps3_cam->listDevices();
+	int n_ps3 = ofxCLeye::listDevices();
 	if (n_ps3 > 0)
 	{
 		return _ps3_cam->init(320, 240, false);

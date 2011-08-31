@@ -37,6 +37,8 @@ public:
 	bool getDepthBW();//threshold on the depth date we can get this BW image
 	bool getDepthColorImage();//pseudo-color depth image
 	bool getColorImage();//color image from the rgb camera
+
+	static int getCount();
 	
 	int getCamWidth();
 	int getCamHeight();

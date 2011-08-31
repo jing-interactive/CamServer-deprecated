@@ -814,7 +814,7 @@ void vBlobTracker::doBlobMoved( vTrackedBlob& b ) {
 	if( listener != NULL ) {
 		listener->blobMoved( b.center.x, b.center.y, b.id, 0/*findOrder(b.id)*/ );
 	} else {
-		printf("blob: %d move\n" , b.id);
+	//	printf("blob: %d move\n" , b.id);
 	}
 }
 void vBlobTracker::doBlobOff( vTrackedBlob& b ) {

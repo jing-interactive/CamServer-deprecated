@@ -13,8 +13,6 @@ void enableMemleakCheck(int breakpt = 0)
 	#endif
 }
 
-bool using_debug_file = true;
-
 struct StartThread: public ofxThread
 {
 	void threadedFunction()

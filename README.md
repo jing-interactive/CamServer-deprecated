@@ -5,5 +5,3 @@ Inside CamServer folder is the main application.
 OSC/TUIO protocol is employed to send reconginzed blob/face information to client softwares.
 
 It now supports Kinect and PS3 Camera.
-
-![im](https://vinjncode.googlecode.com/svn/trunk/wiki/CamServer_walle.jpg)

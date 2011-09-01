@@ -1,4 +1,4 @@
-﻿#include <opencv/cv.h>
+﻿#include <opencv2/core/core.hpp>
 
 #define MAIN_WINDOW "Monitor"
 #define PARAM_WINDOW "Param Panel"

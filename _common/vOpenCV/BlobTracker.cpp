@@ -2,6 +2,14 @@
 #include "vector2d.h"
 #include <list>
 
+#if defined _DEBUG
+#pragma comment(lib,"opencv_video231d.lib")
+#pragma comment(lib,"opencv_objdetect231d.lib")
+#else
+#pragma comment(lib,"opencv_video231.lib")
+#pragma comment(lib,"opencv_objdetect231.lib")
+#endif
+
 //Just some convienience macros
 #define CV_CVX_WHITE	CV_RGB(0xff,0xff,0xff)
 #define CV_CVX_BLACK	CV_RGB(0x00,0x00,0x00)
@@ -172,7 +180,7 @@ vector<vBlob>  vUpdateMhi( IplImage* silh, IplImage* dst )
 	cvCvtScale( mhi, mask, 255./MHI_DURATION,
 		(MHI_DURATION - timestamp)*255./MHI_DURATION );
 	cvZero( dst );
-	cvCvtPlaneToPix( mask, 0, 0, 0, dst );
+	cvMerge( mask, 0, 0, 0, dst );
 
 	// calculate motion gradient orientation and valid orientation mask
 	cvCalcMotionGradient( mhi, mask, orient, MAX_TIME_DELTA, MIN_TIME_DELTA, 3 );
@@ -484,7 +492,7 @@ vOpticalFlowLK::vOpticalFlowLK(IplImage* gray, int blocksize)
 
 	prev = cvCreateImage(cvSize( width ,height ), 8, 1);
 	if (gray->nChannels == 1)
-		cvCopyImage(gray, prev);
+		cvCopy(gray, prev);
 	else
 		vGrayScale(gray, prev);
 
@@ -499,7 +507,7 @@ void vOpticalFlowLK::update(IplImage* gray)
 	//cout<<"CALC-ING FLOW"<<endl;
 	cvCalcOpticalFlowLK( prev, gray,
 		cvSize( block_size, block_size), vel_x, vel_y);
-	cvCopyImage(gray, prev);
+	cvCopy(gray, prev);
 }
 
 cv::point2df vOpticalFlowLK::flowAtPoint(int x, int y){

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <opencv/cxcore.h>
+#include <opencv2/core/core.hpp>
 #include <string>
 
 #define		REAL_BG	0		//real time background

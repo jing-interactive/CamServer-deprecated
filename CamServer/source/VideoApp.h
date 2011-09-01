@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#define MODE_320X240	//always 320*240
+
 #include "vOpenCV/OpenCV.h"
 #include "vOpenCV/cvButtons.h"
 #include "vOpenCV/BlobTracker.h"

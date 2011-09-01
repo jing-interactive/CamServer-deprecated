@@ -4,6 +4,7 @@
 
 #include "ofxCLeye.h"
 #include <stdio.h>
+#include <opencv2/core/core_c.h>
 
 #pragma comment(lib, "CLEyeMulticam.lib")
 
@@ -54,7 +55,7 @@ bool ofxCLeye::getFrame()
 			pixels[i*3+2] = viPixels[i*4+2];
 		}
 	}
-	cvSetImageData(frame, pixels, frame->widthStep);
+	cvSetData(frame, pixels, frame->widthStep);
 
 	return grab;
 }
@@ -100,7 +101,7 @@ bool ofxCLeye::init(int w, int h, bool isGrey)
 	// INITIALISE
 	////////////////////////////////////////
 	GUID guid = CLEyeGetCameraUUID(deviceID);
-	_cam = CLEyeCreateCamera(guid, colourMode, _resolution, attemptFramerate);
+	_cam = CLEyeCreateCamera(guid, colourMode, _resolution, (float)attemptFramerate);
 	bool bOk = (_cam != NULL);
 	if (bOk) bOk &= CLEyeCameraStart(_cam);
 	////////////////////////////////////////

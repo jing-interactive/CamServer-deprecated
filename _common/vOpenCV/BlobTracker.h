@@ -122,7 +122,7 @@ struct vHaarFinder
 	float scale;
 	//
 	bool init(char* cascade_name);
-	void find(IN IplImage* img, int minArea = 1, bool findAllFaces = true);
+	void find(IplImage* img, int minArea = 1, bool findAllFaces = true);
 
 	vHaarFinder();
 	~vHaarFinder();

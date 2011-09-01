@@ -1,15 +1,13 @@
 #include "OpenCV.h"
 
 #if defined _DEBUG
-#pragma comment(lib,"cv210d.lib")
-#pragma comment(lib,"cvaux210d.lib")
-#pragma comment(lib,"cxcore210d.lib")
-#pragma comment(lib,"highgui210d.lib")
+#pragma comment(lib,"opencv_core231d.lib")
+#pragma comment(lib,"opencv_imgproc231d.lib")
+#pragma comment(lib,"opencv_highgui231d.lib")
 #else
-#pragma comment(lib,"cv210.lib")
-#pragma comment(lib,"cvaux210.lib")
-#pragma comment(lib,"cxcore210.lib")
-#pragma comment(lib,"highgui210.lib")
+#pragma comment(lib,"opencv_core231.lib")
+#pragma comment(lib,"opencv_imgproc231.lib")
+#pragma comment(lib,"opencv_highgui231.lib")
 #endif
 
 #ifdef KINECT 
@@ -188,35 +186,10 @@ VideoInput::VideoInput()
 	_InputType = From_Count;
 }
 
-#ifndef CV_CAP_PROP_AUTO_EXPOSURE
-#define CV_CAP_PROP_AUTO_EXPOSURE 19
-#define CV_CAP_PROP_SHOW_DIALOG 20
-#endif
-
-void VideoInput::setAutoExplosure(bool is)
-{
-	if (_capture)
-		cvSetCaptureProperty(_capture,CV_CAP_PROP_AUTO_EXPOSURE,(double)is);
-}
-
-bool VideoInput::getAutoExplosure()
-{
-	if (_capture)
-		return cvGetCaptureProperty(_capture,CV_CAP_PROP_AUTO_EXPOSURE);
-	else
-		return false;
-}
-
 void VideoInput::showSettingsDialog()
 {
-	if (_capture)
-		cvSetCaptureProperty(_capture,CV_CAP_PROP_SHOW_DIALOG, true);
-}
-
-void VideoInput::setParamExplosure(int value)
-{
-	if (_capture)
-		cvSetCaptureProperty(_capture,CV_CAP_PROP_EXPOSURE,(double)value);
+// 	if (_capture)
+// 		cvSetCaptureProperty(_capture,CV_CAP_PROP_SHOW_DIALOG, true);
 }
 
 bool VideoInput::init(int cam_idx)
@@ -327,6 +300,16 @@ bool VideoInput::init(int argc, char** argv)
 	return false;
 }
 
+void VideoInput::resize( int w, int h )
+{
+	if (_capture)
+	{
+		cvSetCaptureProperty(_capture,CV_CAP_PROP_FRAME_WIDTH, (double)w);
+		cvSetCaptureProperty(_capture,CV_CAP_PROP_FRAME_HEIGHT, (double)h);
+		_post_init();
+	}
+}
+
 void VideoInput::wait(int t)
 {
 	if (_InputType == From_Image)
@@ -358,12 +341,14 @@ IplImage* VideoInput::get_frame()
 			_frame_num ++;
 		}break;
 #endif
+#ifdef PS3
 	case From_PS3:
 		{
 			bool b = _ps3_cam->getFrame();
 			_frame = _ps3_cam->frame;
 			_frame_num ++;
 		}break;
+#endif
 	default:
 		break;
 	}
@@ -402,14 +387,15 @@ VideoInput::~VideoInput()
 	//	if (_frame != NULL)
 	//		cvReleaseImage(&_frame);
 }
+
 #ifdef KINECT
 bool VideoInput::init_kinect()
 {
 	_kinect = new ofxKinectCLNUI;
 	return _kinect->initKinect(640, 480, 0, 0);
 }
-
 #endif
+
 #ifdef PS3
 bool VideoInput::init_ps3()
 {
@@ -533,14 +519,14 @@ void vBackGrayDiff::init(IplImage* initial, void* param/* = NULL*/){
 	dark_thresh = 200;
 
 	if (initial->nChannels == 1)
-		cvCopyImage(initial, Bg);
+		cvCopy(initial, Bg);
 	else
 		vGrayScale(initial, Bg);
 }
 
 void vBackGrayDiff::update(IplImage* image, int mode/* = 0*/){
 	if (image->nChannels == 1)
-		cvCopyImage(image, Frame);
+		cvCopy(image, Frame);
 	else
 		vGrayScale(image, Frame); 
 	if (mode == DETECT_BOTH)
@@ -588,7 +574,7 @@ void vBackColorDiff::init(IplImage* initial, void* param/* = NULL*/){
 
 void vBackColorDiff::update(IplImage* image, int mode/* = 0*/){
 //	vGrayScale(image, Frame);
-	cvCopyImage(image, Frame);
+	cvCopy(image, Frame);
 	if (mode == DETECT_BOTH)
 	{
 		if (nChannels == 1)
@@ -682,8 +668,8 @@ void vThreeFrameDiff::update(IplImage* image, int mode/* = 0*/){
 		show_image(grayFrameOne);
 		show_image(grayFrameTwo);
 		show_image(grayFrameThree);
-		cvCopyImage(grayFrameTwo, grayFrameOne);
-		cvCopyImage(grayFrameThree, grayFrameTwo);
+		cvCopy(grayFrameTwo, grayFrameOne);
+		cvCopy(grayFrameThree, grayFrameTwo);
 
 	//if (mode == DETECT_BOTH)
 	//	cvAbsDiff(grayFrame, grayBg, grayDiff);

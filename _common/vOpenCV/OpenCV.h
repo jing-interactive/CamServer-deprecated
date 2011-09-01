@@ -9,9 +9,16 @@
 #pragma warning( disable: 4099 )
 #pragma warning( disable: 4819 )
 
-#include <opencv/cv.h>
-#include <opencv/highgui.h>
-#include <opencv/cvaux.h>
+#include "opencv2/core/core_c.h"
+#include "opencv2/core/core.hpp"
+#include "opencv2/imgproc/imgproc_c.h"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/video/tracking.hpp"
+#include "opencv2/video/background_segm.hpp"
+#include "opencv2/objdetect/objdetect.hpp"
+// #include "opencv2/legacy/compat.hpp"
+#include "opencv2/highgui/highgui_c.h"
+#include "opencv2/highgui/highgui.hpp"
 #include <stdio.h>
 #include <stdarg.h>
 #include <time.h>
@@ -91,8 +98,6 @@ void vCopyImageTo(CvArr* small_image, IplImage* big_image, const CvRect& region)
 void vDrawText(IplImage* img, int x,int y,char* str, CvScalar clr=CV_RGB(255,255,255));
 void vPolyLine(IplImage* dst, vector<Point>& pts, CvScalar clr=CV_RGB(255,255,255), int thick = 1);
 CvScalar vDefaultColor(int idx);
-//在title窗口中，显示w * h个小图片(input)
-void vShowManyImages(char* title, CvImage& input, int w, int h);
 
 #define show_image(img_name) do{\
 	cvNamedWindow(#img_name);\
@@ -206,9 +211,6 @@ struct VideoInput
 
 	CvCapture* _capture;
 
-	void setAutoExplosure(bool is);
-	bool getAutoExplosure();
-	void setParamExplosure(int value);
 	void showSettingsDialog();
 
 	IplImage* _frame;
@@ -221,6 +223,8 @@ struct VideoInput
 	int _frame_num;
 
 	VideoInput();
+
+	void resize(int w, int h);
 
 	bool init(int cam_idx);
 	bool init(char* video_file);

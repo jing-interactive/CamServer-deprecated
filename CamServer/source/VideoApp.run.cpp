@@ -22,7 +22,10 @@ void VideoApp::run()
 		if (!raw)
 			break;
 
-		cvResize(raw, half_raw);
+		if (raw->width == HalfWidth)
+			cvCopy(raw, half_raw);
+		else
+			cvResize(raw, half_raw);
 		timer.profileFunction("cvResize");
 
 		int key = cvWaitKey(1);
@@ -63,7 +66,7 @@ void VideoApp::run()
 			&& theConfig.corners[3] == cv::Point2f(0,HalfHeight) && theConfig.corners[2] == cv::Point2f(HalfWidth,HalfHeight)
 			)
 		{//original ROI (region of interest), it saves time
-			cvCopyImage(half_raw, frame);
+			cvCopy(half_raw, frame);
 		}
 		else
 		{//needs perspective transform
@@ -78,9 +81,9 @@ void VideoApp::run()
 				if (channels == 3)
 					vGrayScale(prevBg, diff->Bg);
 				else
-					cvCopyImage(prevBg, diff->Bg);
+					cvCopy(prevBg, diff->Bg);
 				//clean frame->prevFrame
-				cvCopyImage(frame, prevBg);
+				cvCopy(frame, prevBg);
 			}
 		}
 		timer.profileFunction("vPerspectiveTransform");	
@@ -97,17 +100,17 @@ void VideoApp::run()
 					backModel->init(frame, (void*)&paramMoG);
 					g_prevFx = g_Fx;
 					g_prevFy = g_Fy;
-					cvCopyImage(frame, prevBg);
+					cvCopy(frame, prevBg);
 				}break;
 			case BLACK_BG:
 				{
 					backModel->init(black_frame, (void*)&paramMoG);
-					cvCopyImage(black_frame, prevBg);
+					cvCopy(black_frame, prevBg);
 				}break;
 			case WHITE_BG:
 				{
 					backModel->init(white_frame, (void*)&paramMoG);
-					cvCopyImage(white_frame, prevBg);
+					cvCopy(white_frame, prevBg);
 				}break;
 			case DIFF_BG:
 				{
@@ -150,7 +153,7 @@ void VideoApp::run()
 		timer.profileFunction("backModel->update");
 		//fore->blobs
 		vHighPass(fore, grayBuffer, theConfig.paramBlur1, theConfig.paramBlur2);		
-		cvCopyImage(grayBuffer, fore);
+		cvCopy(grayBuffer, fore);
 		timer.profileFunction("vHighPass");
 
 		const int scale =HalfWidth*HalfHeight/PARAM_MAXAREA;

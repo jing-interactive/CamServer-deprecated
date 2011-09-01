@@ -90,6 +90,13 @@ bool VideoApp::init(int argc, char** argv)
 		system("pause");
 		return false;
 	}
+#ifdef MODE_320X240
+	if (input._InputType == VideoInput::From_Camera)
+	{
+		if (input._frame->width > 320)
+			input.resize(320, 240);
+	}
+#endif
 	input_inited = true;
 	grab_thread = new VideoGrabThread(input);
 #ifdef _DEBUG

@@ -2,8 +2,6 @@
 #include "ofxArgs.h"
 #include <stdio.h>
 
-#include <opencv/cv.h>
-
 using cv::FileStorage;
 
 #ifndef FALSE

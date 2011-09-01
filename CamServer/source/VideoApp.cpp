@@ -5,6 +5,15 @@
 
 VideoApp theApp;//global
 
+int CamServer_WindowCallback(HWND hwnd, UINT uMsg, WPARAM wparam, LPARAM lparam, int* was_processed)
+{
+	if (uMsg == WM_DESTROY)
+	{
+		theApp.app_running = false;
+	}
+	return 0;
+}
+
 VideoApp::VideoGrabThread::VideoGrabThread(VideoInput& input):_input(input)
 {
 	fps = 0;
@@ -176,6 +185,8 @@ bool VideoApp::init(int argc, char** argv)
 	param_gui::init();
 
 	onRefreshBack();
+
+	cvSetPreprocessFuncWin32(CamServer_WindowCallback);
 
 	return true;
 }

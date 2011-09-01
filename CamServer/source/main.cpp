@@ -17,10 +17,10 @@ struct StartThread: public ofxThread
 {
 	void threadedFunction()
 	{
-		printf("CamServer %s  vinjn @ RoboPeak\n", VERSION);
+		printf("CamServer %s  vinjn.z@gmail.com.\n", VERSION);
 		for (int b=0;b<8;b++)
 		{
-			if (theApp.input_inited)//if VideoInput is already inited
+			if (theApp.input_inited)//if VideoInput is already initialized
 				break;				//exit the thread now
 			for (int i=0;i<10;i++)
 				printf("%c ", rand()%3+1);
@@ -43,7 +43,7 @@ struct ReadyThread: public ofxThread
 
 void say_byebye()
 {
-	printf("CamServer %s  vinjn @ RoboPeak\n", VERSION);
+	printf("CamServer %s  vinjn.z@gmail.com.\n", VERSION);
 	for (int b=8;b>1;b--)
 	{
 		for (int j=0;j<8-b;j++)

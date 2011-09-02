@@ -194,31 +194,42 @@ void VideoInput::showSettingsDialog()
 
 bool VideoInput::init(int cam_idx)
 {
-	_capture = cvCaptureFromCAM(CV_CAP_DSHOW+cam_idx);
-
-	if( !_capture )
+	bool ret = true;
+	do 
 	{
-		_capture = cvCaptureFromCAM(cam_idx);
+		_capture = cvCaptureFromCAM(CV_CAP_DSHOW+cam_idx);
 
-		if (!_capture)
+		if( !_capture )
 		{
-			printf("Failed to open camera # %d\n", cam_idx);
-			return false;
+			_capture = cvCaptureFromCAM(cam_idx);
+
+			if (!_capture)
+			{
+				sprintf(buffer, "Failed to open camera # %d", cam_idx);
+				ret = false;
+				break;
+			}
+			else
+			{
+				_InputType = From_Camera;
+				sprintf(buffer, "Reading from camera # %d.", cam_idx);
+				_post_init();
+				ret = true;
+				break;
+			}
 		}
 		else
 		{
-			printf("Reading from camera # %d.\n", cam_idx);
+			_InputType = From_Camera;
+			sprintf(buffer, "Reading from camera # %d via DirectShow.", cam_idx);
 			_post_init();
-			return true;
+			ret = true;
+			break;
 		}
-	}
-	else
-	{
-		_InputType = From_Camera;
-		printf("Reading from camera # %d via DirectShow.\n", cam_idx);
-		_post_init();
-		return true;
-	}
+	} while (0);
+
+	printf("\n%s\n",buffer);
+	return ret;
 }
 
 bool VideoInput::init(char* file_name)

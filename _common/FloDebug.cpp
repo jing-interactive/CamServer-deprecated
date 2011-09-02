@@ -1,4 +1,5 @@
 #include "FloDebug.h"
+#include <string.h>
 
 //this trick is learned from CSK :)
 static struct DebugHelper
@@ -10,32 +11,13 @@ static struct DebugHelper
 }_singleton_helper;
 
 CFloDebug*	CFloDebug:: m_pItslef;
-FILE*		CFloDebug:: m_fpDebug;
-
+FILE*		CFloDebug:: fp;
+char		CFloDebug::fileName[256];
 
 CFloDebug::CFloDebug(char *filename){
 	//
-	m_fpDebug = fopen(filename,"w");
-	assert(m_fpDebug && "can not open the debug file");
-
-	// get the current time
-/*	timeb timebuffer;
-	char *timeline;
-	char timestring[280];
-
-	_ftime(&timebuffer);
-	timeline = ctime(&(timebuffer.time));
-
-	sprintf(timestring, "%.19s.%hu, %s", timeline, timebuffer.millitm, &timeline[20]);*/
-
-	// write out error header with time
-	Write("\nOpening Debug Output File (%s)\n",filename);
-
-	// now the file is created, re-open with append mode
-
-//	fclose(m_fpDebug);
-//	m_fpDebug = fopen(filename,"w");
-//	assert(m_fpDebug && "can not close the debug file");
+	strcpy(fileName, filename);
+	fp = NULL;
 }
 
 CFloDebug::~CFloDebug(void){
@@ -43,15 +25,19 @@ CFloDebug::~CFloDebug(void){
 	Close();
 }
 
-
 int CFloDebug::Write(char *string, ...){
 	//
-	static char buffer[120]; // working buffer
+	if (!fp)
+	{
+		fp = fopen(fileName,"w");
+		assert(fp && "can not open the debug file");
+	}
+	static char buffer[256]; // working buffer
 
 	va_list arglist; // variable argument list
 
 	// make sure both the error file and string are valid
-	if (!string || !m_fpDebug)
+	if (!string || !fp)
 	   return(0);
 
 	// print out the string using the variable number of arguments on stack
@@ -60,10 +46,10 @@ int CFloDebug::Write(char *string, ...){
 	va_end(arglist);
 
 	// write string to file
-	fprintf(m_fpDebug,buffer);
+	fprintf(fp,buffer);
 
 	// flush buffer incase the system bails
-	fflush(m_fpDebug);
+	fflush(fp);
 
 	// return success
 	return(1);
@@ -73,10 +59,9 @@ int CFloDebug::Write(char *string, ...){
 int CFloDebug::Close(void){
 	// this function closes the error file
 
-	if (m_fpDebug){
-		Write("\nClosing Debug Output File.");
-		fclose(m_fpDebug);
-		m_fpDebug = NULL;
+	if (fp){
+		fclose(fp);
+		fp = NULL;
 		return(1);
 	}
 	else
@@ -88,12 +73,19 @@ CFloDebug* CFloDebug:: GetItself(void){
 	//
 	if (!m_pItslef){
 		//
-		m_pItslef = new CFloDebug(debug_file_name);
+		time_t rawtime;
+		char fileName[256];
+		time ( &rawtime );
+		tm* timeinfo = localtime ( &rawtime );
+		system("mkdir logs");
+		strftime(fileName,80,"logs/%Y_%b_%d__%H_%M_%S.log",timeinfo);
+		printf("%s created.\n", fileName);
+		m_pItslef = new CFloDebug(fileName);
 	}
 	return m_pItslef;
 }
 
 FILE* CFloDebug::get_file(void){
 	//
-	return m_fpDebug;
+	return fp;
 }

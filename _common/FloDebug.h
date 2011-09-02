@@ -28,8 +28,6 @@
 
 extern bool using_debug_file;//u decide whether to use it.
 
-#define debug_file_name  "application.log"//uh..  u can changed its name
-
 class CFloDebug{
 	//it's used to deal with error information
 public:
@@ -41,7 +39,8 @@ public:
 	static int Write(char *string, ...);
 	static FILE* get_file(void);
 private:
-	static FILE *m_fpDebug;
+	static char fileName[256];
+	static FILE *fp;
 	static CFloDebug*		m_pItslef;
 
 };

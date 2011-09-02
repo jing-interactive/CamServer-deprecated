@@ -27,7 +27,7 @@ struct StartThread: public ofxThread
 			printf("\n");
 			BEEP(sin(b/20.0f*3.14)*300,100);
 		}
-		printf("\n\n");
+		printf("\n");
 	}
 };
 

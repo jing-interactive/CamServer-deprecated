@@ -245,6 +245,9 @@ struct VideoInput
 	void _post_init();
 
 	~VideoInput();
+
+private:
+	char buffer[256];
 };
 
 struct IBackGround

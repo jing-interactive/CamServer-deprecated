@@ -419,6 +419,7 @@ bool vHaarFinder::init(char* cascade_name)
 	cascade = (CvHaarClassifierCascade*)cvLoad( cascade_name, 0, 0, 0 );
 	if (cascade)
 	{
+		printf("%s loaded\n", cascade_name);
 		storage = cvCreateMemStorage(0);
 	}
 

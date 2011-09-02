@@ -36,7 +36,7 @@ AppConfig::AppConfig():CLIENT("localhost")
 	paramBlur1 = 35;
 	paramBlur2 = 1;
 	paramNoise = 0;
-	paramMinArea = 10;
+	paramMinArea = 40;
 	paramMaxArea = 800; 
 };
 

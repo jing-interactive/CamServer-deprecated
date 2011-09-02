@@ -6,7 +6,7 @@ static struct DebugHelper
 {
 	~DebugHelper()
 	{
-		delete CFloDebug::GetItself();
+		CFloDebug::Close();
 	}
 }_singleton_helper;
 
@@ -14,59 +14,52 @@ CFloDebug*	CFloDebug:: m_pItslef;
 FILE*		CFloDebug:: fp;
 char		CFloDebug::fileName[256];
 
-CFloDebug::CFloDebug(char *filename){
-	//
+CFloDebug::CFloDebug(char *filename)
+{
 	strcpy(fileName, filename);
 	fp = NULL;
 }
 
-CFloDebug::~CFloDebug(void){
-	//
+CFloDebug::~CFloDebug(void)
+{
 	Close();
 }
 
-int CFloDebug::Write(char *string, ...){
+bool CFloDebug::Write(char *string, ...){
 	//
 	if (!fp)
 	{
 		fp = fopen(fileName,"w");
 		assert(fp && "can not open the debug file");
 	}
-	static char buffer[256]; // working buffer
+	static char buffer[256];
 
-	va_list arglist; // variable argument list
+	va_list arglist;
 
-	// make sure both the error file and string are valid
 	if (!string || !fp)
-	   return(0);
+	   return false;
 
-	// print out the string using the variable number of arguments on stack
 	va_start(arglist,string);
 	vsprintf(buffer,string,arglist);
 	va_end(arglist);
 
-	// write string to file
 	fprintf(fp,buffer);
 
-	// flush buffer incase the system bails
 	fflush(fp);
-
-	// return success
-	return(1);
+	return true;
 }
 
 
-int CFloDebug::Close(void){
-	// this function closes the error file
-
+bool CFloDebug::Close(void)
+{
 	if (fp){
 		fclose(fp);
 		fp = NULL;
-		return(1);
+		delete m_pItslef;
+		return true;
 	}
 	else
-	   return(0);
-
+	   return false;
 }
 
 CFloDebug* CFloDebug:: GetItself(void){
@@ -85,7 +78,7 @@ CFloDebug* CFloDebug:: GetItself(void){
 	return m_pItslef;
 }
 
-FILE* CFloDebug::get_file(void){
+FILE* CFloDebug::GetFILE(void){
 	//
 	return fp;
 }

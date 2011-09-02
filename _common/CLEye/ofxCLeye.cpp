@@ -4,7 +4,6 @@
 
 #include "ofxCLeye.h"
 #include <stdio.h>
-#include <opencv2/core/core_c.h>
 
 #pragma comment(lib, "CLEyeMulticam.lib")
 
@@ -13,6 +12,7 @@ ofxCLeye::ofxCLeye()
 	attemptFramerate = 60;
 	deviceID = 0;
 	frame = NULL;
+	_cam = NULL;
 }
 
 ofxCLeye::~ofxCLeye()
@@ -62,15 +62,18 @@ bool ofxCLeye::getFrame()
 
 void ofxCLeye::close()
 { 
-	// Stop camera capture
-	CLEyeCameraStop(_cam);
-	// Destroy camera object
-	CLEyeDestroyCamera(_cam);
-	_cam = NULL;
+	if (frame)
+	{
+		// Stop camera capture
+		CLEyeCameraStop(_cam);
+		// Destroy camera object
+		CLEyeDestroyCamera(_cam);
+		_cam = NULL;
 
-	cvReleaseImageHeader(&frame);
-	delete[] viPixels;
-	delete[] pixels;
+		cvReleaseImageHeader(&frame);
+		delete[] viPixels;
+		delete[] pixels;
+	}
 }
 
 bool ofxCLeye::init(int w, int h, bool isGrey)

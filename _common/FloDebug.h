@@ -35,9 +35,9 @@ public:
 	~CFloDebug();
 	static CFloDebug* GetItself(void);
 
-	static int Close(void);
-	static int Write(char *string, ...);
-	static FILE* get_file(void);
+	static bool Close(void);
+	static bool Write(char *string, ...);
+	static FILE* GetFILE(void);
 private:
 	static char fileName[256];
 	static FILE *fp;
@@ -48,5 +48,5 @@ private:
 
 #define FloWrite  if (using_debug_file) CFloDebug::GetItself()->Write
 #define FloWriteLn()  FloWrite("\n=====================================\n");
-#define shared_file_ptr  CFloDebug::GetItself()->get_file()
+#define shared_file_ptr  CFloDebug::GetItself()->GetFILE()
 

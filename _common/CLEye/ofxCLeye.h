@@ -6,7 +6,7 @@
 //tested with openFrameworks 0.061 / Visual Studio 2008
 
 #include "CLEyeMulticam.h"
-#include <opencv2/core/core.hpp>
+#include <opencv2/opencv.hpp>
 
 class ofxCLeye
 {

@@ -12,7 +12,7 @@
 #define OFXKINECTCLNUI_H_INCLUDED
 
 #include "CLNUIDevice.h"
-#include <opencv2/core/core.hpp>
+#include <opencv2/opencv.hpp>
 
 class ofxKinectCLNUI
 {

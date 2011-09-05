@@ -5,14 +5,17 @@
 
 VideoApp theApp;//global
 
+#if defined WIN32 || defined _WIN32
 int CamServer_WindowCallback(HWND hwnd, UINT uMsg, WPARAM wparam, LPARAM lparam, int* was_processed)
 {
 	if (uMsg == WM_DESTROY)
 	{
-		theApp.app_running = false;
+		if ((hwnd == (HWND)monitor_gui::handle && theApp.monitorVisible) || hwnd == (HWND)param_gui::handle)
+			theApp.app_running = false;
 	}
 	return 0;
 }
+#endif
 
 VideoApp::VideoGrabThread::VideoGrabThread(VideoInput& input):_input(input)
 {
@@ -186,8 +189,9 @@ bool VideoApp::init(int argc, char** argv)
 
 	onRefreshBack();
 
+#if defined WIN32 || defined _WIN32
 	cvSetPreprocessFuncWin32(CamServer_WindowCallback);
-
+#endif
 	return true;
 }
 

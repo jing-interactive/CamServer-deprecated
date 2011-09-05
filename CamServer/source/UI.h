@@ -13,11 +13,13 @@
 
 namespace monitor_gui
 {
+	extern void* handle;
 	void show(bool visible);
 }
 
 namespace param_gui
 {
+	extern void* handle;
 	extern cv::Ptr<IplImage> setting;
 	void update();
 	void show(bool visible);

@@ -58,6 +58,8 @@ namespace monitor_gui
 			}
 	}
 
+	void* handle = NULL;
+
 	void show(bool visible)
 	{
 		if (visible)
@@ -66,12 +68,12 @@ namespace monitor_gui
 			cvResizeWindow(MAIN_WINDOW,640,480);
 
 			cvSetMouseCallback(MAIN_WINDOW,onMonitorMouse);
+			handle = cvGetWindowHandle(MAIN_WINDOW);
 		}
 		else
 		{
 			cvDestroyWindow(MAIN_WINDOW);
 		}
-
 	}
 }
 
@@ -88,6 +90,8 @@ namespace param_gui
 	int h = 35;
 
 	int negative_one = -1;
+
+	void* handle = NULL;
 
 	void on_x(int t)
 	{
@@ -229,6 +233,8 @@ namespace param_gui
 		{
 			cvNamedWindow(PARAM_WINDOW);
 			cvResizeWindow(PARAM_WINDOW,400,480);
+
+			handle = cvGetWindowHandle(PARAM_WINDOW);
 
 			cvSetMouseCallback( PARAM_WINDOW, onParamMouse, &buttons);
 

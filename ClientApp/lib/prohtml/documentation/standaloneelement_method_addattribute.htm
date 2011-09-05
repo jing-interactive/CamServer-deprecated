@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>proHTML : : StandAloneElement : : addAttribute ( )</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="stylesheet.css" rel="stylesheet" type="text/css">
+</head>
+<body> 
+<div id="page"> 
+  <div id="describtion"> 
+    <div id="libname"><img src="images/title.gif" width="259" height="40"></div> 
+    <div id="indexlink"><a href="index.htm"><img src="images/index.gif"></a></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> name </div> 
+    <div id="pointcontent"><div id="membertitle"> addAttribute ( ) </div></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"><a href="#" id="exampleButton" onClick="handleExample()">openExample</a></div> 
+    <div id="pointcontent"><div id="example"><pre>import prohtml.*;
+
+StandAloneElement standAlone;
+
+void setup(){
+  standAlone = new StandAloneElement("img",null);
+  standAlone.addAttribute("scr","images/getAttribute");
+  println(standAlone.getAttribute("scr"));
+}</pre></div></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> description </div> 
+    <div id="pointcontent">Use this method to add an attribute to the element.</div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> syntax </div> 
+    <div id="pointcontent"> 
+      <pre>addAttribute(key, value);
+</pre> 
+    </div> 
+  </div> 
+   
+<div id="point"> 
+  <div id="pointname"> parameters </div> 
+  <div id="members">
+  <div id="membername">key</div> 
+  <div id="memberdesc">String, the key of the attribute</div>
+
+  <div id="membername">value</div> 
+  <div id="memberdesc">String, the value of the attribute</div>
+</div> 
+</div> 
+  
+<div id="point"> 
+  <div id="pointname"> returns </div> 
+  <div id="pointcontent">None</div> 
+</div> 
+
+  <div id="point"> 
+    <div id="pointname"> usage </div> 
+    <div id="pointcontent">Web & Application</div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> related </div> 
+    <div id="pointcontent"><A href="standaloneelement_class_standaloneelement.htm">StandAloneElement</A><BR>
+<A href="standaloneelement_method_countallchildren.htm">countAllChildren ( )</A><BR>
+<A href="standaloneelement_method_getattribute.htm">getAttribute ( )</A><BR>
+<A href="standaloneelement_method_getattributes.htm">getAttributes ( )</A><BR>
+<A href="standaloneelement_method_getchildren.htm">getChildren ( )</A><BR>
+<A href="standaloneelement_method_getdepth.htm">getDepth ( )</A><BR>
+<A href="standaloneelement_method_hasattribute.htm">hasAttribute ( )</A><BR>
+<A href="standaloneelement_method_hasattributes.htm">hasAttributes ( )</A><BR>
+<A href="standaloneelement_method_haschildren.htm">hasChildren ( )</A><BR>
+<A href="standaloneelement_field_kindofelement.htm">kindOfElement</A><BR>
+<A href="standaloneelement_method_printelementtree.htm">printElementTree ( )</A><BR>
+<A href="standaloneelement_method_tostring.htm">toString ( )</A><BR>
+<A href="standaloneelement_method_type.htm">type ( )</A><BR>
+</div> 
+  </div> 
+</div> 
+</body>
+<script language="JavaScript" src="script.js" type="text/javascript"></script>
+</html>

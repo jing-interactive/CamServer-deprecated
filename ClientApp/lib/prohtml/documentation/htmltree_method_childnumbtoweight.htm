@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>proHTML : : HtmlTree : : childNumbToWeight ( )</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="stylesheet.css" rel="stylesheet" type="text/css">
+</head>
+<body> 
+<div id="page"> 
+  <div id="describtion"> 
+    <div id="libname"><img src="images/title.gif" width="259" height="40"></div> 
+    <div id="indexlink"><a href="index.htm"><img src="images/index.gif"></a></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> name </div> 
+    <div id="pointcontent"><div id="membertitle"> childNumbToWeight ( ) </div></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"><a href="#" id="exampleButton" onClick="handleExample()">openExample</a></div> 
+    <div id="pointcontent"><div id="example"><pre>import prohtml.*;
+
+HtmlTree htmlTree;
+
+void setup(){
+  //enter your url here
+  htmlTree = new HtmlTree("http://www.yoururl.com");
+  println("Weight of the body: " + 
+    htmlTree.childNumbToWeight(htmlTree.pageTree.countAllChildren()));
+}</pre></div></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> description </div> 
+    <div id="pointcontent">This method converts the number of descendants of an element of the HTML document, 
+ into a float value between 1 and 20. The values result from taking the number 
+ of all descendants from each element. Now the programm takes all different values 
+ and spreads them over the range from 1 to 20. <br>
+ For example the values 1234, 444, 344, 322, 234, 233, 232, 230,44,33 would result in
+ the following values: 1.0, 2.9, 4.8, 6.7, 8.6, 10.5, 12.4, 14.299999, 16.2, 18.099998. <br>
+ So the exponentially increasing numbers of descendants are changed into 
+ proportionally growing float values.</div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> syntax </div> 
+    <div id="pointcontent"> 
+      <pre>childNumbToWeight(childNumb);
+</pre> 
+    </div> 
+  </div> 
+   
+<div id="point"> 
+  <div id="pointname"> parameters </div> 
+  <div id="members">
+  <div id="membername">childNumb</div> 
+  <div id="memberdesc">int, the number of childs</div>
+</div> 
+</div> 
+  
+<div id="point"> 
+  <div id="pointname"> returns </div> 
+  <div id="pointcontent">float, the weight for the number of childs</div> 
+</div> 
+
+  <div id="point"> 
+    <div id="pointname"> usage </div> 
+    <div id="pointcontent">Web & Application</div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> related </div> 
+    <div id="pointcontent"><A href="htmltree_class_htmltree.htm">HtmlTree</A><BR>
+<A href="htmltree_method_getlinks.htm">getLinks ( )</A><BR>
+<A href="htmltree_method_getnumbofcolors.htm">getNumbOfColors ( )</A><BR>
+<A href="htmltree_method_getpagecolor.htm">getPageColor ( )</A><BR>
+</div> 
+  </div> 
+</div> 
+</body>
+<script language="JavaScript" src="script.js" type="text/javascript"></script>
+</html>

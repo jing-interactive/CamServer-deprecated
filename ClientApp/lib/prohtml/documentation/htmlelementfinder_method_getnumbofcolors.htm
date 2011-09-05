@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>proHTML : : HtmlElementFinder : : getNumbOfColors ( )</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="stylesheet.css" rel="stylesheet" type="text/css">
+</head>
+<body> 
+<div id="page"> 
+  <div id="describtion"> 
+    <div id="libname"><img src="images/title.gif" width="259" height="40"></div> 
+    <div id="indexlink"><a href="index.htm"><img src="images/index.gif"></a></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> name </div> 
+    <div id="pointcontent"><div id="membertitle"> getNumbOfColors ( ) </div></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"><a href="#" id="exampleButton" onClick="handleExample()">openExample</a></div> 
+    <div id="pointcontent"><div id="example"><pre>import prohtml.*;
+
+HtmlTree htmlTree;
+int numbOfColors,stripeWidth;
+
+void setup(){
+  //enter your url here
+  htmlTree = new HtmlTree("http://www.yoururl.com");
+
+  numbOfColors = htmlTree.getNumbOfColors();
+  stripeWidth = width/numbOfColors;
+}
+
+void draw(){
+  if(!(numbOfColors &lt; 1)){
+    int stripeWidth = width/numbOfColors;
+    for (int i = 0;i&lt;numbOfColors;i++){
+      noStroke();
+      fill(htmlTree.getPageColor(i));
+      rect(i*stripeWidth,0,stripeWidth,height);
+    }
+  }else{
+    println("no color in html code");
+  }
+}</pre></div></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> description </div> 
+    <div id="pointcontent">Use this Method to get the number of all different colors of a HTML document.</div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> syntax </div> 
+    <div id="pointcontent"> 
+      <pre>getNumbOfColors();
+</pre> 
+    </div> 
+  </div> 
+    
+<div id="point"> 
+  <div id="pointname"> returns </div> 
+  <div id="pointcontent">int, the number of found colors</div> 
+</div> 
+
+  <div id="point"> 
+    <div id="pointname"> usage </div> 
+    <div id="pointcontent">Web & Application</div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> related </div> 
+    <div id="pointcontent"><A href="htmltree_class_htmltree.htm">HtmlTree</A><BR>
+<A href="htmltree_method_childnumbtoweight.htm">childNumbToWeight ( )</A><BR>
+<A href="htmllist_method_getlinks.htm">getLinks ( )</A><BR>
+<A href="htmlelementfinder_method_getpagecolor.htm">getPageColor ( )</A><BR>
+</div> 
+  </div> 
+</div> 
+</body>
+<script language="JavaScript" src="script.js" type="text/javascript"></script>
+</html>

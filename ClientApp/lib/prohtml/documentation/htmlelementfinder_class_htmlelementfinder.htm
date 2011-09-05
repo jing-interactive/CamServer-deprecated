@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>proHTML : : HtmlElementFinder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="stylesheet.css" rel="stylesheet" type="text/css">
+</head>
+<body> 
+<div id="page"> 
+  <div id="describtion"> 
+    <div id="libname"><img src="images/title.gif" width="259" height="40"></div> 
+    <div id="indexlink"><a href="index.htm"><img src="images/index.gif"></a></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> name </div> 
+    <div id="pointcontent"><div id="membertitle"> HtmlElementFinder </div></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"><a href="#" id="exampleButton" onClick="handleExample()">openExample</a></div> 
+    <div id="pointcontent"><div id="example"><pre>import prohtml.*;
+
+HtmlElementFinder htmlElementFinder;
+
+void setup(){
+  //enter your url here
+  htmlElementFinder = new HtmlElementFinder("http://www.yoururl.com","a"); 
+
+  java.util.List links = htmlElementFinder.getElements();
+
+  for (int i = 0;i&lt;links.size();i++){
+    println(((StandAloneElement)links.get(i)).getAttribute("href"));
+  }
+}</pre></div></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> description </div> 
+    <div id="pointcontent">Use this class to directly find all elements of a given type. 
+ HtmlElementFinder parses a HtmlDocument and puts all elements matching 
+ the given type into a list. You can search for existing html elements. 
+ To search for textelements only type in &quot;text &quot;.  
+ The result of the HtmlElementFinder contains only standalone elements 
+ and text elements. This is because the tree structure of the html document 
+ gets lost parsing it into a HtmlELementFinder. 
+ There is no element having children.</div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> constructors </div> 
+    <div id="pointcontent"> 
+      <pre>HtmlElementFinder(url, kindOfElement);
+HtmlElementFinder(page, url, kindOfElement);
+HtmlCollection(url);
+HtmlCollection(page, url);
+</pre> 
+    </div> 
+  </div> 
+   
+<div id="point"> 
+  <div id="pointname"> parameters </div> 
+  <div id="members">
+  <div id="membername">url</div> 
+  <div id="memberdesc">String, url to the document you want to scan</div>
+
+  <div id="membername">kindOfElement</div> 
+  <div id="memberdesc">String, name of the element you look for</div>
+
+  <div id="membername">page,</div> 
+  <div id="memberdesc">StringReader holding the document youwant to scan</div>
+
+  <div id="membername">url</div> 
+  <div id="memberdesc">String</div>
+</div> 
+</div> 
+  
+<div id="point"> 
+  <div id="pointname"> fields </div> 
+  <div id="members"> 
+<div id="membername"><a href="htmlelementfinder_field_colors.htm">colors</a></div> 
+<div id="memberdesc">Arraylist holding the colors found in the page</div> 
+ 
+<div id="membername"><a href="htmlelementfinder_field_parenturlpart.htm">parentUrlPart</a></div> 
+<div id="memberdesc">Keeps the absolutepart (without file information) of the url of this document.</div> 
+</div> 
+</div> 
+  
+<div id="point"> 
+  <div id="pointname"> methods </div> 
+  <div id="members"> 
+<div id="membername"><a href="htmlelementfinder_method_getelements.htm">getElements ( )</a></div> 
+<div id="memberdesc">This methods gives you an ArrayList with the elements you looked for.</div> 
+ 
+<div id="membername"><a href="htmlelementfinder_method_getnumbofcolors.htm">getNumbOfColors ( )</a></div> 
+<div id="memberdesc">Use this Method to get the number of all different colors of a HTML document.</div> 
+ 
+<div id="membername"><a href="htmlelementfinder_method_getpagecolor.htm">getPageColor ( )</a></div> 
+<div id="memberdesc">GetPageColor gives you a specified color of an HtmlPage.</div> 
+ 
+<div id="membername"><a href="htmlelementfinder_method_printelements.htm">printElements ( )</a></div> 
+<div id="memberdesc">Use this method for a simple trace of all elements in the list of the parsed html document.</div> 
+</div> 
+</div> 
+
+  <div id="point"> 
+    <div id="pointname"> usage </div> 
+    <div id="pointcontent">Web & Application</div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> related </div> 
+    <div id="pointcontent"><A href="htmllist_class_htmllist.htm">HtmlList</A><BR>
+<A href="htmlimagefinder_class_htmlimagefinder.htm">HtmlImageFinder</A><BR>
+</div> 
+  </div> 
+</div> 
+</body>
+<script language="JavaScript" src="script.js" type="text/javascript"></script>
+</html>

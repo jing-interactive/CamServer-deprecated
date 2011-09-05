@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>proHTML : : LetterElement</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="stylesheet.css" rel="stylesheet" type="text/css">
+</head>
+<body> 
+<div id="page"> 
+  <div id="describtion"> 
+    <div id="libname"><img src="images/title.gif" width="259" height="40"></div> 
+    <div id="indexlink"><a href="index.htm"><img src="images/index.gif"></a></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> name </div> 
+    <div id="pointcontent"><div id="membertitle"> LetterElement </div></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"><a href="#" id="exampleButton" onClick="handleExample()">openExample</a></div> 
+    <div id="pointcontent"><div id="example"><pre>import prohtml.*;
+
+LetterElement letter;
+               
+void setup(){
+  letter = new LetterElement("t");
+  
+  println("countAllChildren:.."+letter.countAllChildren());
+  println("getChildren:......."+letter.getChildren());
+  println("getDepth:.........."+letter.getDepth());
+  println("hasChildren:......."+letter.hasChildren());
+  letter.printElementTree("");println();
+  println("toString:.........."+letter.toString());
+  println("type:.............."+letter.type());
+}</pre></div></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> description </div> 
+    <div id="pointcontent">Object for keeping the letter of a text element of the HTML document.</div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> constructors </div> 
+    <div id="pointcontent"> 
+      <pre>LetterElement(kindOfElement);
+</pre> 
+    </div> 
+  </div> 
+   
+<div id="point"> 
+  <div id="pointname"> parameters </div> 
+  <div id="members">
+  <div id="membername">kindOfElement</div> 
+  <div id="memberdesc">String, the letter for the element</div>
+</div> 
+</div> 
+  
+<div id="point"> 
+  <div id="pointname"> fields </div> 
+  <div id="members"> 
+<div id="membername"><a href="letterelement_field_kindofelement.htm">kindOfElement</a></div> 
+<div id="memberdesc">String holding the kind of the Element. For a LetterElement it keeps a single letter.</div> 
+</div> 
+</div> 
+  
+<div id="point"> 
+  <div id="pointname"> methods </div> 
+  <div id="members"> 
+<div id="membername"><a href="letterelement_method_countallchildren.htm">countAllChildren ( )</a></div> 
+<div id="memberdesc">Method for counting the descendants of the element.</div> 
+ 
+<div id="membername"><a href="letterelement_method_getchildren.htm">getChildren ( )</a></div> 
+<div id="memberdesc">Method for getting the children of an element.</div> 
+ 
+<div id="membername"><a href="letterelement_method_getdepth.htm">getDepth ( )</a></div> 
+<div id="memberdesc">Method for getting the maximum depth of an Element</div> 
+ 
+<div id="membername"><a href="letterelement_method_haschildren.htm">hasChildren ( )</a></div> 
+<div id="memberdesc">This method looks if the element has Children</div> 
+ 
+<div id="membername"><a href="letterelement_method_printelementtree.htm">printElementTree ( )</a></div> 
+<div id="memberdesc">This method prints the treestrucure of this element and its decendents.</div> 
+ 
+<div id="membername"><a href="letterelement_method_tostring.htm">toString ( )</a></div> 
+<div id="memberdesc">Method for counting the descendants of the element.</div> 
+ 
+<div id="membername"><a href="letterelement_method_type.htm">type ( )</a></div> 
+<div id="memberdesc">Method for counting the descendants of the element.</div> 
+</div> 
+</div> 
+
+  <div id="point"> 
+    <div id="pointname"> usage </div> 
+    <div id="pointcontent">Web & Application</div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> related </div> 
+    <div id="pointcontent"><A href="textelement_class_textelement.htm">TextElement</A><BR>
+<A href="letterelement_method_countallchildren.htm">countAllChildren ( )</A><BR>
+<A href="letterelement_method_getchildren.htm">getChildren ( )</A><BR>
+<A href="letterelement_method_getdepth.htm">getDepth ( )</A><BR>
+<A href="letterelement_method_haschildren.htm">hasChildren ( )</A><BR>
+<A href="letterelement_field_kindofelement.htm">kindOfElement</A><BR>
+<A href="letterelement_method_printelementtree.htm">printElementTree ( )</A><BR>
+<A href="letterelement_method_tostring.htm">toString ( )</A><BR>
+<A href="letterelement_method_type.htm">type ( )</A><BR>
+</div> 
+  </div> 
+</div> 
+</body>
+<script language="JavaScript" src="script.js" type="text/javascript"></script>
+</html>

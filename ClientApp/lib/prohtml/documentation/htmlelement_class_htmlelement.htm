@@ -1,0 +1,184 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>proHTML : : HtmlElement</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="stylesheet.css" rel="stylesheet" type="text/css">
+</head>
+<body> 
+<div id="page"> 
+  <div id="describtion"> 
+    <div id="libname"><img src="images/title.gif" width="259" height="40"></div> 
+    <div id="indexlink"><a href="index.htm"><img src="images/index.gif"></a></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> name </div> 
+    <div id="pointcontent"><div id="membertitle"> HtmlElement </div></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"><a href="#" id="exampleButton" onClick="handleExample()">openExample</a></div> 
+    <div id="pointcontent"><div id="example"><pre>import prohtml.*;
+
+HtmlElement table;
+
+void setup(){
+  table = new HtmlElement("table",null);
+  table.addAttribute("width","200");
+
+  HtmlElement tr1 = new HtmlElement("tr",table);
+  HtmlElement td1 = new HtmlElement("td",tr1);
+  HtmlElement td2 = new HtmlElement("td",tr1);
+
+  td1.addChild(new TextElement("1",td1));
+  td2.addChild(new TextElement("2",td2));
+  tr1.addChild(td1);
+  tr1.addChild(td2);
+  table.addChild(tr1);
+
+  HtmlElement tr2 = new HtmlElement("tr",table);
+  HtmlElement td3 = new HtmlElement("td",tr2);
+  HtmlElement td4 = new HtmlElement("td",tr2);
+
+  td3.addChild(new TextElement("3",td3));
+  td4.addChild(new TextElement("4",td4));
+  tr2.addChild(td3);
+  tr2.addChild(td4);
+  table.addChild(tr2);
+
+  table.printElementTree(". ");
+}</pre></div></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> description </div> 
+    <div id="pointcontent">HtmlElement respresent n element of a HTML page
+ having further children Elements. It extends StandAloneElment and uses
+ its methods to manage attributes. HtmlElemt Elemt makes it possible to add
+ further Elements as Children.</div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> constructors </div> 
+    <div id="pointcontent"> 
+      <pre>HtmlElement(kindOfElement, attributes, children, parent);
+HtmlElement(kindOfElement, parent);
+HtmlElement(kindOfElement, children, parent);
+HtmlElement(kindOfElement, attributes, parent);
+StandAloneElement(kindOfElement, attributes, parent);
+StandAloneElement(kindOfElement, parent);
+LetterElement(kindOfElement);
+</pre> 
+    </div> 
+  </div> 
+   
+<div id="point"> 
+  <div id="pointname"> parameters </div> 
+  <div id="members">
+  <div id="membername">kindOfElement</div> 
+  <div id="memberdesc">String, the kind of the element</div>
+
+  <div id="membername">attributes</div> 
+  <div id="memberdesc">HashMap, holds the attributes for the Element</div>
+
+  <div id="membername">children</div> 
+  <div id="memberdesc">List, holds the children of the Element</div>
+
+  <div id="membername">attributes</div> 
+  <div id="memberdesc">HashMap, holds the attributes as key value pairs</div>
+
+  <div id="membername">parent</div> 
+  <div id="memberdesc">HtmlElement, the parent element</div>
+
+  <div id="membername">kindOfElement</div> 
+  <div id="memberdesc">String</div>
+
+  <div id="membername">kindOfElement</div> 
+  <div id="memberdesc">String, the letter for the element</div>
+</div> 
+</div> 
+  
+<div id="point"> 
+  <div id="pointname"> fields </div> 
+  <div id="members"> 
+<div id="membername"><a href="htmlelement_field_kindofelement.htm">kindOfElement</a></div> 
+<div id="memberdesc">String holding the kind of the Element. For a LetterElement it keeps a single letter.</div> 
+</div> 
+</div> 
+  
+<div id="point"> 
+  <div id="pointname"> methods </div> 
+  <div id="members"> 
+<div id="membername"><a href="htmlelement_method_addattribute.htm">addAttribute ( )</a></div> 
+<div id="memberdesc">Use this method to add an attribute to the element.</div> 
+ 
+<div id="membername"><a href="htmlelement_method_addchild.htm">addChild ( )</a></div> 
+<div id="memberdesc">Adds an Element to the Children of the Element at the given position</div> 
+ 
+<div id="membername"><a href="htmlelement_method_countallchildren.htm">countAllChildren ( )</a></div> 
+<div id="memberdesc">Method for counting the descendants of the element.</div> 
+ 
+<div id="membername"><a href="htmlelement_method_getattribute.htm">getAttribute ( )</a></div> 
+<div id="memberdesc">Use this method to get the value of a given attribute of an element.</div> 
+ 
+<div id="membername"><a href="htmlelement_method_getattributes.htm">getAttributes ( )</a></div> 
+<div id="memberdesc">Use this method to get the keys of all available attributes of an element.</div> 
+ 
+<div id="membername"><a href="htmlelement_method_getchildren.htm">getChildren ( )</a></div> 
+<div id="memberdesc">Method for getting the children of an element.</div> 
+ 
+<div id="membername"><a href="htmlelement_method_getdepth.htm">getDepth ( )</a></div> 
+<div id="memberdesc">Method for getting the maximum depth of an Element</div> 
+ 
+<div id="membername"><a href="htmlelement_method_getparent.htm">getParent ( )</a></div> 
+<div id="memberdesc">Gives back the parent of this Element.</div> 
+ 
+<div id="membername"><a href="htmlelement_method_getspecificelements.htm">getSpecificElements ( )</a></div> 
+<div id="memberdesc">Use this method to get a list with elements of the given kind being decendents of this Element.</div> 
+ 
+<div id="membername"><a href="htmlelement_method_hasattribute.htm">hasAttribute ( )</a></div> 
+<div id="memberdesc">Use this method to see if an element has a given attribute.</div> 
+ 
+<div id="membername"><a href="htmlelement_method_hasattributes.htm">hasAttributes ( )</a></div> 
+<div id="memberdesc">Use this method to see if an element has attributes.</div> 
+ 
+<div id="membername"><a href="htmlelement_method_haschildren.htm">hasChildren ( )</a></div> 
+<div id="memberdesc">This method looks if the element has Children</div> 
+ 
+<div id="membername"><a href="htmlelement_method_printelementtree.htm">printElementTree ( )</a></div> 
+<div id="memberdesc">This method prints the treestrucure of this element and its decendents.</div> 
+ 
+<div id="membername"><a href="htmlelement_method_tostring.htm">toString ( )</a></div> 
+<div id="memberdesc">Method for counting the descendants of the element.</div> 
+ 
+<div id="membername"><a href="htmlelement_method_type.htm">type ( )</a></div> 
+<div id="memberdesc">Method for counting the descendants of the element.</div> 
+</div> 
+</div> 
+
+  <div id="point"> 
+    <div id="pointname"> usage </div> 
+    <div id="pointcontent">Web & Application</div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> related </div> 
+    <div id="pointcontent"><A href="htmlelement_class_htmlelement.htm">HtmlElement</A><BR>
+<A href="htmlelement_method_addattribute.htm">addAttribute ( )</A><BR>
+<A href="htmlelement_method_addchild.htm">addChild ( )</A><BR>
+<A href="htmlelement_method_countallchildren.htm">countAllChildren ( )</A><BR>
+<A href="htmlelement_method_getattribute.htm">getAttribute ( )</A><BR>
+<A href="htmlelement_method_getattributes.htm">getAttributes ( )</A><BR>
+<A href="htmlelement_method_getchildren.htm">getChildren ( )</A><BR>
+<A href="htmlelement_method_getdepth.htm">getDepth ( )</A><BR>
+<A href="htmlelement_method_getspecificelements.htm">getSpecificElements ( )</A><BR>
+<A href="htmlelement_method_hasattribute.htm">hasAttribute ( )</A><BR>
+<A href="htmlelement_method_hasattributes.htm">hasAttributes ( )</A><BR>
+<A href="htmlelement_method_haschildren.htm">hasChildren ( )</A><BR>
+<A href="htmlelement_field_kindofelement.htm">kindOfElement</A><BR>
+<A href="htmlelement_method_printelementtree.htm">printElementTree ( )</A><BR>
+<A href="htmlelement_method_tostring.htm">toString ( )</A><BR>
+<A href="htmlelement_method_type.htm">type ( )</A><BR>
+</div> 
+  </div> 
+</div> 
+</body>
+<script language="JavaScript" src="script.js" type="text/javascript"></script>
+</html>

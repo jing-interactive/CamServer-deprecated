@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>proHTML : : HtmlList</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="stylesheet.css" rel="stylesheet" type="text/css">
+</head>
+<body> 
+<div id="page"> 
+  <div id="describtion"> 
+    <div id="libname"><img src="images/title.gif" width="259" height="40"></div> 
+    <div id="indexlink"><a href="index.htm"><img src="images/index.gif"></a></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> name </div> 
+    <div id="pointcontent"><div id="membertitle"> HtmlList </div></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"><a href="#" id="exampleButton" onClick="handleExample()">openExample</a></div> 
+    <div id="pointcontent"><div id="example"><pre>import prohtml.*;
+
+HtmlList htmlList;
+
+void setup(){
+  //enter your url here
+  htmlList = new HtmlList("http://www.yoururl.com");
+  
+  htmlList.printElements();
+}</pre></div></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> description </div> 
+    <div id="pointcontent">Object for parsing a valid Html Document to convert its String into 
+ a HtmlList representing its elements. Use HtmlList if you just need 
+ a list with all elements. The element List can contain text and html 
+ elements. In the HtmlList all html elements are parsed as standalone 
+ elements. This is because the tree structure of the html document gets 
+ lost parsing it into a List. There is no element having children.</div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> constructors </div> 
+    <div id="pointcontent"> 
+      <pre>HtmlList(url);
+HtmlList(page, url);
+HtmlCollection(url);
+HtmlCollection(page, url);
+</pre> 
+    </div> 
+  </div> 
+   
+<div id="point"> 
+  <div id="pointname"> parameters </div> 
+  <div id="members">
+  <div id="membername">url</div> 
+  <div id="memberdesc">String, the url to document to be parsed</div>
+
+  <div id="membername">page</div> 
+  <div id="memberdesc">StringReader, holding the document to be parsed</div>
+
+  <div id="membername">url</div> 
+  <div id="memberdesc">String</div>
+</div> 
+</div> 
+  
+<div id="point"> 
+  <div id="pointname"> fields </div> 
+  <div id="members"> 
+<div id="membername"><a href="htmllist_field_colors.htm">colors</a></div> 
+<div id="memberdesc">Arraylist holding the colors found in the page</div> 
+ 
+<div id="membername"><a href="htmllist_field_pagelist.htm">pageList</a></div> 
+<div id="memberdesc">This field holds the complete List of elements.</div> 
+ 
+<div id="membername"><a href="htmllist_field_parenturlpart.htm">parentUrlPart</a></div> 
+<div id="memberdesc">Keeps the absolutepart (without file information) of the url of this document.</div> 
+</div> 
+</div> 
+  
+<div id="point"> 
+  <div id="pointname"> methods </div> 
+  <div id="members"> 
+<div id="membername"><a href="htmllist_method_getelements.htm">getElements ( )</a></div> 
+<div id="memberdesc">This methods gives you an ArrayList with the elements you looked for.</div> 
+ 
+<div id="membername"><a href="htmllist_method_getlinks.htm">getLinks ( )</a></div> 
+<div id="memberdesc">Use this method to get all Links of a document.</div> 
+ 
+<div id="membername"><a href="htmllist_method_getnumbofcolors.htm">getNumbOfColors ( )</a></div> 
+<div id="memberdesc">Use this Method to get the number of all different colors of a HTML document.</div> 
+ 
+<div id="membername"><a href="htmllist_method_getpagecolor.htm">getPageColor ( )</a></div> 
+<div id="memberdesc">GetPageColor gives you a specified color of an HtmlPage.</div> 
+ 
+<div id="membername"><a href="htmllist_method_printelements.htm">printElements ( )</a></div> 
+<div id="memberdesc">Use this method for a simple trace of all elements in the list of the parsed html document.</div> 
+</div> 
+</div> 
+
+  <div id="point"> 
+    <div id="pointname"> usage </div> 
+    <div id="pointcontent">Web & Application</div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> related </div> 
+    <div id="pointcontent"><A href="htmllist_field_pagelist.htm">pageList</A><BR>
+</div> 
+  </div> 
+</div> 
+</body>
+<script language="JavaScript" src="script.js" type="text/javascript"></script>
+</html>

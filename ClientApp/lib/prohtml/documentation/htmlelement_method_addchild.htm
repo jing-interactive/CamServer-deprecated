@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>proHTML : : HtmlElement : : addChild ( )</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="stylesheet.css" rel="stylesheet" type="text/css">
+</head>
+<body> 
+<div id="page"> 
+  <div id="describtion"> 
+    <div id="libname"><img src="images/title.gif" width="259" height="40"></div> 
+    <div id="indexlink"><a href="index.htm"><img src="images/index.gif"></a></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> name </div> 
+    <div id="pointcontent"><div id="membertitle"> addChild ( ) </div></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"><a href="#" id="exampleButton" onClick="handleExample()">openExample</a></div> 
+    <div id="pointcontent"><div id="example"><pre>import prohtml.*;
+
+HtmlElement table;
+
+void setup(){
+  table = new HtmlElement("table",null);
+  table.addAttribute("width","200");
+
+  HtmlElement tr1 = new HtmlElement("tr",table);
+  HtmlElement td1 = new HtmlElement("td",tr1);
+  HtmlElement td2 = new HtmlElement("td",tr1);
+
+  td1.addChild(new TextElement("1",td1));
+  td2.addChild(new TextElement("2",td2));
+  tr1.addChild(td1);
+  tr1.addChild(td2);
+  table.addChild(tr1);
+
+  HtmlElement tr2 = new HtmlElement("tr",table);
+  HtmlElement td3 = new HtmlElement("td",tr2);
+  HtmlElement td4 = new HtmlElement("td",tr2);
+
+  td3.addChild(new TextElement("3",td3));
+  td4.addChild(new TextElement("4",td4));
+  tr2.addChild(td3);
+  tr2.addChild(td4);
+  table.addChild(tr2);
+
+  table.printElementTree(". ");
+}</pre></div></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> description </div> 
+    <div id="pointcontent">Use this method to add a child to an element.</div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> syntax </div> 
+    <div id="pointcontent"> 
+      <pre>addChild(element);
+addChild(element, position);
+</pre> 
+    </div> 
+  </div> 
+   
+<div id="point"> 
+  <div id="pointname"> parameters </div> 
+  <div id="members">
+  <div id="membername">element</div> 
+  <div id="memberdesc">Element, to add as child</div>
+
+  <div id="membername">position</div> 
+  <div id="memberdesc">int, position to where to insert the element.</div>
+</div> 
+</div> 
+  
+<div id="point"> 
+  <div id="pointname"> returns </div> 
+  <div id="pointcontent">None</div> 
+</div> 
+
+  <div id="point"> 
+    <div id="pointname"> usage </div> 
+    <div id="pointcontent">Web & Application</div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> related </div> 
+    <div id="pointcontent"><A href="htmlelement_class_htmlelement.htm">HtmlElement</A><BR>
+<A href="htmlelement_method_addattribute.htm">addAttribute ( )</A><BR>
+<A href="htmlelement_method_countallchildren.htm">countAllChildren ( )</A><BR>
+<A href="htmlelement_method_getattribute.htm">getAttribute ( )</A><BR>
+<A href="htmlelement_method_getattributes.htm">getAttributes ( )</A><BR>
+<A href="htmlelement_method_getchildren.htm">getChildren ( )</A><BR>
+<A href="htmlelement_method_getdepth.htm">getDepth ( )</A><BR>
+<A href="htmlelement_method_getspecificelements.htm">getSpecificElements ( )</A><BR>
+<A href="htmlelement_method_hasattribute.htm">hasAttribute ( )</A><BR>
+<A href="htmlelement_method_hasattributes.htm">hasAttributes ( )</A><BR>
+<A href="htmlelement_method_haschildren.htm">hasChildren ( )</A><BR>
+<A href="htmlelement_field_kindofelement.htm">kindOfElement</A><BR>
+<A href="htmlelement_method_printelementtree.htm">printElementTree ( )</A><BR>
+<A href="htmlelement_method_tostring.htm">toString ( )</A><BR>
+<A href="htmlelement_method_type.htm">type ( )</A><BR>
+</div> 
+  </div> 
+</div> 
+</body>
+<script language="JavaScript" src="script.js" type="text/javascript"></script>
+</html>

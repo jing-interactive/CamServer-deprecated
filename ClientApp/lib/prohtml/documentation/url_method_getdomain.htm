@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>proHTML : : Url : : getDomain ( )</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="stylesheet.css" rel="stylesheet" type="text/css">
+</head>
+<body> 
+<div id="page"> 
+  <div id="describtion"> 
+    <div id="libname"><img src="images/title.gif" width="259" height="40"></div> 
+    <div id="indexlink"><a href="index.htm"><img src="images/index.gif"></a></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> name </div> 
+    <div id="pointcontent"><div id="membertitle"> getDomain ( ) </div></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"><a href="#" id="exampleButton" onClick="handleExample()">openExample</a></div> 
+    <div id="pointcontent"><div id="example"><pre>import prohtml.*;
+
+HtmlTree htmlTree;
+
+void setup(){
+  //enter your url here
+  htmlTree = new HtmlTree("http://www.yoururl.com");
+
+  ArrayList links = htmlTree.getLinks();
+
+  for(int i = 0;i&lt;links.size();i++){
+    println("**********************************************");
+    println("Url_"+nf(i,3)+" : "+
+      ((Url)(links.get(i))).toString());
+    println(" getCompleteUrl: "+
+      ((Url)(links.get(i))).getCompleteUrl());
+    println(" getDomain : "+
+      ((Url)(links.get(i))).getDomain());
+    println(" getParentPart : "+
+      ((Url)(links.get(i))).getParentPart());
+    println(" getUrl : "+
+      ((Url)(links.get(i))).getUrl());
+    println(" isAbsolute : "+
+      ((Url)(links.get(i))).isAbsolute());
+  }
+}</pre></div></div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> description </div> 
+    <div id="pointcontent">Gives back the domain of the site.</div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> syntax </div> 
+    <div id="pointcontent"> 
+      <pre>getDomain();
+</pre> 
+    </div> 
+  </div> 
+    
+<div id="point"> 
+  <div id="pointname"> returns </div> 
+  <div id="pointcontent">String, the domainpart of the url</div> 
+</div> 
+
+  <div id="point"> 
+    <div id="pointname"> usage </div> 
+    <div id="pointcontent">Web & Application</div> 
+  </div> 
+  <div id="point"> 
+    <div id="pointname"> related </div> 
+    <div id="pointcontent"><A href="url_class_url.htm">Url</A><BR>
+<A href="url_method_compareto.htm">compareTo ( )</A><BR>
+<A href="url_method_equals.htm">equals ( )</A><BR>
+<A href="url_method_getcompleteurl.htm">getCompleteUrl ( )</A><BR>
+<A href="url_method_getparentpart.htm">getParentPart ( )</A><BR>
+<A href="url_method_geturl.htm">getUrl ( )</A><BR>
+<A href="url_method_isabsolute.htm">isAbsolute ( )</A><BR>
+<A href="url_method_tostring.htm">toString ( )</A><BR>
+</div> 
+  </div> 
+</div> 
+</body>
+<script language="JavaScript" src="script.js" type="text/javascript"></script>
+</html>

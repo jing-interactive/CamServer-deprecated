@@ -41,6 +41,11 @@ AppConfig::AppConfig():CLIENT("localhost")
 
 bool using_debug_file = true;
 
+char* hack_cam_str[]=
+{
+	"c0","c1","c2","c3","c4","c5","c6","c7","c8","c9"
+};
+
 std::string AppConfig::parse_args(int argc, char** argv)
 {
 	const char *keys =
@@ -55,6 +60,14 @@ std::string AppConfig::parse_args(int argc, char** argv)
 		"{a|aut|false|auto background mode}"
 		"{1| |0	|the input source, could be camera_idx/picture}"
 	};
+
+	for (int i=1;i<argc;i++)
+	{
+		if (strlen(argv[i]) == 1 && ::isdigit(argv[i][0]))
+		{
+			argv[i] = hack_cam_str[argv[i][0]-'0'];
+		}
+	}
 
 	cv::CommandLineParser args(argc, (const char**)argv, keys);
 	args.printParams();
@@ -72,7 +85,7 @@ std::string AppConfig::parse_args(int argc, char** argv)
 
 	std::string input_src = args.get<std::string>("1");
 
-	return input_src;
+	return input_src.substr(1);
 }
 
 bool AppConfig::load_from(char* filename)

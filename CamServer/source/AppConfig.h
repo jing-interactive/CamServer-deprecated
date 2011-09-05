@@ -12,7 +12,9 @@
 struct AppConfig
 {
 	AppConfig();
-	void parse_args(int argc, char** argv);
+
+	//return the input_source
+	std::string parse_args(int argc, char** argv);
 	bool load_from(char* filename);
 	bool save_to(char* filename);
 

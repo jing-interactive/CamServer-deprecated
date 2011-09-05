@@ -1,5 +1,4 @@
 #include "AppConfig.h"
-#include "ofxArgs.h"
 #include <stdio.h>
 
 using cv::FileStorage;
@@ -42,30 +41,38 @@ AppConfig::AppConfig():CLIENT("localhost")
 
 bool using_debug_file = true;
 
-void AppConfig::parse_args(int argc, char** argv)
+std::string AppConfig::parse_args(int argc, char** argv)
 {
-	ofxArgs args(argc, argv);
-	//if (args.contains("-a"))
-	//	fixed_back_mode = false;
-	//else
-	//	fixed_back_mode = true;
+	const char *keys =
+	{
+		"{delay||0|delay ms}"
+		"{client||localhost|specify the client ip}"
+		"{port||3333|specify the client port}"
+		"{log| |false|write log to file}"
+		"{minim ||false|minim windows mode}"
+		"{finger||false|enable finger track}"
+		"{hand||false|enable hand track}"
+		"{a|aut|false|auto background mode}"
+		"{1| |0	|the input source, could be camera_idx/picture}"
+	};
 
-	if (args.contains("-client"))
-		CLIENT = args.getString("-client");
+	cv::CommandLineParser args(argc, (const char**)argv, keys);
+	args.printParams();
 
+	fixed_back_mode = !args.get<bool>("a");
+	CLIENT = args.get<std::string>("client");
 #ifndef _DEBUG
-	using_debug_file = args.contains("-log");
+	using_debug_file = args.get<bool>("log");
 #endif
+	minim_window = args.get<bool>("minim");
+	delay_for_run = args.get<int>("delay");
+	finger_track = args.get<bool>("finger");
+	hand_track = args.get<bool>("hand");
+	PORT = args.get<int>("port");
 
-	minim_window = args.contains("-minim");
+	std::string input_src = args.get<std::string>("1");
 
-	if (args.contains("-delay"))
-		delay_for_run = args.getInt("-delay");
-
-	finger_track = args.contains("-finger");
-	hand_track = args.contains("-hand");
-	if (args.contains("-port"))
-		PORT = args.getInt("-port");
+	return input_src;
 }
 
 bool AppConfig::load_from(char* filename)

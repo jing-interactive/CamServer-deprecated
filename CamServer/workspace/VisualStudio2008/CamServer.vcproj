@@ -196,14 +196,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\ofxArgs.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\_common\ofxArgs.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\_common\ofxThread.cpp"
 				>
 			</File>

@@ -1,5 +1,6 @@
 ﻿#include "ofxThread.h"
 #include "VideoApp.h"
+#include "AppConfig.h"
 
 #define VERSION "0.6.1"
 
@@ -17,7 +18,7 @@ struct StartThread: public ofxThread
 {
 	void threadedFunction()
 	{
-		printf("CamServer %s  vinjn.z@gmail.com.\n", VERSION);
+		printf("CamServer %s  vinjn.z@gmail.com.\n\n", VERSION);
 		for (int b=0;b<8;b++)
 		{
 			if (theApp.input_inited)//if VideoInput is already initialized
@@ -40,7 +41,6 @@ struct ReadyThread: public ofxThread
 	}
 };
 
-
 void say_byebye()
 {
 	printf("CamServer %s  vinjn.z@gmail.com.\n", VERSION);
@@ -55,7 +55,12 @@ void say_byebye()
 
 int main(int argc, char** argv )
 {
-	enableMemleakCheck(); 
+	enableMemleakCheck();
+
+	std::string input_src = theConfig.parse_args(argc, argv);
+	argc = 2;
+	argv[1] = (char*)input_src.c_str();
+
 	StartThread start_thread;
 	start_thread.startThread(false, false);
 

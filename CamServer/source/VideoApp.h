@@ -92,6 +92,7 @@ struct VideoApp
 
 	void run();
 
+private:
 	void parse_args(int argc, char** argv);
 	void send_custom_msg();
 	void send_tuio_msg();

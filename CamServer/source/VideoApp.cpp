@@ -82,8 +82,6 @@ VideoApp::VideoApp()
 
 bool VideoApp::init(int argc, char** argv)
 {
-	theConfig.parse_args(argc, argv);
-
 	if (theConfig.minim_window)
 	{
 #ifdef WIN32
@@ -92,9 +90,6 @@ bool VideoApp::init(int argc, char** argv)
 		keybd_event(VK_LWIN, 0, KEYEVENTF_KEYUP, 0);
 #endif
 	}
-
-	if (argc > 2)
-		argc = 2;//hack the _input.init
 
 	if (!input.init(argc,argv))
 	{

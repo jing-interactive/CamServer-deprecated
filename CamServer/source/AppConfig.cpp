@@ -84,8 +84,10 @@ std::string AppConfig::parse_args(int argc, char** argv)
 	PORT = args.get<int>("port");
 
 	std::string input_src = args.get<std::string>("1");
-
-	return input_src.substr(1);
+	if (input_src[0] == 'c')
+		return input_src.substr(1);
+	else
+		return input_src;
 }
 
 bool AppConfig::load_from(char* filename)

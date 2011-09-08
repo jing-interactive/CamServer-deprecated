@@ -7,7 +7,7 @@
 #define		WHITE_BG 1		//white
 #define		BLACK_BG 2		//black
 #define		DIFF_BG	3		//diff 
-#define		KINECT_BG	4		//for kinect
+#define		KINECT_BG 4		//for kinect
 
 struct AppConfig
 {

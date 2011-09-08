@@ -97,7 +97,7 @@ bool AppConfig::load_from(char* filename)
 	FileStorage fs(filename, FileStorage::READ);
 	if (!fs.isOpened())
 	{
-		printf("config.xml does not exist, application start with default value.\n");
+		printf("config.xml does not exist, CamServer starts with default values.\n");
 		return false;
 	}
 	else

@@ -7,7 +7,7 @@
 #define PARAM_BRIGHT 255
 #define PARAM_AUTO 40
 #define PARAM_BLUR1 80
-#define PARAM_BLUR2 7
+#define PARAM_BLUR2 20
 #define PARAM_NOISE 3 
 #define PARAM_MAXAREA 1000
 

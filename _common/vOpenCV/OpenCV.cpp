@@ -247,7 +247,8 @@ bool VideoInput::init(char* file_name)
 		}
 		else
 		{
-			printf("Failed to open kinect.\n");
+			printf("Failed to open Kinect.\n"
+				"You can download the driver from http://codelaboratories.com/get/nui/\n\n");
 			return false;
 		}
 	}
@@ -264,7 +265,8 @@ bool VideoInput::init(char* file_name)
 		}
 		else
 		{
-			printf("Failed to open ps3 camera.\n");
+			printf("Failed to open ps3 camera.\n"
+				"You can download the driver from http://codelaboratories.com/get/cl-eye-driver/\n\n");
 			return false;
 		}
 	}

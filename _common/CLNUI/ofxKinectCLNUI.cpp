@@ -150,17 +150,16 @@ ofxKinectCLNUI::~ofxKinectCLNUI()
 	{
 		StopNUICamera(kinectCam);
 		DestroyNUICamera(kinectCam);
+		cvReleaseImage(&bgrImage);
+		cvReleaseImage(&rgbImage);
+		cvReleaseImage(&depthShortImage);
+		cvReleaseImage(&depthColorImage);
+		cvReleaseImage(&bwImage);
+
+		delete[] depthData;
+		delete[] colorData;
+		delete[] depthColorData;
 	}
-
-	cvReleaseImage(&bgrImage);
-	cvReleaseImage(&rgbImage);
-	cvReleaseImage(&depthShortImage);
-	cvReleaseImage(&depthColorImage);
-	cvReleaseImage(&bwImage);
-
-	delete[] depthData;
-	delete[] colorData;
-	delete[] depthColorData;
 }
 
 int ofxKinectCLNUI::getCount()

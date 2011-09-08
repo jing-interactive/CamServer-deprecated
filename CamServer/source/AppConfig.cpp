@@ -59,6 +59,7 @@ std::string AppConfig::parse_args(int argc, char** argv)
 		"{hand||false|enable hand track}"
 		"{a|aut|false|auto background mode}"
 		"{1| |0	|the input source, could be camera_idx/picture}"
+		"{h|help|false|display this help text}"
 	};
 
 	for (int i=1;i<argc;i++)
@@ -70,7 +71,8 @@ std::string AppConfig::parse_args(int argc, char** argv)
 	}
 
 	cv::CommandLineParser args(argc, (const char**)argv, keys);
-	args.printParams();
+	if (args.get<bool>("help"))
+		args.printParams();
 
 	fixed_back_mode = !args.get<bool>("a");
 	CLIENT = args.get<std::string>("client");

@@ -43,7 +43,6 @@ struct ReadyThread: public ofxThread
 
 void say_byebye()
 {
-	printf("CamServer %s  vinjn.z@gmail.com.\n", VERSION);
 	for (int b=8;b>1;b--)
 	{
 		for (int j=0;j<8-b;j++)

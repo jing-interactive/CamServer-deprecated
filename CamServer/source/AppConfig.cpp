@@ -58,13 +58,13 @@ std::string AppConfig::parse_args(int argc, char** argv)
 		"{finger||false|enable finger track}"
 		"{hand||false|enable hand track}"
 		"{a|aut|false|auto background mode}"
-		"{1| |0	|the input source, could be camera_idx/picture}"
+		"{1| |0|the input source, could be camera_idx/picture}"
 		"{h|help|false|display this help text}"
 	};
 
 	for (int i=1;i<argc;i++)
 	{
-		if (strlen(argv[i]) == 1 && ::isdigit(argv[i][0]))
+		if (strlen(argv[i]) == 1 && argv[i][0]=='1')
 		{
 			argv[i] = hack_cam_str[argv[i][0]-'0'];
 		}
@@ -97,7 +97,7 @@ bool AppConfig::load_from(char* filename)
 	FileStorage fs(filename, FileStorage::READ);
 	if (!fs.isOpened())
 	{
-		printf("config.xml does not exist, application start with default value.\n");
+		printf("config.xml does not exist, CamServer starts with default values.\n");
 		return false;
 	}
 	else

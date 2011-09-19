@@ -26,8 +26,8 @@ void help()
 		"Usage:\n matcher_simple <image1> <image2>\n");
 }
 
-int min_dist = 1;
-int max_dist = 10;
+int k_min = 5;
+int k_max = 20;
 bool new_frame = true;
 
 void onTracker(int pos, void* userdata)
@@ -52,20 +52,20 @@ int main(int argc, char** argv)
 	}
 
 	namedWindow("feature");
-	createTrackbar("min_dist", "feature", &min_dist, 50, onTracker);
-	createTrackbar("max_dist", "feature", &max_dist, 200, onTracker);
+	createTrackbar("min_dist", "feature", &k_min, 100, onTracker);
+	createTrackbar("max_dist", "feature", &k_max, 100, onTracker);
 
-	equalizeHist(img1,img1);
-	equalizeHist(img2,img2);
+	//equalizeHist(img1,img1);
+	//equalizeHist(img2,img2);
 
 	// detecting keypoints
-	Ptr<FeatureDetector> detector = new SurfFeatureDetector;
+	Ptr<FeatureDetector> detector = new SiftFeatureDetector;
 	vector<KeyPoint> keypoints1, keypoints2;
 	detector->detect(img1, keypoints1);
 	detector->detect(img2, keypoints2);
 
 	// computing descriptors
-	Ptr<DescriptorExtractor> extractor = new SurfDescriptorExtractor;
+	Ptr<DescriptorExtractor> extractor = new SiftDescriptorExtractor;
 	Mat descriptors1, descriptors2;
 	extractor->compute(img1, keypoints1, descriptors1);
 	extractor->compute(img2, keypoints2, descriptors2);
@@ -80,7 +80,7 @@ int main(int argc, char** argv)
 	matcher = new FlannBasedMatcher;
 	matcher->match( descriptors1, descriptors2, matches );
 #endif
-#if 0
+#if 1
 	double max_dist = 0; double min_dist = 100;
 
 	//-- Quick calculation of max and min distances between keypoints
@@ -109,7 +109,7 @@ int main(int argc, char** argv)
 			for( int i = 0; i < descriptors1.rows; i++ )
 			{ 
 				float dist = matches[i].distance;
-				if( dist > min_dist*0.01 && dist < max_dist*0.01)
+				if( dist > min_dist*k_min*0.01 && dist < max_dist*k_max*0.01)
 				{
 					good_matches.push_back( matches[i]);
 				}

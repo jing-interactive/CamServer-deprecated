@@ -363,10 +363,6 @@
 				RelativePath="..\..\..\_common\vOpenCV\OpenCV.h"
 				>
 			</File>
-			<File
-				RelativePath="..\..\..\_common\vOpenCV\vector2d.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="doc"

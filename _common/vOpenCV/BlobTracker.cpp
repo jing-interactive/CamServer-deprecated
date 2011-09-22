@@ -1,5 +1,5 @@
 #include "BlobTracker.h"
-#include "vector2d.h"
+#include "point2d.h"
 #include <list>
 
 #if defined _DEBUG

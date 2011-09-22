@@ -11,7 +11,7 @@
 #pragma once
 
 #include "OpenCV.h"
-#include "vector2d.h"
+#include "point2d.h"
 
 struct vBlob
 {

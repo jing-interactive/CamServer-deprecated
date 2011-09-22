@@ -16,7 +16,7 @@
 #include <vector>
 #include <map>
 
-#include "vector2d.h"
+#include "point2d.h"
 
 #ifdef KINECT
 class ofxKinectCLNUI; 

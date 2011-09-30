@@ -1,5 +1,8 @@
 *.user
 *.suo 
-*.sdf
-*.ipch
-*.ncb 
+*.pdb
+*.ilk
+*.obj
+*.ncb
+*.suo
+*.exe

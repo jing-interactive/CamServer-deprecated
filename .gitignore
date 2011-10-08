@@ -6,3 +6,5 @@
 *.ncb
 *.suo
 *.exe
+/CamServer/workspace/VisualStudio2008/Debug
+/CamServer/workspace/VisualStudio2008/Release

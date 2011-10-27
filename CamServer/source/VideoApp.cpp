@@ -307,15 +307,15 @@ void VideoApp::send_custom_msg()
 				else
 					m.setAddress( "/contour");
 
-				m.addIntArg(id);
-				m.addStringArg(obj.getStatusString());
-				addFloatX(cx);
-				addFloatY(cy);
-				addFloatX(w);
-				addFloatY(h);
-				m.addFloatArg(angle);
+				m.addIntArg(id);                        //0
+				m.addStringArg(obj.getStatusString());  //1
+				addFloatX(cx);                          //2
+				addFloatY(cy);                          //3
+				addFloatX(w);                           //4
+				addFloatY(h);                           //5
+				m.addFloatArg(angle);                   //6
 				int nPts = obj.pts.size();
-				m.addIntArg(nPts);
+				m.addIntArg(nPts);                      //7
 				for (int k=0;k<nPts;k++)
 				{
 					addFloatX(obj.pts[k].x);

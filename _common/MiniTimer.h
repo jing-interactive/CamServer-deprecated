@@ -30,7 +30,7 @@ public:
     static unsigned int getGlobalTime()
     {
 #ifdef WIN32
-        return timegettime();
+        return timeGetTime();
 #else
         timeval tv;
         gettimeofday(&tv, 0 );

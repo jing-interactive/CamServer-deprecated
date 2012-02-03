@@ -1,0 +1,47 @@
+#ifndef _FLO_DEBUG_H_
+#define _FLO_DEBUG_H_
+
+#include <stdio.h>
+
+static FILE* the_fp = NULL;
+
+static struct DebugHelper
+{
+	~DebugHelper()
+	{
+		if (the_fp)
+			fclose(the_fp);
+	}
+}the_helper;
+
+inline void FloWrite(char *string, ...)
+{
+	//
+	if (!the_fp)
+	{
+		time_t rawtime;
+		char fileName[256];
+		time ( &rawtime );
+		tm* timeinfo = localtime ( &rawtime );
+		strftime(fileName,80,"%Y_%b_%d__%H_%M_%S.log",timeinfo);
+		printf("%s created.\n", fileName);
+		the_fp = fopen(fileName,"w");
+		assert(the_fp && "can not open the debug file");
+	}
+	static char buffer[256];
+
+	va_list arglist;
+
+	if (!string || !the_fp)
+		return;
+
+	va_start(arglist,string);
+	vsprintf(buffer,string,arglist);
+	va_end(arglist);
+
+	fprintf(the_fp,buffer);
+
+	fflush(the_fp);
+}
+
+#endif //_FLO_DEBUG_H_

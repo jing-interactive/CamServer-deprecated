@@ -13,7 +13,7 @@ void VideoApp::run()
 
 	while (app_running)
 	{ 
-		FloWriteLn();
+		FloWrite("\n");
 
 		timer.resetStartTime();
 		timer_total.resetStartTime();

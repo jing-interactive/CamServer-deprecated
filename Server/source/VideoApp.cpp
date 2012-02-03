@@ -3,6 +3,8 @@
 #include "UI.h"
 #include "MiniTimer.h"
 
+#define DISABLE_FACE_DETECTION
+
 VideoApp theApp;//global
 
 #if defined WIN32 || defined _WIN32
@@ -118,11 +120,12 @@ bool VideoApp::init(int argc, char** argv)
 
 	//theConfig.auto_explosure = _input.getAutoExplosure();
 	/*if (face_track)*/
+#ifndef DISABLE_FACE_DETECTION
 	if (!haar.init("../../data/haarcascade_frontalface_alt.xml"))
 	{//try another folder
 		haar.init("../data/haarcascade_frontalface_alt.xml");
 	}
-
+#endif
 	//grab related
 	grab_thread->lock();//wait for VideoInput::init() returns
 	size = input._size;

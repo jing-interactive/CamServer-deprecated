@@ -4,11 +4,11 @@
 #include <assert.h>
 
 
-//uncomment this if u have "FloDebug.h"
-//#define USING_FLO_DEBUG
+//uncomment this if u have "FloWrite.h"
+//#define USING_FLO_WRITE
 
-#ifdef USING_FLO_DEBUG
-#include "FloDebug.h"
+#ifdef USING_FLO_WRITE
+#include "FloWrite.h"
 #else
 #include <stdio.h>
 #endif
@@ -38,7 +38,7 @@ public:
 
 	void profileFunction(char* funcName)
 	{
-#ifdef USING_FLO_DEBUG
+#ifdef USING_FLO_WRITE
 		FloWrite("%s[%s] : %d ms\n", getProperBlank(), funcName, getTimeElapsedMS());
 #else
 		printf("%s[%s] : %d ms\n", getProperBlank(), funcName, getTimeElapsedMS());	

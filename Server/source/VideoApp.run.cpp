@@ -3,6 +3,17 @@
 #include "UI.h"
 #include "MiniTimer.h"
 
+#ifndef WIN32
+#define VK_BACK 8
+#define VK_RETURN 13
+#define VK_ESCAPE 27
+#define VK_SPACE 32
+#define VK_LEFT 37
+#define VK_UP 38
+#define VK_RIGHT 39
+#define VK_DOWN 40
+#endif
+
 void VideoApp::run()
 {	
 	MiniTimer timer;
@@ -166,7 +177,7 @@ void VideoApp::run()
 
 		if (theConfig.finger_track)
 		{
-			for (UINT i=0;i<blobs.size();i++)
+			for (unsigned int i=0;i<blobs.size();i++)
 			{
 				bool ffound=finger.findFingers(blobs[i], 12);
 				//	bool hfound=finger.findHands(blobs[0]);

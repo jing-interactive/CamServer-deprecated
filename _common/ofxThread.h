@@ -6,6 +6,7 @@
 #include <windows.h>
 #include <process.h>
 #else
+#include <stdio.h>
 #include <pthread.h>
 #include <semaphore.h>
 #endif

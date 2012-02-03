@@ -1,9 +1,12 @@
-#pragma once
+#ifndef _MINI_TIMER_H_
+#define _MINI_TIMER_H_
 
+#ifdef WIN32
 #include <windows.h>
-#include <assert.h>
-
-
+#else
+#include <sys/time.h>
+#endif
+ 
 //uncomment this if u have "FloWrite.h"
 //#define USING_FLO_WRITE
 
@@ -11,6 +14,7 @@
 #include "FloWrite.h"
 #else
 #include <stdio.h>
+#define FloWrite(str) 
 #endif
 
 #pragma comment(lib,"winmm.lib")
@@ -22,18 +26,29 @@ public:
 	{
 		resetStartTime();
 	}
+    
+    static unsigned int getGlobalTime()
+    {
+#ifdef WIN32
+        return timegettime();
+#else
+        timeval tv;
+        gettimeofday(&tv, 0 );
+        return tv.tv_usec;
 
-	DWORD getTimeElapsedMS()//mil-seconds
+#endif
+    }
+	unsigned int getTimeElapsedMS()//mil-seconds
 	{
-		return ::timeGetTime() - _start_time;
+		return getGlobalTime() - _start_time;
 	}
 	void resetStartTime()
 	{
-		_start_time = ::timeGetTime();
+		_start_time = getGlobalTime();
 	}
 	float getTimeElapsed()//seconds
 	{
-		return 0.001f*(::timeGetTime() - _start_time);
+		return 0.001f*(getGlobalTime() - _start_time);
 	}
 
 	void profileFunction(char* funcName)
@@ -52,6 +67,7 @@ public:
 	}
 
 private:
-	DWORD _start_time;
+	unsigned int _start_time;
 };
 
+#endif

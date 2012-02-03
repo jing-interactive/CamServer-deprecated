@@ -1,4 +1,4 @@
-﻿#include "vOpenCV/cvButtons.h"
+﻿#include "../../_common/vOpenCV/cvButtons.h"
 #include "UI.h"
 #include "AppConfig.h"
 #include "VideoApp.h"
@@ -191,7 +191,7 @@ namespace param_gui
 #endif
 	};
 	
-	int num_btns = _countof(btn_infs);
+	int num_btns = sizeof(btn_infs)/sizeof(btn_infs[0]);
 
 	void update()
 	{

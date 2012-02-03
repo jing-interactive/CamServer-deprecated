@@ -45,7 +45,7 @@ void VideoApp::VideoGrabThread::threadedFunction()
 		_dirty = true; 
 		if (_input._InputType == _input.From_Video)
 		{
-			DWORD elapse = timer.getTimeElapsedMS();
+			unsigned int elapse = timer.getTimeElapsedMS();
 			if (elapse < 40)
 				SLEEP(40 - elapse);
 		}
@@ -272,7 +272,7 @@ void VideoApp::send_custom_msg()
 	{
 		vector<vTrackedBlob>* pTb = pTrackBlobs[v];
 		int nB = pTb->size();
-		for (UINT i=0;i<nB;i++)
+		for (unsigned int i=0;i<nB;i++)
 		{
 			vTrackedBlob& obj = (*pTb)[i];
 

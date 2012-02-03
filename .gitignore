@@ -1,3 +1,4 @@
+#for VS 2008
 *.user
 *.suo 
 *.pdb
@@ -8,3 +9,6 @@
 *.exe
 /CamServer/workspace/VisualStudio2008/Debug
 /CamServer/workspace/VisualStudio2008/Release
+
+#for Mac Xcode
+.DS_Store

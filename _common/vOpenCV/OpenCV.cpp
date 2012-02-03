@@ -142,7 +142,7 @@ CvScalar vDefaultColor(int idx){ return default_colors[idx%sizeOfColors];}
 
 char* get_time(bool full_length)
 {
-	static char str[MAX_PATH];
+	static char str[100];
 	time_t timep;
 	tm *p;
 	time(&timep);

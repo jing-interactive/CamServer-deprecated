@@ -38,7 +38,7 @@
 		74AE699214DBC509007B4D39 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
+			dstPath = usr/share/man/man1;
 			dstSubfolderSpec = 0;
 			files = (
 				74AE699B14DBC509007B4D39 /* CamServer.1 in CopyFiles */,
@@ -380,6 +380,7 @@
 					"\"$(SRCROOT)/../../../../opencv_svn/opencv/build/lib/Debug\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = ../../bin;
 			};
 			name = Debug;
 		};
@@ -391,6 +392,7 @@
 					"\"$(SRCROOT)/../../../../opencv_svn/opencv/build/lib/Debug\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = ../../bin;
 			};
 			name = Release;
 		};
@@ -413,6 +415,7 @@
 				74AE69A014DBC509007B4D39 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

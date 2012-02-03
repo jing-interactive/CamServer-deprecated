@@ -1,1 +1,0 @@
-Basically I have no plan for a MacOSX release.

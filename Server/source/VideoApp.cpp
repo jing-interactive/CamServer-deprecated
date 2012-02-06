@@ -3,11 +3,11 @@
 #include "UI.h"
 #include "MiniTimer.h"
 
-#define DISABLE_FACE_DETECTION
+//#define DISABLE_FACE_DETECTION
 
 VideoApp theApp;//global
 
-#if defined WIN32 || defined _WIN32
+#ifdef WIN32
 int CamServer_WindowCallback(HWND hwnd, UINT uMsg, WPARAM wparam, LPARAM lparam, int* was_processed)
 {
 	if (uMsg == WM_DESTROY)
@@ -125,6 +125,7 @@ bool VideoApp::init(int argc, char** argv)
 	{//try another folder
 		haar.init("../data/haarcascade_frontalface_alt.xml");
 	}
+	haar.scale = 2;
 #endif
 	//grab related
 	grab_thread->lock();//wait for VideoInput::init() returns
@@ -135,12 +136,12 @@ bool VideoApp::init(int argc, char** argv)
 	{
 		size = size*2;//enlarge the size of camera with small resolution
 	}
-	total = cvCreateImage(size, 8, 3);
+	total = cvCreateImage(cv::Size(size.width*1.5, size.height*1.5), 8, 3);
 	cvSet(total, CV_RGB(122,122,122));
 
 	float k = 0;
-	HalfWidth = size.width/2;
-	HalfHeight = size.height/2;
+	HalfWidth = size.width*0.75;
+	HalfHeight = size.height*0.75;
 	half = cv::Size(HalfWidth-k, HalfHeight-k);
 
 	roi[0] = cv::Rect(Point(k,k), half);
@@ -187,7 +188,7 @@ bool VideoApp::init(int argc, char** argv)
 
 	onRefreshBack();
 
-#if defined WIN32 || defined _WIN32
+#ifdef WIN32
 	cvSetPreprocessFuncWin32(CamServer_WindowCallback);
 #endif
 	return true;

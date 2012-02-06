@@ -2,31 +2,30 @@
 
 #include <windows.h>
 
-class CSimpleMutex: public CRITICAL_SECTION
+class MiniMutex: public CRITICAL_SECTION
 {
 public:
-    CSimpleMutex ()
+    MiniMutex()
             : m_nLockCount(0)
     {
         ::InitializeCriticalSection(this);
     }
 
-    ~CSimpleMutex ()
+    ~MiniMutex()
     {
         ::DeleteCriticalSection(this);
     }
 
-    void lock ()
+    void lock()
     {
         ::EnterCriticalSection(this);
         m_nLockCount++;
     }
-    void unlock ()
+    void unlock()
     {
         ::LeaveCriticalSection(this);
         m_nLockCount--;
     }
-
 
 public :
     int m_nLockCount;
@@ -34,8 +33,8 @@ public :
 
 struct ScopedLocker
 {
-	CSimpleMutex& _mutex;
-	ScopedLocker(CSimpleMutex& mutex):_mutex(mutex)
+	MiniMutex& _mutex;
+	ScopedLocker(MiniMutex& mutex):_mutex(mutex)
 	{
 		_mutex.lock();
 	}
@@ -46,7 +45,7 @@ struct ScopedLocker
 };
 
 /*usage
-CSimpleMutex a_mutex;
+MiniMutex a_mutex;
 
 {
 ScopedLocker(a_mutex);
@@ -56,29 +55,43 @@ ScopedLocker(a_mutex);
 #define LOCK_START(mutex) {ScopedLocker _locker(mutex)
 #define LOCK_END() }
 
-class CSimpleEvent
+class MiniEvent
 {
 public:
-	CSimpleEvent ()
+	MiniEvent(BOOL bManualReset = TRUE)
 	{
 		// start in non-signaled state (red light)
+		// event is set manually
 		// auto reset after every Wait
-		_handle = CreateEvent (0, FALSE, FALSE, 0);
+		_handle = ::CreateEvent (NULL, bManualReset, FALSE, NULL);
 	}
 
-	~CSimpleEvent ()
+	~MiniEvent()
 	{
-		CloseHandle (_handle);
+		::CloseHandle (_handle);
 	}
 
 	// put into signaled state
-	void set () { SetEvent (_handle); }
-	void wait ()
+	void set() 
+	{ 
+		::SetEvent (_handle); 
+	}
+
+	void wait(DWORD dwMilliseconds = INFINITE)
 	{
 		// Wait until event is in signaled (green) state
-		WaitForSingleObject (_handle, INFINITE);
+		::WaitForSingleObject (_handle, dwMilliseconds);
 	}
-	operator HANDLE () { return _handle; }
+
+	operator HANDLE() 
+	{ 
+		return _handle;
+	}
+
+	HANDLE getHandle() const
+	{
+		return _handle;
+	}
 private:
 	HANDLE _handle;
 };

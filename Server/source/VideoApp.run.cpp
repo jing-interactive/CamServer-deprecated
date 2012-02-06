@@ -44,8 +44,9 @@ void VideoApp::run()
 		switch (key)
 		{
 		case VK_ESCAPE:
-			app_running = false;
-
+			{
+				app_running = false;
+			}break;
 		case VK_BACK:
 			{//reset four corner points
 				theConfig.corners[0] = cv::Point2f(0,0);
@@ -57,7 +58,6 @@ void VideoApp::run()
 
 				onRefreshBack();
 			}break;
-
 		case VK_SPACE:
 			{//toggle big window visibility
 				monitorVisible = !monitorVisible;

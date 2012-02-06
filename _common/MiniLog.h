@@ -1,20 +1,20 @@
-#ifndef _FLO_DEBUG_H_
-#define _FLO_DEBUG_H_
+#ifndef _MINI_LOG_H_
+#define _MINI_LOG_H_
 
 #include <stdio.h>
 
 static FILE* the_fp = NULL;
 
-static struct DebugHelper
+static struct MiniLogHelper
 {
-	~DebugHelper()
+	~MiniLogHelper()
 	{
 		if (the_fp)
 			fclose(the_fp);
 	}
 }the_helper;
 
-inline void FloWrite(char *string, ...)
+inline void MiniLog(char *string, ...)
 {
 	//
 	if (!the_fp)
@@ -44,4 +44,4 @@ inline void FloWrite(char *string, ...)
 	fflush(the_fp);
 }
 
-#endif //_FLO_DEBUG_H_
+#endif //_MINI_LOG_H_

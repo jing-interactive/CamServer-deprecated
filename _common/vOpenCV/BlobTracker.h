@@ -31,7 +31,7 @@ struct vBlobListener
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-// This cleans up the forground segmentation mask derived from calls to cvBackCodeBookDiff
+// This cleans up the foreground segmentation mask derived from calls to cvBackCodeBookDiff
 //
 // mask			Is a grayscale (8 bit depth) "raw" mask image which will be cleaned up
 //
@@ -125,11 +125,10 @@ struct vHaarFinder
 	void find(IplImage* img, int minArea = 1, bool findAllFaces = true);
 
 	vHaarFinder();
-	~vHaarFinder();
 
 protected:
-	CvHaarClassifierCascade* cascade;
-	CvMemStorage* storage;
+
+	CascadeClassifier _cascade;
 };
 
 struct vOpticalFlowLK

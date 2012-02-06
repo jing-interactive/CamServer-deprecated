@@ -399,39 +399,19 @@ bool vFingerDetector::findHands(const vBlob& smblob, int k)
 	//Positions of hands are in (lhand[handspos[0]].x, y+lhand[handspos[0]].y) for left hand and (rhand[handspos[1]].x, y+rhand[handspos[1]].y) for right hand
 }
 
-
-
 vHaarFinder::vHaarFinder()
-{
-	cascade = NULL;
-	storage = NULL;
+{ 
 	scale = 1.2;
 }
-
-vHaarFinder::~vHaarFinder()
-{
-	if (cascade) cvReleaseHaarClassifierCascade(&this->cascade);
-	if (storage) cvReleaseMemStorage(&this->storage);
-}
-
+ 
 bool vHaarFinder::init(char* cascade_name)
 {
-	cascade = (CvHaarClassifierCascade*)cvLoad( cascade_name, 0, 0, 0 );
-	if (cascade)
-	{
-		printf("%s loaded\n", cascade_name);
-		storage = cvCreateMemStorage(0);
-	}
-
-	return cascade && storage;
+	return _cascade.load(cascade_name);
 }
 
 
 void vHaarFinder::find(IplImage* img, int minArea, bool findAllFaces)
 {
-	if (!cascade)
-		return;
-
 	blobs.clear();
 
 	Ptr<IplImage> gray = cvCreateImage( cvSize(img->width,img->height), 8, 1 );
@@ -441,23 +421,24 @@ void vHaarFinder::find(IplImage* img, int minArea, bool findAllFaces)
 	vGrayScale(img, gray);
 	cvResize( gray, tiny );
 	cvEqualizeHist( tiny, tiny );
-	cvClearMemStorage( storage );
 
-	CvSeq* found = cvHaarDetectObjects( tiny, cascade, storage,
-		1.2, 2,
-		findAllFaces ? CV_HAAR_FIND_BIGGEST_OBJECT|CV_HAAR_DO_CANNY_PRUNING : CV_HAAR_DO_CANNY_PRUNING
+	vector<Rect> faces;
+
+	_cascade.detectMultiScale( (IplImage*)tiny, faces,
+		1.1, 2, 0
+		| findAllFaces ? CV_HAAR_FIND_BIGGEST_OBJECT|CV_HAAR_DO_CANNY_PRUNING : CV_HAAR_DO_CANNY_PRUNING
 		//|CV_HAAR_FIND_BIGGEST_OBJECT
 		//|CV_HAAR_DO_ROUGH_SEARCH
-		//|CV_HAAR_DO_CANNY_PRUNING
-		//|CV_HAAR_SCALE_IMAGE
-		//,
-		//cvSize(30, 30)
-		);
-	//printf( "detection time = %gms\n", t/((double)cvGetTickFrequency()*1000.) );
-	for(int i = 0; i < (found ? found->total : 0); i++ )
+		|CV_HAAR_SCALE_IMAGE
+		,
+		Size(30, 30) );
+
+	int n_faces = faces.size();
+
+	for(int i = 0; i < n_faces; i++ )
 	{
-		CvRect* _r = (CvRect*)cvGetSeqElem( found, i );
-		CvRect r = cvRect(_r->x*scale, _r->y*scale, _r->width*scale,_r->height*scale);
+		Rect& _r = faces[i];
+		Rect r = Rect(_r.x*scale, _r.y*scale, _r.width*scale,_r.height*scale);
 
 		float area          = r.width * r.height;
 		if (area < minArea)

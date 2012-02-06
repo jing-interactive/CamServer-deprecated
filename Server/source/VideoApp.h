@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#define MODE_320X240	//always 320*240
+//#define MODE_320X240	//always 320*240
 
 #include "../../_common/vOpenCV/OpenCV.h"
 #include "../../_common/vOpenCV/cvButtons.h"

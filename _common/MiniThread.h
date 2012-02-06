@@ -1,20 +1,48 @@
-#ifndef _OFX_THREAD_H_
-#define _OFX_THREAD_H_
+#ifndef _MINI_THREAD_H_
+#define _MINI_THREAD_H_
 
 #ifdef WIN32	
 #include <stdio.h>
 #include <windows.h>
 #include <process.h>
+const DWORD MS_VC_EXCEPTION=0x406D1388;
+
+#pragma pack(push,8)
+typedef struct tagTHREADNAME_INFO
+{
+	DWORD dwType; // Must be 0x1000.
+	LPCSTR szName; // Pointer to name (in user addr space).
+	DWORD dwThreadID; // Thread ID (-1=caller thread).
+	DWORD dwFlags; // Reserved for future use, must be zero.
+} THREADNAME_INFO;
+#pragma pack(pop)
+
+inline void SetThreadName( DWORD dwThreadID, char* threadName)
+{
+	THREADNAME_INFO info;
+	info.dwType = 0x1000;
+	info.szName = threadName;
+	info.dwThreadID = dwThreadID;
+	info.dwFlags = 0;
+
+	__try
+	{
+		RaiseException( MS_VC_EXCEPTION, 0, sizeof(info)/sizeof(ULONG_PTR), (ULONG_PTR*)&info );
+	}
+	__except(EXCEPTION_EXECUTE_HANDLER)
+	{
+	}
+}
 #else
 #include <stdio.h>
 #include <pthread.h>
 #include <semaphore.h>
 #endif
 
-class ofxThread{
+class MiniThread{
 
 public:
-	ofxThread()
+	MiniThread(const std::string& name = "ofxThread"):_name(name)
 	{
 		threadRunning = false; 
 #ifdef WIN32 
@@ -23,18 +51,20 @@ public:
 		pthread_mutex_init(&myMutex, NULL); 
 #endif 
 	}
-	virtual ~ofxThread()
+	virtual ~MiniThread()
 	{
 #ifndef WIN32 
 		pthread_mutex_destroy(&myMutex); 
 #endif 
 		stopThread(); 
 	}
+
 	bool isThreadRunning()
 	{
 		//should be thread safe - no writing of vars here 
 		return threadRunning; 
 	}
+
 	void startThread(bool _blocking = true, bool _verbose = true)
 	{
 		if( threadRunning ){ 
@@ -57,6 +87,7 @@ public:
 		blocking      =   _blocking; 
 		verbose         = _verbose; 
 	}
+
 	bool lock()
 	{
 #ifdef WIN32 
@@ -85,9 +116,9 @@ public:
 			} 
 		} 
 #endif 
-
 		return true; 
 	}
+
 	bool unlock()
 	{
 #ifdef WIN32 
@@ -100,6 +131,7 @@ public:
 
 		return true; 
 	}
+
 	void stopThread()
 	{
 		if(threadRunning){ 
@@ -128,14 +160,14 @@ protected:
 
 #ifdef WIN32
 	static unsigned int __stdcall thread(void * objPtr){
-		ofxThread* me	= (ofxThread*)objPtr;
+		MiniThread* me	= (MiniThread*)objPtr;
 		me->threadedFunction();
 		return 0;
 	}
 
 #else
 	static void * thread(void * objPtr){
-		ofxThread* me	= (ofxThread*)objPtr;
+		MiniThread* me	= (MiniThread*)objPtr;
 		me->threadedFunction();
 		return 0;
 	}
@@ -149,7 +181,7 @@ protected:
 	pthread_t        myThread;
 	pthread_mutex_t  myMutex;
 #endif
-
+	std::string _name;
 	bool threadRunning;
 	bool blocking;
 	bool verbose;

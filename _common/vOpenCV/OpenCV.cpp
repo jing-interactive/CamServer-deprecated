@@ -416,7 +416,7 @@ bool VideoInput::init_ps3()
 	int n_ps3 = ofxCLeye::listDevices();
 	if (n_ps3 > 0)
 	{
-		return _ps3_cam->init(320, 240, false);
+		return _ps3_cam->init(640, 480, false);
 	}
 	else
 	{

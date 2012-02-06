@@ -3,6 +3,7 @@
 
 #ifdef WIN32
 #include <windows.h>
+#pragma comment(lib,"winmm.lib")
 #else
 #include <sys/time.h>
 #endif
@@ -16,8 +17,6 @@
 #include <stdio.h>
 #define FloWrite(str) 
 #endif
-
-#pragma comment(lib,"winmm.lib")
 
 class MiniTimer
 {
@@ -35,17 +34,19 @@ public:
         timeval tv;
         gettimeofday(&tv, 0 );
         return tv.tv_usec;
-
 #endif
     }
+    
 	unsigned int getTimeElapsedMS()//mil-seconds
 	{
 		return getGlobalTime() - _start_time;
 	}
+    
 	void resetStartTime()
 	{
 		_start_time = getGlobalTime();
 	}
+    
 	float getTimeElapsed()//seconds
 	{
 		return 0.001f*(getGlobalTime() - _start_time);

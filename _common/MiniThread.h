@@ -53,6 +53,7 @@ public:
 		pthread_mutex_init(&myMutex, NULL); 
 #endif 
 	}
+    
 	virtual ~MiniThread()
 	{
 #ifndef WIN32 

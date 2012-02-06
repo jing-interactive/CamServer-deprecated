@@ -6,7 +6,7 @@
 #include "../../_common/vOpenCV/cvButtons.h"
 #include "../../_common/vOpenCV/BlobTracker.h"
 
-#include "../../_common/ofxThread.h"
+#include "../../_common/MiniThread.h"
 #include "../../_common/ofxOsc/ofxOsc.h"
 
 #ifdef WIN32 
@@ -23,7 +23,7 @@
 
 struct VideoApp
 {
-	struct VideoGrabThread: public ofxThread
+	struct VideoGrabThread: public MiniThread
 	{
 		int fps;
 

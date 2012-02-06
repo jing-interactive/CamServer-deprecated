@@ -24,7 +24,7 @@ void VideoApp::run()
 
 	while (app_running)
 	{ 
-		FloWrite("\n");
+		MiniLog("\n");
 
 		timer.resetStartTime();
 		timer_total.resetStartTime();

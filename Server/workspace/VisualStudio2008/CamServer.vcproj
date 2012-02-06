@@ -184,15 +184,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\_common\FloWrite.h"
+				RelativePath="..\..\..\_common\MiniLog.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\_common\MiniMutex.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\_common\MiniThread.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\_common\MiniTimer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\_common\ofxThread.h"
 				>
 			</File>
 		</Filter>

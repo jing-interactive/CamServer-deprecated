@@ -7,11 +7,11 @@
 #include <sys/time.h>
 #endif
  
-//uncomment this if u have "FloWrite.h"
+//uncomment this if u have "MiniLog.h"
 //#define USING_FLO_WRITE
 
 #ifdef USING_FLO_WRITE
-#include "FloWrite.h"
+#include "MiniLog.h"
 #else
 #include <stdio.h>
 #define FloWrite(str) 
@@ -54,7 +54,7 @@ public:
 	void profileFunction(char* funcName)
 	{
 #ifdef USING_FLO_WRITE
-		FloWrite("%s[%s] : %d ms\n", getProperBlank(), funcName, getTimeElapsedMS());
+		MiniLog("%s[%s] : %d ms\n", getProperBlank(), funcName, getTimeElapsedMS());
 #else
 		printf("%s[%s] : %d ms\n", getProperBlank(), funcName, getTimeElapsedMS());	
 #endif

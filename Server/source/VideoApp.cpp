@@ -19,7 +19,7 @@ int CamServer_WindowCallback(HWND hwnd, UINT uMsg, WPARAM wparam, LPARAM lparam,
 }
 #endif
 
-VideoApp::VideoGrabThread::VideoGrabThread(VideoInput& input):_input(input)
+VideoApp::VideoGrabThread::VideoGrabThread(VideoInput& input):MiniThread("video"),_input(input)
 {
 	fps = 0;
 }

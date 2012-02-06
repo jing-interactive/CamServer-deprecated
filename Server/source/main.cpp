@@ -1,4 +1,4 @@
-﻿#include "ofxThread.h"
+﻿#include "MiniThread.h"
 #include "VideoApp.h"
 #include "AppConfig.h"
 
@@ -14,7 +14,7 @@ void enableMemleakCheck(int breakpt = 0)
 	#endif
 }
 
-struct StartThread: public ofxThread
+struct StartThread: public MiniThread
 {
 	void threadedFunction()
 	{
@@ -32,7 +32,7 @@ struct StartThread: public ofxThread
 	}
 };
 
-struct ReadyThread: public ofxThread
+struct ReadyThread: public MiniThread
 {
 	void threadedFunction()
 	{

@@ -39,10 +39,12 @@ inline void SetThreadName( DWORD dwThreadID, char* threadName)
 #include <semaphore.h>
 #endif
 
+#include <string>
+
 class MiniThread{
 
 public:
-	MiniThread(const std::string& name = "ofxThread"):_name(name)
+	MiniThread(const std::string& name = "MiniThread"):_name(name)
 	{
 		threadRunning = false; 
 #ifdef WIN32 

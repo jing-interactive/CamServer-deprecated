@@ -3,6 +3,7 @@
 #include "UI.h"
 #include "MiniTimer.h"
 
+using namespace cv;
 //#define DISABLE_FACE_DETECTION
 
 VideoApp theApp;//global
@@ -280,14 +281,14 @@ void VideoApp::send_custom_msg()
 			//if (obj.status == statusStill)
 			//	//do send still blobs out
 			//	continue;
-
+			Mat m = frame;
 			if (obj.isHole)
-				vPolyLine(frame, obj.pts, cv::Scalar(0,0,0), 1);
+				vPolyLine(m, obj.pts, cv::Scalar(0,0,0), 1);
 			else
-				vPolyLine(frame, obj.pts, vDefaultColor(obj.id), 1);
+				vPolyLine(m, obj.pts, vDefaultColor(obj.id), 1);
 			//	vDrawRect(frame, obj.box, CV_RGB(0,122,255));
 			sprintf(g_buffer, "#%d", obj.id);
-			vDrawText(frame, obj.center.x, obj.center.y, g_buffer, vDefaultColor(obj.id));
+			vDrawText(m, obj.center.x, obj.center.y, g_buffer, vDefaultColor(obj.id));
 
 			int id = obj.id;
 #if 0
@@ -361,13 +362,14 @@ void VideoApp::send_tuio_msg()
 	{
 		vTrackedBlob& blob = blobTracker.trackedBlobs[i];
 
+		Mat ma = frame;
 		if (blob.isHole)
-			vPolyLine(frame, blob.pts, cv::Scalar(0,0,0), 1);
+			vPolyLine(ma, blob.pts, cv::Scalar(0,0,0), 1);
 		else
-			vPolyLine(frame, blob.pts, vDefaultColor(blob.id), 1);
+			vPolyLine(ma, blob.pts, vDefaultColor(blob.id), 1);
 		//	vDrawRect(frame, obj.box, CV_RGB(0,122,255));
 		sprintf(g_buffer, "#%d", blob.id);
-		vDrawText(frame, blob.center.x, blob.center.y, g_buffer, vDefaultColor(blob.id));
+		vDrawText(ma, blob.center.x, blob.center.y, g_buffer, vDefaultColor(blob.id));
 
 		//Set Message
 		ofxOscMessage m;

@@ -37,7 +37,7 @@ struct VideoApp
 	};
 
 	//thread
-	Ptr<VideoGrabThread> grab_thread;
+	cv::Ptr<VideoGrabThread> grab_thread;
 	VideoInput input;
 
 	//the important objects
@@ -58,22 +58,22 @@ struct VideoApp
 	CvMat* warp_matrix;
 
 	//the IplImages
-	Ptr<IplImage> total;
-	Ptr<IplImage> frame, black_frame, white_frame, kinect_frame;
-	Ptr<IplImage> prevBg;
+	cv::Ptr<IplImage> total;
+	cv::Ptr<IplImage> frame, black_frame, white_frame, kinect_frame;
+	cv::Ptr<IplImage> prevBg;
 
 	//
-	Ptr<IplImage> half_raw;
-	Ptr<IplImage> half_flip;
-	Ptr<IplImage> grayBlob;
-	Ptr<IplImage> grayBuffer;
+	cv::Ptr<IplImage> half_raw;
+	cv::Ptr<IplImage> half_flip;
+	cv::Ptr<IplImage> grayBlob;
+	cv::Ptr<IplImage> grayBuffer;
 
 	cv::Size size;
 	int channels;
 	cv::Size half;
 	bool monitorVisible;
 
-	Ptr<IBackGround> backModel;
+	cv::Ptr<IBackGround> backModel;
 	CvGaussBGStatModelParams paramMoG;
 
 	int HalfWidth, HalfHeight;

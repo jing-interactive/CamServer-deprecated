@@ -20,15 +20,6 @@
 
 #include "Blob.h"
 
-struct vBlobListener
-{
-	virtual void blobOn( int x, int y, int id, int order ) = 0;
-	virtual void blobMoved( int x, int y, int id, int order ) = 0;
-	virtual void blobOff( int x, int y, int id, int order ) = 0;
-};
-
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 // This cleans up the foreground segmentation mask derived from calls to cvBackCodeBookDiff
@@ -40,10 +31,11 @@ struct vBlobListener
 // areaScale 	Area = image (width*height)*areaScale.  If contour area < this, delete that contour (DEFAULT: 0.1)
 //
 
-void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea, int maxArea, bool convexHull=true, bool (*sort_func)(const vBlob& a, const vBlob& b)  = NULL);
+void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea = 1, int maxArea = 3072000, bool convexHull=false, bool (*sort_func)(const vBlob& a, const vBlob& b)  = NULL);
 
 void vFindBlobs(IplImage *mask,
-				int minArea = 1, int maxArea = 3072000, bool convexHull=true);//draw trackedBlobs only
+				int minArea = 1, int maxArea = 3072000, bool convexHull=false);//draw trackedBlobs only
+//void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea, int maxArea, bool convexHull=true, bool (*sort_func)(const vBlob& a, const vBlob& b)  = NULL);
 
 // parameters:
 //  silh - input video frame
@@ -60,9 +52,6 @@ public:
 
 	vBlobTracker();
 
-	//setup a event listener
-	void setListener( vBlobListener* _listener );
-
 	//assigns IDs to each blob in the contourFinder
 	void trackBlobs(const vector<vBlob>& newBlobs);
 
@@ -74,8 +63,6 @@ private:
 	int						IDCounter;	  //counter of last blob
 
 protected:
-
-	vBlobListener* listener;
 
 	//blob Events
 	void doBlobOn(vTrackedBlob& b );
@@ -114,8 +101,6 @@ struct vFingerDetector
 	 float teta,lhd;
 };
 
-
-
 struct vHaarFinder
 {
 	vector<vBlob> blobs;
@@ -128,7 +113,7 @@ struct vHaarFinder
 
 protected:
 
-	CascadeClassifier _cascade;
+	cv::CascadeClassifier _cascade;
 };
 
 struct vOpticalFlowLK
@@ -148,9 +133,112 @@ struct vOpticalFlowLK
         int width;
         int height;
 
-        Ptr<IplImage> vel_x;
-        Ptr<IplImage> vel_y;
-		Ptr<IplImage> prev;
+		cv::Ptr<IplImage> vel_x;
+        cv::Ptr<IplImage> vel_y;
+		cv::Ptr<IplImage> prev;
 
 		int block_size;
+};
+
+
+
+struct IBackGround
+{
+	CvBGStatModel* bg_model;
+
+	int thresh;
+
+	IBackGround(){
+		bg_model = NULL;
+		thresh = 200;
+	}
+
+	virtual void init(IplImage* initial, void* param = NULL) = 0;
+
+	virtual void update(IplImage* image, int mode = 0){
+		cvUpdateBGStatModel( image, bg_model );
+	}
+	virtual void setIntParam(int idx, int value)
+	{
+		if (idx ==0) thresh = 255-value;
+	}
+
+	virtual IplImage* getForeground(){
+		return bg_model->foreground;
+	}
+
+	virtual IplImage* getBackground(){
+		return bg_model->background;
+	}
+
+	virtual ~IBackGround(){
+		if (bg_model)
+			cvReleaseBGStatModel(&bg_model);
+	}
+};
+
+
+struct vBackFGDStat: public IBackGround
+{
+	void init(IplImage* initial, void* param = NULL);
+};
+
+struct vBackGaussian: public IBackGround
+{
+	void init(IplImage* initial, void* param = NULL);
+};
+
+#define DETECT_BOTH 0
+#define DETECT_DARK 1
+#define DETECT_BRIGHT 2
+
+struct vBackGrayDiff: public IBackGround
+{
+	cv::Ptr<IplImage> Frame;
+	cv::Ptr<IplImage> Bg;
+	cv::Ptr<IplImage> Fore ;
+
+	int dark_thresh;
+
+	void init(IplImage* initial, void* param = NULL);
+
+	void setIntParam(int idx, int value);
+	///mode: 0-> ¼ì²âÃ÷Óë°µ 1->¼ì²âºÚ°µ 2->¼ì²âÃ÷ÁÁ
+	void update(IplImage* image, int mode = DETECT_BOTH);
+
+	IplImage* getForeground(){
+		return Fore;
+	}
+	IplImage* getBackground(){
+		return Bg;
+	}
+};
+
+struct vBackColorDiff: public vBackGrayDiff
+{
+	int nChannels;
+	void init(IplImage* initial, void* param = NULL);
+
+	///mode: 0-> ¼ì²âÃ÷Óë°µ 1->¼ì²âºÚ°µ 2->¼ì²âÃ÷ÁÁ
+	void update(IplImage* image, int mode = DETECT_BOTH);
+};
+
+//ÈýÖ¡²îÖµ·¨
+struct vThreeFrameDiff: public IBackGround
+{
+	cv::Ptr<IplImage> grayFrameOne;
+	cv::Ptr<IplImage> grayFrameTwo;
+	cv::Ptr<IplImage> grayFrameThree;
+	cv::Ptr<IplImage> grayDiff ;
+
+	void init(IplImage* initial, void* param = NULL);
+
+	void update(IplImage* image, int mode = 0);
+
+	IplImage* getForeground(){
+		return grayDiff;
+	}
+	IplImage* getBackground(){
+		return grayDiff;
+	}
 };

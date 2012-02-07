@@ -242,7 +242,8 @@ void VideoApp::run()
 		if (theConfig.face_track)
 			sprintf(g_buffer, "%s %d face", g_buffer, haar.blobs.size()); 
 		cvRectangle(param_gui::setting, Point(0,0), Point(400,30), CV_RGB(122,122,122), CV_FILLED);
-		vDrawText(param_gui::setting, 20,20, g_buffer);
+		cv::Mat m = param_gui::setting;
+		vDrawText(m, 20,20, g_buffer);
 
 		cvShowImage(PARAM_WINDOW, param_gui::setting);
 		timer.profileFunction("show Param Panel");

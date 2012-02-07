@@ -13,6 +13,11 @@
 #include "OpenCV.h"
 #include "point2d.h"
 
+using cv::Rect;
+using cv::Point;
+using cv::RotatedRect;
+using cv::Point2f;
+
 struct vBlob
 {
 	vBlob()
@@ -25,13 +30,10 @@ struct vBlob
 
 	vBlob(const vBlob& b):box(b.box),center(b.center),pts(b.pts),rotBox(b.rotBox)
 	{
-	//	box = b.box;
-	//	center = b.center;
 		area = b.area;
 		angle = b.angle;
 		isHole = b.isHole;
 		length = b.length;
-	//	pts = b.pts;
 	}
 
 	vBlob(Rect rc, Point ct, float _area = 0, float _angle = 0, bool hole = false)
@@ -43,12 +45,29 @@ struct vBlob
 		isHole = hole;
 		length = 0;
 	}
+
+	vBlob& operator = (const vBlob& b)
+	{
+		pts = b.pts;
+		box = b.box;
+		rotBox = b.rotBox;
+		center = b.center;
+		area = b.area;
+		angle = b.angle;
+		isHole = b.isHole;
+		length = b.length;
+		return *this;
+	}
 	
 	Rect box;
 	RotatedRect rotBox;
 	float angle;
 
 	Point2f center;
+	vector<Point> pts;
+	float area;
+	float length;
+	bool isHole;
 
 	bool operator<(const vBlob& other) const 
 	{//sorted by Y-coord first then X-coord
@@ -63,10 +82,10 @@ struct vBlob
 
 	void boxMerge(const vBlob& other)
 	{
-		int _x = min(other.box.x, box.x);
-		int _y = min(other.box.y, box.y);
-		box.width = max(other.box.x + other.box.width, box.x + box.width)- _x;
-		box.height = max(other.box.y + other.box.height, box.y + box.height) - _y;
+		int _x = cv::min(other.box.x, box.x);
+		int _y = cv::min(other.box.y, box.y);
+		box.width = cv::max(other.box.x + other.box.width, box.x + box.width)- _x;
+		box.height = cv::max(other.box.y + other.box.height, box.y + box.height) - _y;
 
 		box.x = _x;
 		box.y = _y;
@@ -74,11 +93,6 @@ struct vBlob
 		center.x = box.x + box.width/2;
 		center.y = box.y + box.height/2;		
 	}
-
-	float area;
-	float length;
-	vector<Point> pts;
-	bool isHole;
 };
 
 enum E_status
@@ -87,6 +101,15 @@ enum E_status
 	statusEnter,
 	statusLeave,
 	statusMove,	
+};
+
+struct vDefect
+{
+	vDefect( const Point& _start, const Point& _end, const Point& _depth, float _depthVal):
+	  startPoint(_start), endPoint(_end), depthPoint(_depth), depth(_depthVal){}
+
+	  Point startPoint, endPoint, depthPoint;
+	  float depth;
 };
 
 struct vTrackedBlob : public vBlob 

@@ -15,7 +15,7 @@
 #include "MiniLog.h"
 #else
 #include <stdio.h>
-#define FloWrite(str) 
+#define MiniLog(str) 
 #endif
 
 class MiniTimer

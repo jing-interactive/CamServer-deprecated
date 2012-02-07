@@ -1,4 +1,4 @@
-﻿#include "MiniThread.h"
+﻿#include "../../_common/MiniThread.h"
 #include "VideoApp.h"
 #include "AppConfig.h"
 

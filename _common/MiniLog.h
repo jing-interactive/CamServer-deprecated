@@ -23,7 +23,12 @@ inline void MiniLog(char *string, ...)
 		char fileName[256];
 		time ( &rawtime );
 		tm* timeinfo = localtime ( &rawtime );
-		strftime(fileName,80,"%Y_%b_%d__%H_%M_%S.log",timeinfo);
+#ifdef WIN32
+        system("mkdir log");
+		strftime(fileName,80,"log/%Y_%m_%d__%H_%M.log",timeinfo);
+#else
+		strftime(fileName,80,"%Y_%m_%d__%H_%M.log",timeinfo);
+#endif
 		printf("%s created.\n", fileName);
 		the_fp = fopen(fileName,"w");
 		assert(the_fp && "can not open the debug file");

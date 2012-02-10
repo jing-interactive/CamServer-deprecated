@@ -18,11 +18,11 @@
 
 #include "point2d.h"
 
+#ifdef WIN32
+class videoInput;
+#endif
 #ifdef KINECT
 class ofxKinectCLNUI; 
-#endif
-#ifdef PS3
-class ofxCLeye;
 #endif
 
 using std::vector;
@@ -189,9 +189,6 @@ struct VideoInput
 #ifdef KINECT
 		From_Kinect,
 #endif
-#ifdef PS3
-		From_PS3,
-#endif
 		From_Count,
 	}_InputType;
 
@@ -223,9 +220,8 @@ struct VideoInput
 	cv::Ptr<ofxKinectCLNUI> _kinect;
 	bool init_kinect();
 #endif
-#ifdef PS3
-    cv::Ptr<ofxCLeye> _ps3_cam;
-	bool init_ps3();
+#ifdef WIN32
+	cv::Ptr<videoInput> VI;
 #endif
 	void wait(int t);
 
@@ -251,57 +247,6 @@ CvFGDStatModelParams cvFGDStatModelParams();
 void vGetPerspectiveMatrix(CvMat*& warp_matrix, cv::Point2f xsrcQuad[4], cv::Point2f xdstQuad[4]);
 
 
-
-void vDrawDelaunay( CvSubdiv2D* subdiv,IplImage* src,IplImage * dst, bool drawLine = true );
-void vDrawVoroni( CvSubdiv2D * subdiv, IplImage * src, IplImage * dst, bool drawLine = true );
-
-struct Triangle
-{
-	int& operator[](int i){return idx[i];}
-	const int operator[](int i) const{return idx[i];}
-	int idx[3];
-	cv::point2di center;
-
-	bool operator == (const Triangle& other) const 
-	{
-		return center == other.center;
-	}
-
-	bool operator < (const Triangle& other) const 
-	{
-		return center < other.center;
-	}
-};
-
-struct DelaunaySubdiv
-{
-	DelaunaySubdiv(int w, int h);
-
-	void insert(float x, float y);
-	void clear();
-	void build();
-
-	void drawDelaunay( IplImage* src,IplImage * dst, bool drawLine = true );
-	void drawVoroni( IplImage* src,IplImage * dst, bool drawLine = true );
-
-	int getIndex(float x, float y);
-
-	CvRect rect;
-	cv::MemStorage storage;
-	CvSubdiv2D* subdiv;
-
-	std::vector<cv::Point> points;
-	std::vector<cv::Point> hull;
-
-	std::vector<Triangle> triangles;//x,y,z -> vert_0, vert_1, vert_2
-//	Mat hull;
-	std::map<cv::point2di, int> pt_map;
-
-//	std::vector<std::vector<int> > triangles;	
-private:
-	void buildTriangles();
-	void intoEdge(CvSubdiv2DEdge edge);
-};
 
 void on_default(int );
 

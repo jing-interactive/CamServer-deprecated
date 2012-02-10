@@ -413,18 +413,14 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="PS3Camera"
+			Name="videoInput"
 			>
 			<File
-				RelativePath="..\..\..\_common\CLEye\CLEyeMulticam.h"
+				RelativePath="..\..\..\_common\videoInput\videoInput.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\CLEye\ofxCLeye.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\_common\CLEye\ofxCLeye.h"
+				RelativePath="..\..\..\_common\videoInput\videoInput.h"
 				>
 			</File>
 		</Filter>

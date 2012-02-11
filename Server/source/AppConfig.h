@@ -41,6 +41,7 @@ struct AppConfig
 	int paramNoise;
 	int paramMinArea;
 	int paramMaxArea;
+	int n_diff_frames;
 
 	cv::Point2f corners[4];
 };

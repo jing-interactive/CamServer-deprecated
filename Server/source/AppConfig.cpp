@@ -26,6 +26,7 @@ AppConfig::AppConfig():CLIENT("localhost")
 	delay_for_run= 0;
 
 	bg_mode = DIFF_BG;
+	n_diff_frames = 2;//normal diff mode, change according to frame-rate
 
 	paramFlipX = 0;
 	paramFlipY = 0;
@@ -35,8 +36,8 @@ AppConfig::AppConfig():CLIENT("localhost")
 	paramBlur1 = 35;
 	paramBlur2 = 1;
 	paramNoise = 0;
-	paramMinArea = 40;
-	paramMaxArea = 800; 
+	paramMinArea = 1;
+	paramMaxArea = 50; 
 };
 
 bool using_debug_file = true;
@@ -56,8 +57,8 @@ std::string AppConfig::parse_args(int argc, char** argv)
 		"{log| |false|write log to file}"
 		"{minim ||false|minim windows mode}"
 		"{finger||false|enable finger track}"
-		"{hand||false|enable hand track}"
-		"{a|aut|false|auto background mode}"
+//		"{hand||false|enable hand track}"
+//		"{a|aut|false|auto background mode}"
 		"{1| |0|the input source, could be camera_idx/picture}"
 		"{h|help|false|display this help text}"
 	};
@@ -82,7 +83,7 @@ std::string AppConfig::parse_args(int argc, char** argv)
 	minim_window = args.get<bool>("minim");
 	delay_for_run = args.get<int>("delay");
 	finger_track = args.get<bool>("finger");
-	hand_track = args.get<bool>("hand");
+//	hand_track = args.get<bool>("hand");
 	PORT = args.get<int>("port");
 
 	std::string input_src = args.get<std::string>("1");

@@ -13,8 +13,8 @@
 #ifdef KINECT 
 #include "../clnui/ofxKinectCLNUI.h"
 #endif
-#ifdef PS3 
-#include "../CLEye/ofxCLeye.h"
+#ifdef WIN32 
+#include "../videoInput/videoInput.h"
 #endif
 
 using namespace cv;
@@ -189,56 +189,69 @@ void feature_out(IplImage* img, IplImage* mask, int thresh)
 VideoInput::VideoInput()
 {
 	_fps = 0;
-	_capture = NULL;
 	_frame = NULL;
 	_InputType = From_Count;
+	device_id = 0;
 }
 
 void VideoInput::showSettingsDialog()
 {
 #if WIN32
-	
+	if (VI)
+		VI->showSettingsWindow(device_id);
 #endif
 }
 
 bool VideoInput::init(int cam_idx)
 {
-	bool ret = true;
+	bool opened = false;
+	device_id = cam_idx;
 	do 
 	{
+#ifdef WIN32
+		VI = new videoInput();
+		VI->setVerbose(false);
+		if (VI)
+		{
+			int numDevices = VI->listDevices();
+			if (opened = VI->setupDevice(cam_idx))
+				break;
+		}	
+#endif
 		_capture = cvCaptureFromCAM(CV_CAP_DSHOW+cam_idx);
-
-		if( !_capture )
+		if (_capture)
+		{
+			_InputType = From_Camera;
+			sprintf(buffer, "Reading from camera # %d via DirectShow.", cam_idx);
+			opened = true;
+			break;
+		}
+		else
 		{
 			_capture = cvCaptureFromCAM(cam_idx);
 
 			if (!_capture)
 			{
 				sprintf(buffer, "Failed to open camera # %d", cam_idx);
-				ret = false;
+				opened = false;
 				break;
 			}
 			else
 			{
 				_InputType = From_Camera;
 				sprintf(buffer, "Reading from camera # %d.", cam_idx);
-				_post_init();
-				ret = true;
+				opened = true;
 				break;
 			}
 		}
-		else
-		{
-			_InputType = From_Camera;
-			sprintf(buffer, "Reading from camera # %d via DirectShow.", cam_idx);
-			_post_init();
-			ret = true;
-			break;
-		}
 	} while (0);
 
+	if (opened)
+	{
+		_post_init();
+	}
 	printf("\n%s\n",buffer);
-	return ret;
+	return opened;
 }
 
 bool VideoInput::init(char* file_name)
@@ -262,25 +275,6 @@ bool VideoInput::init(char* file_name)
 		}
 	}
 #endif
-#ifdef PS3
-	if (strcmp(file_name, "ps3")==0)
-	{
-		bool b = init_ps3();
-		if (b)
-		{
-			_InputType = From_PS3;
-			loaded = true;
-			printf("Reading from ps3 camera.\n");
-		}
-		else
-		{
-			printf("Failed to open ps3 camera.\n"
-				"You can download the driver from http://codelaboratories.com/get/cl-eye-driver/\n\n");
-			return false;
-		}
-	}
-#endif
-
 	if (!loaded)
 	{
 		_frame = cvLoadImage(file_name);
@@ -329,7 +323,17 @@ void VideoInput::resize( int w, int h )
 		cvSetCaptureProperty(_capture,CV_CAP_PROP_FRAME_WIDTH, (double)w);
 		cvSetCaptureProperty(_capture,CV_CAP_PROP_FRAME_HEIGHT, (double)h);
 		_post_init();
+		return;
 	}
+
+#ifdef WIN32
+	if( w != VI->getWidth(device_id) || h != VI->getHeight(device_id) )
+	{
+		VI->stopDevice(device_id);
+		VI->setupDevice(device_id, w, h);
+		_post_init();
+	}
+#endif // WIN32
 }
 
 void VideoInput::wait(int t)
@@ -342,44 +346,49 @@ void VideoInput::wait(int t)
 
 IplImage* VideoInput::get_frame()
 {
-	switch (_InputType)
+	do 
 	{
-	case From_Camera:
-	case From_Video:
+		if (_capture)
 		{
 			_frame = cvQueryFrame(_capture);
-			_frame_num ++;
-// 			if (_frame == NULL)
-// 			{
-// 				cvReleaseCapture(&_capture);
-// 				init(_argc, _argv);
-// 			}
-		}break;
-#ifdef KINECT
-	case From_Kinect:
+			
+			// 			if (_frame == NULL)
+			// 			{
+			// 				cvReleaseCapture(&_capture);
+			// 				init(_argc, _argv);
+			// 			}
+			break;
+		}
+#ifdef WIN32
+		if (VI)
+		{
+			VI->getPixels( device_id, (uchar*)_frame->imageData, false, true );
+			break;;
+		}
+#endif
+		if (_kinect)
 		{
 			bool b = _kinect->getDepthBW();
 			_frame = _kinect->bwImage;
 			_frame_num ++;
-		}break;
-#endif
-#ifdef PS3
-	case From_PS3:
-		{
-			bool b = _ps3_cam->getFrame();
-			_frame = _ps3_cam->frame;
-			_frame_num ++;
-		}break;
-#endif
-	default:
-		break;
-	}
+			break;
+		}
+	} while (0);
 
 	return _frame;
 }
 
 void VideoInput::_post_init()
 {
+#ifdef WIN32
+	if (VI)
+	{
+		if (_frame)
+			cvReleaseImage( &_frame );
+		int w = VI->getWidth(device_id), h = VI->getHeight(device_id);
+		_frame = cvCreateImage( cvSize(w,h), 8, 3 );
+	}
+#endif
 	_frame = get_frame();
 
 	if (_InputType == From_Video)
@@ -409,10 +418,16 @@ void VideoInput::_post_init()
 
 VideoInput::~VideoInput()
 {
-	if (_capture != NULL)
-		cvReleaseCapture( &_capture );
+// 	if (_capture != NULL)
+// 		cvReleaseCapture( &_capture );
 	//	if (_frame != NULL)
 	//		cvReleaseImage(&_frame);
+#ifdef WIN32
+	if (VI)
+	{//the IplImage is allocated by myself is using VI directly
+		cvReleaseImage(&_frame);
+	}
+#endif
 }
 
 #ifdef KINECT
@@ -420,22 +435,6 @@ bool VideoInput::init_kinect()
 {
 	_kinect = new ofxKinectCLNUI;
 	return _kinect->initKinect(640, 480, 0, 0);
-}
-#endif
-
-#ifdef PS3
-bool VideoInput::init_ps3()
-{
-	_ps3_cam = new ofxCLeye;
-	int n_ps3 = ofxCLeye::listDevices();
-	if (n_ps3 > 0)
-	{
-		return _ps3_cam->init(320, 240, false);
-	}
-	else
-	{
-		return false;
-	}
 }
 #endif
 

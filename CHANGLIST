@@ -1,3 +1,13 @@
+Version 0.6.4
+remove ofxPS3 and using theo's videoInput library directly to handle both common usb cameras and ps3 camera.
+automatically change the param panel's layout according to different background mode.
+
+Version 0.6.2
+make a MacOSX solution
+
+Version 0.6.1
+make a public release
+
 Version 0.6
 implement normal exit
 upgrade OpenCV to 2.3.1

@@ -180,6 +180,7 @@ return 0;
 struct VideoInput
 {
 	int _fps;
+	int device_id;
 
 	enum e_InputType
 	{
@@ -195,7 +196,7 @@ struct VideoInput
 	int _argc;
 	char** _argv;
 
-	CvCapture* _capture;
+	cv::Ptr<CvCapture> _capture;
 
 	void showSettingsDialog();
 
@@ -216,6 +217,14 @@ struct VideoInput
 	bool init(char* video_file);
 	bool init(int argc, char** argv);
 
+	void wait(int t);
+
+	IplImage* get_frame();
+
+	~VideoInput();
+
+private:
+
 #ifdef KINECT
 	cv::Ptr<ofxKinectCLNUI> _kinect;
 	bool init_kinect();
@@ -223,15 +232,7 @@ struct VideoInput
 #ifdef WIN32
 	cv::Ptr<videoInput> VI;
 #endif
-	void wait(int t);
-
-	IplImage* get_frame();
-
 	void _post_init();
-
-	~VideoInput();
-
-private:
 	char buffer[256];
 };
 

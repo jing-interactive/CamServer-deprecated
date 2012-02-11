@@ -168,10 +168,8 @@ void VideoApp::run()
 		timer.profileFunction("vHighPass");
 
 		const int scale =HalfWidth*HalfHeight/PARAM_MAXAREA;
-		int minArea = (theConfig.paramMinArea+1)*scale*0.1;
-		int maxArea = theConfig.paramMaxArea*scale;// + HalfWidth*HalfHeight*0.1;
-		if (maxArea < minArea*10)
-			maxArea = minArea*10;
+		int minArea = (theConfig.paramMinArea)*scale/10;
+		int maxArea = minArea+(theConfig.paramMaxArea)*scale;
 		vFindBlobs(grayBuffer, blobs, minArea ,maxArea, theConfig.hull_mode == 1);
 		timer.profileFunction("vFindBlobs");
 

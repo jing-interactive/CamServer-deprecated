@@ -9,7 +9,7 @@
 #define PARAM_BLUR1 80
 #define PARAM_BLUR2 20
 #define PARAM_NOISE 3 
-#define PARAM_MAXAREA 1000
+#define PARAM_MAXAREA 200
 
 namespace monitor_gui
 {
@@ -21,6 +21,7 @@ namespace param_gui
 {
 	extern void* handle;
 	extern cv::Ptr<IplImage> setting;
+	extern bool is_changing_layout;
 	void update();
 	void show(bool visible);
 	void init();

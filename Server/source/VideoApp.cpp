@@ -13,35 +13,36 @@ int CamServer_WindowCallback(HWND hwnd, UINT uMsg, WPARAM wparam, LPARAM lparam,
 {
 	if (uMsg == WM_DESTROY)
 	{
-		if ((hwnd == (HWND)monitor_gui::handle && theApp.monitorVisible) || hwnd == (HWND)param_gui::handle)
+		if ((hwnd == (HWND)monitor_gui::handle && theApp.monitorVisible) || (hwnd == (HWND)param_gui::handle && !param_gui::is_changing_layout))
 			theApp.app_running = false;
 	}
 	return 0;
 }
 #endif
 
-VideoApp::VideoGrabThread::VideoGrabThread(VideoInput& input):MiniThread("video"),_input(input)
+VideoGrabThread::VideoGrabThread(VideoInput& input):MiniThread("grab"),_input(input)
 {
 	fps = 0;
 }
 
-bool VideoApp::VideoGrabThread::is_dirty()
+bool VideoGrabThread::is_dirty()
 {
 	bool ret = _dirty;
 	_dirty = false;
 	return ret;
 }
 
-void VideoApp::VideoGrabThread::threadedFunction()
+void VideoGrabThread::threadedFunction()
 {
 	MiniTimer timer;
 	int frame_counter = 0;
 	int ms_counter = 0;	
 	while(true)
 	{
-		timer.resetStartTime();
 		if (!theApp.app_running)
 			return;
+
+		timer.resetStartTime();
 		_input.get_frame();
 		_dirty = true; 
 		if (_input._InputType == _input.From_Video)
@@ -129,13 +130,13 @@ bool VideoApp::init(int argc, char** argv)
 	haar.scale = 2;
 #endif
 	//grab related
-	grab_thread->lock();//wait for VideoInput::init() returns
+//	grab_thread->lock();//wait for VideoInput::init() returns
 	size = input._size;
 	channels = input._channel;
 
 	if (size.width < 400)
 	{
-		size = size*2;//enlarge the size of camera with small resolution
+		size = size*2;//hack: enlarge the size of camera with small resolution
 	}
 	total = cvCreateImage(cv::Size(size.width*1.5, size.height*1.5), 8, 3);
 	cvSet(total, CV_RGB(122,122,122));

@@ -21,21 +21,21 @@
 #define BEEP(freq, ms)
 #endif
 
+struct VideoGrabThread: public MiniThread
+{
+	int fps;
+
+	VideoInput& _input;
+
+	VideoGrabThread(VideoInput& input);
+	void threadedFunction();
+	bool is_dirty();
+private:
+	bool _dirty;
+};
+
 struct VideoApp
 {
-	struct VideoGrabThread: public MiniThread
-	{
-		int fps;
-
-		VideoInput& _input;
-
-		VideoGrabThread(VideoInput& input);
-		void threadedFunction();
-		bool is_dirty();
-	private:
-		bool _dirty;
-	};
-
 	//thread
 	cv::Ptr<VideoGrabThread> grab_thread;
 	VideoInput input;

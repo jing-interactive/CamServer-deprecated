@@ -80,6 +80,7 @@ namespace monitor_gui
 namespace param_gui
 {
 	cv::Ptr<IplImage> setting;
+	bool is_changing_layout = false;
 
 	CvButtons buttons;
 	const int _w = 55;//btn width
@@ -89,7 +90,7 @@ namespace param_gui
 	const int dh = _h+10;//btn+space
 	int h = 35;
 
-	int negative_one = -1;
+	int minus_one = -1;
 
 	void* handle = NULL;
 
@@ -145,31 +146,52 @@ namespace param_gui
 
 	void on_realbg(int t)
 	{
-		theConfig.bg_mode = REAL_BG;
+		if (theConfig.bg_mode != REAL_BG)
+		{
+			theConfig.bg_mode = REAL_BG;
+			show(true);			
+		}
 		theApp.onRefreshBack();		
 	}
 
 	void on_whitebg(int t)
 	{
-		theConfig.bg_mode = WHITE_BG;
+		if (theConfig.bg_mode != WHITE_BG)
+		{
+			theConfig.bg_mode = WHITE_BG;
+			show(true);			
+		}
 		theApp.onRefreshBack();
 	}
 
 	void on_diffbg(int t)
 	{
-		theConfig.bg_mode = DIFF_BG;
+		if (theConfig.bg_mode != DIFF_BG)
+		{
+			theConfig.bg_mode = DIFF_BG;
+			show(true);
+		}
+		
 		theApp.onRefreshBack();
 	}
 
 	void on_blackbg(int t)
 	{
-		theConfig.bg_mode = BLACK_BG;
+		if (theConfig.bg_mode != BLACK_BG)
+		{
+			theConfig.bg_mode = BLACK_BG;
+			show(true);
+		}		
 		theApp.onRefreshBack();
 	}
 
 	void on_kinectbg(int t)
 	{
-		theConfig.bg_mode = KINECT_BG;
+		if (theConfig.bg_mode != KINECT_BG)
+		{
+			show(true);
+			theConfig.bg_mode = KINECT_BG;
+		}
 		theApp.onRefreshBack();
 	}
 	ButtonInfo btn_infs[]=
@@ -181,7 +203,9 @@ namespace param_gui
 		{ w+=dw, h,  "hull", on_hull, &theConfig.hull_mode},
 //		{ w+=dw, h,  "gray", on_mode, &theConfig.gray_detect_mode},
 //		{ w=13, h+=dh,  "expo", on_expo, &theConfig.auto_explosure},
-		{ w+=dw, h,  "dialog", on_dialog, &negative_one},
+#ifdef WIN32
+		{ w+=dw, h,  "dialog", on_dialog, &minus_one},
+#endif // WIN32
 		{ w=13, h+=dh,  "now", on_realbg, NULL},
 		{ w+=dw, h,  "white", on_whitebg, NULL},
 		{ w+=dw, h,  "black", on_blackbg, NULL},
@@ -231,6 +255,9 @@ namespace param_gui
 	{
 		if (visible)
 		{
+			is_changing_layout = true;
+			cvDestroyWindow(PARAM_WINDOW);
+			is_changing_layout = false;
 			cvNamedWindow(PARAM_WINDOW);
 			cvResizeWindow(PARAM_WINDOW,400,480);
 
@@ -244,8 +271,20 @@ namespace param_gui
 				//		backModel = new vBackGrayDiff();
 				//	backModel = new vBackColorDiff();
 				//	backModel = new vThreeFrameDiff();
-				cvCreateTrackbar("Darkness",PARAM_WINDOW,&theConfig.paramDark,PARAM_DARK, NULL);
-				cvCreateTrackbar("Brightness",PARAM_WINDOW,&theConfig.paramBright,PARAM_BRIGHT, NULL);
+				if (theConfig.bg_mode == WHITE_BG)
+					cvCreateTrackbar("Darkness",PARAM_WINDOW,&theConfig.paramDark,PARAM_DARK, NULL);
+				else if (theConfig.bg_mode == BLACK_BG)
+					cvCreateTrackbar("Brightness",PARAM_WINDOW,&theConfig.paramBright,PARAM_BRIGHT, NULL);
+				else if (theConfig.bg_mode == KINECT_BG)
+				{
+					cvCreateTrackbar("Far",PARAM_WINDOW,&theConfig.paramDark,PARAM_DARK, NULL);
+					cvCreateTrackbar("Near",PARAM_WINDOW,&theConfig.paramBright,PARAM_BRIGHT, NULL);
+				}
+				else
+				{
+					cvCreateTrackbar("Below",PARAM_WINDOW,&theConfig.paramDark,PARAM_DARK, NULL);
+					cvCreateTrackbar("Above",PARAM_WINDOW,&theConfig.paramBright,PARAM_BRIGHT, NULL);
+				}
 			}
 			else
 			{

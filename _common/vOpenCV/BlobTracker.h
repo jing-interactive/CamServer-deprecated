@@ -53,14 +53,15 @@ public:
 	vBlobTracker();
 
 	//assigns IDs to each blob in the contourFinder
+	void trackBlobs2(const vector<vBlob>& newBlobs);
 	void trackBlobs(const vector<vBlob>& newBlobs);
 
 	std::vector<vTrackedBlob>	trackedBlobs; //tracked blobs
-	std::vector<vTrackedBlob>  leaveBlobs;
+	std::vector<vTrackedBlob>  deadBlobs;
 
 private:
 	int trackKnn(const vector<vTrackedBlob>& newBlobs, vTrackedBlob& track, int k, double thresh=0);
-	int						IDCounter;	  //counter of last blob
+	unsigned int						IDCounter;	  //counter of last blob
 
 protected:
 

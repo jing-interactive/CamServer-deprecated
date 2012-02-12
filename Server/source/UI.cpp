@@ -27,8 +27,7 @@ namespace monitor_gui
 		if(theConfig.fixed_back_mode &&  Event == CV_EVENT_RBUTTONUP)
 		{
 			theApp.onRefreshBack();
-			theConfig.bg_mode = REAL_BG;
-			param_gui::update();
+			param_gui::on_realbg();			
 		}
 		else
 			if( Event == CV_EVENT_LBUTTONUP || !(flags & CV_EVENT_FLAG_LBUTTON) )
@@ -303,5 +302,6 @@ namespace param_gui
 		{
 			cvDestroyWindow(PARAM_WINDOW);
 		}
+		update();
 	}
 }

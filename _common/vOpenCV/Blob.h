@@ -116,7 +116,7 @@ struct vTrackedBlob : public vBlob
 {
 	enum
 	{
-		BLOB_UN_NAMED = -3,
+		BLOB_NEW_ID = -3,
 		BLOB_TO_DELETE = -2,		
 	};
 
@@ -133,20 +133,14 @@ struct vTrackedBlob : public vBlob
     vector<int> neighbors;  // ids of the closest points, sorted
 
 	vTrackedBlob():vBlob() {
-        id = BLOB_UN_NAMED;
+        id = BLOB_NEW_ID;
 		status = statusStill;
         markedForDeletion = false;
         framesLeft = 0;
     }
 
 	vTrackedBlob( const vBlob& b ):vBlob(b) {
-        area = b.area;
-   //     box = b.box;
-     //   center = b.center;
-        isHole = b.isHole;
-       // pts = b.pts;
-
-        id = BLOB_UN_NAMED;
+        id = BLOB_NEW_ID;
 		status = statusStill;
         markedForDeletion = false;
         framesLeft = 0;
@@ -163,6 +157,11 @@ struct vTrackedBlob : public vBlob
 		else if (status == statusMove)
 			return "move";
 		else return "";
+	}
+
+	bool isDead() const
+	{
+		return id == BLOB_TO_DELETE;
 	}
 
     int getMinDistance() {

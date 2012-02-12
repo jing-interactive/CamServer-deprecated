@@ -368,11 +368,11 @@
 			Name="doc"
 			>
 			<File
-				RelativePath="..\..\doc\manual.txt"
+				RelativePath="..\..\doc\osc_protocol.txt"
 				>
 			</File>
 			<File
-				RelativePath="..\..\doc\osc_protocol.txt"
+				RelativePath="..\..\..\README.md"
 				>
 			</File>
 			<File

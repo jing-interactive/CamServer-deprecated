@@ -270,7 +270,7 @@ void VideoApp::send_custom_msg()
 	}
 
 	//object
-	vector<vTrackedBlob>* pTrackBlobs[] = {&blobTracker.trackedBlobs, &blobTracker.leaveBlobs};
+	vector<vTrackedBlob>* pTrackBlobs[] = {&blobTracker.trackedBlobs, &blobTracker.deadBlobs};
 	for (int v=0;v<2;v++)
 	{
 		vector<vTrackedBlob>* pTb = pTrackBlobs[v];

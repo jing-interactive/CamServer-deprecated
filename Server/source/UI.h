@@ -26,6 +26,6 @@ namespace param_gui
 	void show(bool visible);
 	void init();
 
-	void on_realbg(int);
+	void on_realbg(int = 0);
 }
 

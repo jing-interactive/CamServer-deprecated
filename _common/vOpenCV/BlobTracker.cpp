@@ -1,18 +1,21 @@
 #include "BlobTracker.h"
 #include "point2d.h"
 #include <list>
+#include <functional>
 
 #if defined _DEBUG
 #pragma comment(lib,"opencv_video232d.lib")
 #pragma comment(lib,"opencv_objdetect232d.lib")
+#pragma comment(lib,"opencv_features2d232d.lib")
 #else
 #pragma comment(lib,"opencv_video232.lib")
 #pragma comment(lib,"opencv_objdetect232.lib")
+#pragma comment(lib,"opencv_features2d232.lib")
 #endif
 
 using namespace cv;
 
-//Just some convienience macros
+//Just some convenient macros
 #define CV_CVX_WHITE	CV_RGB(0xff,0xff,0xff)
 #define CV_CVX_BLACK	CV_RGB(0x00,0x00,0x00)
 
@@ -268,7 +271,7 @@ bool vFingerDetector::findFingers (const vBlob& blob, int k/* = 10*/)
 
 	for(int i=k; i<nPts-k; i++)
 	{
-		//calculating angre between vectors
+		//calculating angles between vectors
 		v1.set(blob.pts[i].x-blob.pts[i-k].x,	blob.pts[i].y-blob.pts[i-k].y);
 		v2.set(blob.pts[i].x-blob.pts[i+k].x,	blob.pts[i].y-blob.pts[i+k].y);
 
@@ -547,9 +550,9 @@ vBlobTracker::vBlobTracker()
 }
  
 //assigns IDs to each blob in the contourFinder
-void vBlobTracker::trackBlobs(const vector<vBlob>& _newBlobs)
+void vBlobTracker::trackBlobs2(const vector<vBlob>& _newBlobs)
 {
-	leaveBlobs.clear();
+	deadBlobs.clear();
 
 	vector<vTrackedBlob> newBlobs;
 	int nNewBlobs = _newBlobs.size();
@@ -580,7 +583,7 @@ void vBlobTracker::trackBlobs(const vector<vBlob>& _newBlobs)
 		{
 			//if winning new blob was labeled winner by another track\
 			//then compare with this track to see which is closer
-			if(newBlobs[winner].id != vTrackedBlob::BLOB_UN_NAMED)
+			if(newBlobs[winner].id != vTrackedBlob::BLOB_NEW_ID)
 			{
 				//find the currently assigned blob
 				int j; //j will be the index of it
@@ -678,7 +681,7 @@ void vBlobTracker::trackBlobs(const vector<vBlob>& _newBlobs)
 	//have ID of -1... if the ID is -1... we need to make a new track
 	for(int i=0; i<nNewBlobs; i++)
 	{
-		if(newBlobs[i].id == vTrackedBlob::BLOB_UN_NAMED)
+		if(newBlobs[i].id == vTrackedBlob::BLOB_NEW_ID)
 		{
 			//add new track
 			newBlobs[i].id=IDCounter++;
@@ -800,9 +803,92 @@ void vBlobTracker::doBlobMoved( vTrackedBlob& b ) {
 
 void vBlobTracker::doBlobOff( vTrackedBlob& b ) {
 	b.status = statusLeave;
-	leaveBlobs.push_back(b);
+	deadBlobs.push_back(b);
 	printf("blob: %d leave-\n" , b.id);
 	b.id = vTrackedBlob::BLOB_TO_DELETE;
+}
+
+void vBlobTracker::trackBlobs( const vector<vBlob>& newBlobs )
+{
+	deadBlobs.clear();
+	const int n_old = trackedBlobs.size();
+	const int n_new = newBlobs.size();
+	vector<vTrackedBlob> newTrackedBlobs(n_new);
+	std::copy(newBlobs.begin(), newBlobs.end(), newTrackedBlobs.begin());
+
+	vector<int> nn_of_a(n_old);//nearest neighbor of pta in ptb
+	vector<int> dist_of_a(n_old);//nearest neighbor of pta in ptb
+	fill(nn_of_a.begin(), nn_of_a.end(),-1);
+	fill(dist_of_a.begin(), dist_of_a.end(),INT_MAX);
+
+	if (n_old != 0 && n_new != 0)
+	{
+		Mat ma(trackedBlobs.size(),2,CV_32SC1);
+		Mat mb(newBlobs.size(),2,CV_32SC1);
+		for (int i=0;i<n_old;i++)
+		{
+			ma.at<int>(i,0) = trackedBlobs[i].center.x;
+			ma.at<int>(i,1) = trackedBlobs[i].center.y;
+		}
+		for (int i=0;i<n_new;i++)
+		{
+			mb.at<int>(i,0) = newTrackedBlobs[i].center.x;
+			mb.at<int>(i,1) = newTrackedBlobs[i].center.y;
+		}
+
+		BruteForceMatcher<L2<int> > matcher;
+		vector<DMatch> matches;
+		matcher.match(mb, ma, matches);
+		const int n_matches = matches.size();
+		for (int i=0;i<n_matches;i++)
+		{
+			const DMatch& match = matches[i];
+			int t_id = match.trainIdx;
+			int q_id = match.queryIdx;
+			float dist = match.distance;
+
+			if (dist < 500 && dist < dist_of_a[t_id])
+			{
+				dist_of_a[t_id] = dist;
+				nn_of_a[t_id] = q_id;
+			}
+		}
+	}
+
+	for (int i=0;i<n_old;i++)
+	{
+		int nn = nn_of_a[i];
+		if (nn != -1)
+		{//moving blobs
+			Point2f lastCenter = trackedBlobs[i].center;
+			newTrackedBlobs[nn].id = trackedBlobs[i].id;//save id, cause we will overwrite the data
+			trackedBlobs[i] = newTrackedBlobs[nn];//update with new data
+			trackedBlobs[i].velocity.x = newBlobs[nn].center.x - lastCenter.x;
+			trackedBlobs[i].velocity.y = newBlobs[nn].center.y - lastCenter.y;
+			doBlobMoved(trackedBlobs[i]);
+		}
+		else
+		{//leaving blobs
+			doBlobOff(trackedBlobs[i]);
+		}
+	}
+	trackedBlobs.erase(remove_if(trackedBlobs.begin(), trackedBlobs.end(), std::mem_fun_ref(&vTrackedBlob::isDead)),
+		trackedBlobs.end());
+	//entering blobs
+	for(int i=0; i<n_new; i++)
+	{
+		if (newTrackedBlobs[i].id == vTrackedBlob::BLOB_NEW_ID)
+		{
+			//add new track
+			if (IDCounter > UINT_MAX)
+				IDCounter = 0;
+			newTrackedBlobs[i].id=IDCounter++;
+			trackedBlobs.push_back(newTrackedBlobs[i]);
+
+			//SEND BLOB ON EVENT
+			doBlobOn( trackedBlobs.back());
+		}
+	}
 }
 
 CvFGDStatModelParams cvFGDStatModelParams()

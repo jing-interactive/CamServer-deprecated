@@ -129,9 +129,6 @@ struct vTrackedBlob : public vBlob
     bool markedForDeletion;
     int framesLeft;
 
-    vector<float> distance;
-    vector<int> neighbors;  // ids of the closest points, sorted
-
 	vTrackedBlob():vBlob() {
         id = BLOB_NEW_ID;
 		status = statusStill;
@@ -163,16 +160,4 @@ struct vTrackedBlob : public vBlob
 	{
 		return id == BLOB_TO_DELETE;
 	}
-
-    int getMinDistance() {
-        int best=-1;
-        float best_v=99999.0f;
-        for( unsigned int i=0; i<distance.size(); i++ ) {
-            if( distance[i] < best_v ) {
-                best = i;
-                best_v = distance[i];
-            }
-        }
-        return best;
-    }
 };

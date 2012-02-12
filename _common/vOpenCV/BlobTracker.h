@@ -46,14 +46,7 @@ vector<vBlob>  vUpdateMhi( IplImage* silh, IplImage* dst);
 class vBlobTracker
 {
 public:
-	enum{
-		KNN = 3,
-	};
-
 	vBlobTracker();
-
-	//assigns IDs to each blob in the contourFinder
-	void trackBlobs2(const vector<vBlob>& newBlobs);
 	void trackBlobs(const vector<vBlob>& newBlobs);
 
 	std::vector<vTrackedBlob>	trackedBlobs; //tracked blobs
@@ -64,7 +57,6 @@ private:
 	unsigned int						IDCounter;	  //counter of last blob
 
 protected:
-
 	//blob Events
 	void doBlobOn(vTrackedBlob& b );
 	void doBlobMoved(vTrackedBlob& b );
@@ -140,8 +132,6 @@ struct vOpticalFlowLK
 
 		int block_size;
 };
-
-
 
 struct IBackGround
 {

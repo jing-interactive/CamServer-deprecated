@@ -33,9 +33,10 @@
 
 void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea = 1, int maxArea = 3072000, bool convexHull=false, bool (*sort_func)(const vBlob& a, const vBlob& b)  = NULL);
 
-void vFindBlobs(IplImage *mask,
-				int minArea = 1, int maxArea = 3072000, bool convexHull=false);//draw trackedBlobs only
-//void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea, int maxArea, bool convexHull=true, bool (*sort_func)(const vBlob& a, const vBlob& b)  = NULL);
+void vFindBlobs(IplImage *mask,	int minArea = 1, int maxArea = 3072000, bool convexHull=false);//draw trackedBlobs only
+
+void vFindBlobs(IplImage *src, vector<vBlob>& blobs, vector<vector<vDefect>>& defects, int minArea=1, int maxArea=3072000);
+
 
 // parameters:
 //  silh - input video frame

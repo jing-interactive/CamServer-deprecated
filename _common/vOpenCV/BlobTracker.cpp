@@ -136,6 +136,101 @@ void vFindBlobs(IplImage *src, int minArea, int maxArea, bool convexHull)
 	cvEndFindContours( &scanner );
 }
 
+
+void vFindBlobs( IplImage *src, vector<vBlob>& blobs, vector<vector<vDefect>>& defects, int minArea/*=1*/, int maxArea/*=3072000*/)
+{
+	static MemStorage	contour_mem	= NULL;
+	static MemStorage	hull_mem	= NULL;
+
+	CvMoments myMoments;
+
+	if( contour_mem.empty() )
+		contour_mem = cvCreateMemStorage(100);
+	else cvClearMemStorage(contour_mem);
+
+	if( hull_mem.empty() ) 
+		hull_mem = cvCreateMemStorage(100);
+	else cvClearMemStorage(hull_mem);
+
+	blobs.clear();
+	defects.clear();
+
+	CvSeq* contour_list = 0;
+	cvFindContours(src,contour_mem,&contour_list, sizeof(CvContour), CV_RETR_CCOMP,CV_CHAIN_APPROX_SIMPLE);
+
+	for (CvSeq* d = contour_list; d != NULL; d=d->h_next)
+	{
+		bool isHole = false;
+		CvSeq* c = d;
+		while (c != NULL)
+		{
+			double area = fabs(cvContourArea( c ));
+			if( area > minArea && area < maxArea)
+			{
+				int length = cvArcLength(c);
+				cvMoments( c, &myMoments );
+
+				blobs.push_back(vBlob());
+
+				vBlob& obj = blobs.back();
+				//fill the blob structure
+				obj.area	= area;
+				obj.length =  length;
+				obj.isHole	= isHole;
+				obj.box	= cvBoundingRect(c);
+				obj.rotBox = cvMinAreaRect2(c);
+				obj.angle = (90-obj.rotBox.angle)*GRAD_PI2;//in radians
+
+				if (myMoments.m10 > -DBL_EPSILON && myMoments.m10 < DBL_EPSILON)
+				{
+					obj.center.x = obj.box.x + obj.box.width/2;
+					obj.center.y = obj.box.y + obj.box.height/2;
+				}
+				else
+				{
+					obj.center.x = myMoments.m10 / myMoments.m00;
+					obj.center.y = myMoments.m01 / myMoments.m00;
+				}
+
+				// get the points for the blob
+				CvPoint           pt;
+				CvSeqReader       reader;
+				cvStartReadSeq( c, &reader, 0 );
+
+				for (int k=0;k<c->total;k++)
+				{
+					CV_READ_SEQ_ELEM( pt, reader );
+					obj.pts.push_back(pt);
+				}
+
+				// defect detection
+				CvSeq* seqHull = cvConvexHull2( c, hull_mem, CV_COUNTER_CLOCKWISE, 0 );
+				CvSeq* defectsSeq = cvConvexityDefects( c, seqHull, NULL );
+
+				CvConvexityDefect defect;
+				cvStartReadSeq( defectsSeq, &reader, 0 );
+				int numDefects = defectsSeq->total;
+
+				vector<vDefect> one_defect;
+				for(int i=0; i<numDefects; ++i){
+					CV_READ_SEQ_ELEM( defect, reader );
+					CvPoint& startPt = *(defect.start);
+					CvPoint& endPt = *(defect.end);
+					CvPoint& depthPt = *(defect.depth_point);
+					one_defect.push_back(vDefect( startPt, endPt, depthPt, defect.depth));
+				}
+				defects.push_back(one_defect);
+			}//END if( area >= minArea)
+
+			if (isHole)
+				c = c->h_next;//one_hole->h_next is another_hole
+			else
+				c = c->v_next;//one_contour->h_next is one_hole
+			isHole = true;
+		}//END while (c != NULL)
+	}
+}
+
 // various tracking parameters (in seconds)
 const double MHI_DURATION = 1;
 const double MAX_TIME_DELTA = 0.5;

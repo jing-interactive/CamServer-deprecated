@@ -54,7 +54,6 @@ public:
 	std::vector<vTrackedBlob>  deadBlobs;
 
 private:
-	int trackKnn(const vector<vTrackedBlob>& newBlobs, vTrackedBlob& track, int k, double thresh=0);
 	unsigned int						IDCounter;	  //counter of last blob
 
 protected:
@@ -62,7 +61,6 @@ protected:
 	void doBlobOn(vTrackedBlob& b );
 	void doBlobMoved(vTrackedBlob& b );
 	void doBlobOff(vTrackedBlob& b );
-
 };
 
 struct vFingerDetector

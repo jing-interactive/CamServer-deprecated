@@ -188,8 +188,8 @@ namespace param_gui
 	{
 		if (theConfig.bg_mode != KINECT_BG)
 		{
-			show(true);
 			theConfig.bg_mode = KINECT_BG;
+			show(true);			
 		}
 		theApp.onRefreshBack();
 	}
@@ -276,8 +276,8 @@ namespace param_gui
 					cvCreateTrackbar("Brightness",PARAM_WINDOW,&theConfig.paramBright,PARAM_BRIGHT, NULL);
 				else if (theConfig.bg_mode == KINECT_BG)
 				{
-					cvCreateTrackbar("Far",PARAM_WINDOW,&theConfig.paramDark,PARAM_DARK, NULL);
-					cvCreateTrackbar("Near",PARAM_WINDOW,&theConfig.paramBright,PARAM_BRIGHT, NULL);
+					cvCreateTrackbar("Near",PARAM_WINDOW,&theConfig.paramDark,PARAM_DARK, NULL);
+					cvCreateTrackbar("Far",PARAM_WINDOW,&theConfig.paramBright,PARAM_BRIGHT, NULL);
 				}
 				else
 				{

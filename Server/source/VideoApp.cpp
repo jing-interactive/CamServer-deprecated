@@ -130,7 +130,6 @@ bool VideoApp::init(int argc, char** argv)
 	haar.scale = 2;
 #endif
 	//grab related
-//	grab_thread->lock();//wait for VideoInput::init() returns
 	size = input._size;
 	channels = input._channel;
 
@@ -183,6 +182,9 @@ bool VideoApp::init(int argc, char** argv)
 
 	if (theConfig.delay_for_run > 0)					// if necessary
 		SLEEP(theConfig.delay_for_run * 1000);	// sleep before the app shows up
+
+	if (input._InputType == VideoInput::From_Kinect)
+		theConfig.bg_mode = KINECT_BG;
 
 	monitor_gui::show(true);
 	param_gui::show(true);

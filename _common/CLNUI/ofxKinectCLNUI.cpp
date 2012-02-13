@@ -26,7 +26,7 @@ bool ofxKinectCLNUI::initKinect(int wid,int hei,double lowbound,double upbound)
 			//depth image
 			depthShortImage = cvCreateImage(cvSize(camWidth,camHeight),IPL_DEPTH_16U,1);
 			//BW image
-			bwImage = cvCreateImage(cvSize(camWidth,camHeight),IPL_DEPTH_8U,1);
+			bwImage = cvCreateImageHeader(cvSize(camWidth,camHeight),IPL_DEPTH_8U,1);
 			//BGR image
 			bgrImage = cvCreateImage(cvSize(camWidth,camHeight),IPL_DEPTH_8U,3);
 			//RGB image
@@ -148,17 +148,18 @@ ofxKinectCLNUI::~ofxKinectCLNUI()
 {
 	if (kinectCam != NULL)
 	{
-		StopNUICamera(kinectCam);
-		DestroyNUICamera(kinectCam);
+	//	StopNUICamera(kinectCam);
+	//	DestroyNUICamera(kinectCam);
 		cvReleaseImage(&bgrImage);
 		cvReleaseImage(&rgbImage);
 		cvReleaseImage(&depthShortImage);
 		cvReleaseImage(&depthColorImage);
-		cvReleaseImage(&bwImage);
+		cvReleaseImageHeader(&bwImage);
 
 		delete[] depthData;
 		delete[] colorData;
 		delete[] depthColorData;
+		delete[] depth8;
 	}
 }
 

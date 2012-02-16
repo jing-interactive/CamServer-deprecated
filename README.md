@@ -1,4 +1,4 @@
-CamServer is a lightweight camera based interative system written in C++.
+ï»¿CamServer is a lightweight camera based interative system written in C++.
 The main platform is Windows, but linux and MacOSX are also supported.
 It uses OpenCV and some libraries from OpenFrameworks.
 Folder /Server contains the main application. 
@@ -11,21 +11,21 @@ It now supports Kinect and PS3 Camera.
 The tutorials are provided at [here](http://www.everbox.com/f/bwy7u4c3xDkmKpKMbtTWu7ojqR)
 But it's a little bit outdated.
 
-Ê¹ÓÃËµÃ÷
+ä½¿ç”¨è¯´æ˜
 
 CamServer.exe [-i camera/image/video] [-dos] [-log] [-minim] [-delay 5] [-client 192.168.1.122 ][-port 3333] [-face]
 
-µÚÒ»¸ö²ÎÊı£¬¿ÉÒÔÊÇ
-camera		ÉãÏñÍ·µÄ±àºÅ£¬Ä¬ÈÏÎª0£¬¼´µÚÒ»¸öÉãÏñÍ·£¬Í¬Ê±Ö§³ÖÊ¹ÓÃCLEyeÇı¶¯µÄps3ÉãÏñÍ·
-image		Í¼Æ¬Â·¾¶
-video		ÊÓÆµÎÄ¼şµÄÂ·¾¶
-Èç¹û²»Ö¸¶¨£¬Ôò´ò¿ªµÚÒ»¸öÉãÏñÍ·
+ç¬¬ä¸€ä¸ªå‚æ•°ï¼Œå¯ä»¥æ˜¯
+camera		æ‘„åƒå¤´çš„ç¼–å·ï¼Œé»˜è®¤ä¸º0ï¼Œå³ç¬¬ä¸€ä¸ªæ‘„åƒå¤´ï¼ŒåŒæ—¶æ”¯æŒä½¿ç”¨CLEyeé©±åŠ¨çš„ps3æ‘„åƒå¤´
+image		å›¾ç‰‡è·¯å¾„
+video		è§†é¢‘æ–‡ä»¶çš„è·¯å¾„
+å¦‚æœä¸æŒ‡å®šï¼Œåˆ™æ‰“å¼€ç¬¬ä¸€ä¸ªæ‘„åƒå¤´
  
--client 192.168.1.122	Ö¸¶¨¿Í»§¶ËµÄµØÖ·£¬Ä¬ÈÏÎªlocalhost£¬¼´±¾»úµØÖ·
--port 3333	Ö¸¶¨¿Í»§¶ËµÄ¶Ë¿Ú£¬Ä¬ÈÏÎª3333
--face 1.5	ÈËÁ³Ê¶±ğ¹¦ÄÜ£¬Ä¬ÈÏ²»¿ªÆô£¬¿ÉÖ¸¶¨·ÅËõ±ÈÀı£¨±ÈÀıÎ´ÊµÏÖ£©
--finger		ÊÖÖ¸Ê¶±ğ¹¦ÄÜ£¬Ä¬ÈÏ²»¿ªÆô
--hand		ÊÖÖ¸Ê¶±ğ¹¦ÄÜ£¬Ä¬ÈÏ²»¿ªÆô£¬Î´ÊµÏÖ
--minim		Æô¶¯Ê±Îª³ÌĞò×îĞ¡»¯
--delay	5	ÑÓ³Ù5ÃëºóÔÙÔËĞĞ
--log 		ÔÚÎÄ¼şÖĞ¼ÇÂ¼ÔËĞĞ×´¿ö£¬Ä¬ÈÏ²»ÊÊÓÃ
+-client 192.168.1.122	æŒ‡å®šå®¢æˆ·ç«¯çš„åœ°å€ï¼Œé»˜è®¤ä¸ºlocalhostï¼Œå³æœ¬æœºåœ°å€
+-port 3333	æŒ‡å®šå®¢æˆ·ç«¯çš„ç«¯å£ï¼Œé»˜è®¤ä¸º3333
+-face 1.5	äººè„¸è¯†åˆ«åŠŸèƒ½ï¼Œé»˜è®¤ä¸å¼€å¯ï¼Œå¯æŒ‡å®šæ”¾ç¼©æ¯”ä¾‹ï¼ˆæ¯”ä¾‹æœªå®ç°ï¼‰
+-finger		æ‰‹æŒ‡è¯†åˆ«åŠŸèƒ½ï¼Œé»˜è®¤ä¸å¼€å¯
+-hand		æ‰‹æŒ‡è¯†åˆ«åŠŸèƒ½ï¼Œé»˜è®¤ä¸å¼€å¯ï¼Œæœªå®ç°
+-minim		å¯åŠ¨æ—¶ä¸ºç¨‹åºæœ€å°åŒ–
+-delay	5	å»¶è¿Ÿ5ç§’åå†è¿è¡Œ
+-log 		åœ¨æ–‡ä»¶ä¸­è®°å½•è¿è¡ŒçŠ¶å†µï¼Œé»˜è®¤ä¸é€‚ç”¨

@@ -1,21 +1,25 @@
 #include "OpenCV.h"
 
-#if defined _DEBUG
-#pragma comment(lib,"opencv_core232d.lib")
-#pragma comment(lib,"opencv_imgproc232d.lib")
-#pragma comment(lib,"opencv_highgui232d.lib")
-#else
-#pragma comment(lib,"opencv_core232.lib")
-#pragma comment(lib,"opencv_imgproc232.lib")
-#pragma comment(lib,"opencv_highgui232.lib")
-#endif
+#define OPENCV_VERSION CVAUX_STR(CV_MAJOR_VERSION)""CVAUX_STR(CV_MINOR_VERSION)""CVAUX_STR(CV_SUBMINOR_VERSION)
+
+#ifdef WIN32
+#ifdef _DEBUG
+#pragma comment(lib,"opencv_core"OPENCV_VERSION"d.lib")
+#pragma comment(lib,"opencv_imgproc"OPENCV_VERSION".lib")
+#pragma comment(lib,"opencv_highgui"OPENCV_VERSION".lib")
+#else	//_DEBUG
+#pragma comment(lib,"opencv_core"OPENCV_VERSION".lib")
+#pragma comment(lib,"opencv_imgproc"OPENCV_VERSION".lib")
+#pragma comment(lib,"opencv_highgui"OPENCV_VERSION".lib")
+#endif	//_DEBUG
+#endif	//WIN32
 
 #ifdef KINECT 
 #include "../clnui/ofxKinectCLNUI.h"
-#endif
+#endif	//KINECT
 #ifdef WIN32 
 #include "../videoInput/videoInput.h"
-#endif
+#endif	//WIN32
 
 using namespace cv;
 
@@ -41,59 +45,16 @@ flip_param -> flip_mode
 2 -> 1	:	vertical
 3 -> -1	:	both
 */
-void vFlip(CvArr* src, int flipX, int flipY)
+void vFlip(Mat& src, int flipX, int flipY)
 {
-	int flip_param = flipX*2 + flipY;
-	int mode = NO_FLIP;//NO FLIP
-	switch(flip_param)
-	{
-	case 1:
-		mode = 0;break;
-	case 2:
-		mode = 1;break;
-	case 3:
-		mode = -1;break;
-	default:
-		break;
-	}
-	if (mode != NO_FLIP)
-		cvFlip(src, 0, mode);
-}
-//============================================================================
-static bool IsEdgeIn(int ind1, int ind2,
-					 const std::vector<std::vector<int> > &edges)
-{
-	for (int i = 0; i < edges.size (); i++)
-	{
-		if ((edges[i][0] == ind1 && edges[i][1] == ind2) ||
-			(edges[i][0] == ind2 && edges[i][1] == ind1) )
-			return true;
-	}
-	return false;
-}
+	assert (flipX == 0 ||flipX == 1);
+	assert (flipY == 0 ||flipY == 1);
+	static int mapper[2][2] = {{1,-1},{NO_FLIP,0}};
+	int code = mapper[flipY][flipX];
 
-//============================================================================
-static bool IsTriangleNotIn(const std::vector<int>& one_tri,
-							const std::vector<std::vector<int> > &tris)
-{
-	std::set<int> tTriangle;
-	std::set<int> sTriangle;
-
-	for (int i = 0; i < tris.size (); i ++)
-	{
-		tTriangle.clear();
-		sTriangle.clear();
-		for (int j = 0; j < 3; j++ )
-		{
-			tTriangle.insert(tris[i][j]);
-			sTriangle.insert(one_tri[j]);
-		}
-		if (tTriangle == sTriangle)    return false;
-	}
-
-	return true;
-}
-
+	if (code != NO_FLIP)
+		flip(src, src, code);
+} 
 void vCopyImageTo(CvArr* tiny_image, IplImage* big_image, const CvRect& region)
 {
 	CV_Assert(tiny_image && big_image);
@@ -148,44 +109,6 @@ CvScalar default_colors[] =
 const int sizeOfColors = sizeof(default_colors)/sizeof(CvScalar);
 CvScalar vDefaultColor(int idx){ return default_colors[idx%sizeOfColors];}
 
-char* get_time(bool full_length)
-{
-	static char str[256];
-	time_t timep;
-	tm *p;
-	time(&timep);
-	p = gmtime(&timep);
-
-	if (full_length)
-		sprintf(str, "%d-%d-%d__%d_%d_%d",
-		1900+p->tm_year, 1+p->tm_mon, p->tm_mday,
-		p->tm_hour, p->tm_min, p->tm_sec);
-	else
-		sprintf(str, "%d_%d_%d",
-		p->tm_hour, p->tm_min, p->tm_sec);
-
-	return str;
-}
-
-void feature_out(IplImage* img, IplImage* mask, int thresh)
-{
-	int w = img->width;
-	int h = img->height;
-	int step = img->widthStep;
-	int channels = img->nChannels;
-	uchar* data   = (uchar *)img->imageData;
-	uchar* mdata   = (uchar *)mask->imageData;
-
-	for(int i=0;i<h;i++)
-		for(int j=0;j<w;j++)
-			for(int k=0;k<channels;k++)
-			{
-				if (mdata[i*mask->widthStep+j] < thresh)
-					data[i*step+j*channels+k] = 0;
-			}
-
-}
-
 VideoInput::VideoInput()
 {
 	_fps = 0;
@@ -209,6 +132,7 @@ bool VideoInput::init(int cam_idx)
 	do 
 	{
 #ifdef WIN32
+		//try direct show directly (VideoInput)
 		VI = new videoInput();
 		VI->setVerbose(false);
 		if (VI)
@@ -217,9 +141,9 @@ bool VideoInput::init(int cam_idx)
 			if (opened = VI->setupDevice(cam_idx))
 				break;
 		}	
-#endif
-		_capture = cvCaptureFromCAM(CV_CAP_DSHOW+cam_idx);
-		if (_capture)
+#endif	//WIN32
+		_capture.open(CV_CAP_DSHOW+cam_idx); 
+		if (_capture.isOpened())
 		{
 			_InputType = From_Camera;
 			sprintf(buffer, "Reading from camera # %d via DirectShow.", cam_idx);
@@ -228,19 +152,19 @@ bool VideoInput::init(int cam_idx)
 		}
 		else
 		{
-			_capture = cvCaptureFromCAM(cam_idx);
+			_capture.open(cam_idx); 
 
-			if (!_capture)
-			{
-				sprintf(buffer, "Failed to open camera # %d", cam_idx);
-				opened = false;
+			if (_capture.isOpened())
+			{		
+				_InputType = From_Camera;
+				sprintf(buffer, "Reading from camera # %d.", cam_idx);
+				opened = true;
 				break;
 			}
 			else
 			{
-				_InputType = From_Camera;
-				sprintf(buffer, "Reading from camera # %d.", cam_idx);
-				opened = true;
+				sprintf(buffer, "Failed to open camera # %d", cam_idx);
+				opened = false;
 				break;
 			}
 		}
@@ -254,11 +178,11 @@ bool VideoInput::init(int cam_idx)
 	return opened;
 }
 
-bool VideoInput::init(char* file_name)
+bool VideoInput::init(const std::string& file_name)
 {
 	bool loaded = false;
 #ifdef KINECT
-	if (strcmp(file_name, "kinect")==0)
+	if (file_name == "kinect")
 	{
 		bool b = init_kinect();
 		if (b)
@@ -277,17 +201,17 @@ bool VideoInput::init(char* file_name)
 #endif
 	if (!loaded)
 	{
-		_frame = cvLoadImage(file_name);
+		_frame = imread(file_name);
 
-		if (_frame)
+		if (_frame.empty())
 		{
 			printf("Reading from image %s.\n", file_name);
 			_InputType = From_Image;
 		}
 		else
 		{
-			_capture = cvCaptureFromAVI(file_name);
-			if( _capture )
+			_capture = _capture.open(file_name);
+			if(_capture.isOpened())
 			{
 				printf("Reading from video %s.\n", file_name);
 				_InputType = From_Video;
@@ -318,10 +242,10 @@ bool VideoInput::init(int argc, char** argv)
 
 void VideoInput::resize( int w, int h )
 {
-	if (_capture)
+	if (_capture.isOpened())
 	{
-		cvSetCaptureProperty(_capture,CV_CAP_PROP_FRAME_WIDTH, (double)w);
-		cvSetCaptureProperty(_capture,CV_CAP_PROP_FRAME_HEIGHT, (double)h);
+		_capture.set(CV_CAP_PROP_FRAME_WIDTH, (double)w);
+		_capture.set(CV_CAP_PROP_FRAME_HEIGHT, (double)h);
 		_post_init();
 		return;
 	}
@@ -344,13 +268,13 @@ void VideoInput::wait(int t)
 		get_frame();
 }
 
-IplImage* VideoInput::get_frame()
+Mat VideoInput::get_frame()
 {
 	do 
 	{
-		if (_capture)
+		if (_capture.isOpened())
 		{
-			_frame = cvQueryFrame(_capture);
+			_capture >> _frame;
 			
 			// 			if (_frame == NULL)
 			// 			{
@@ -362,7 +286,7 @@ IplImage* VideoInput::get_frame()
 #ifdef WIN32
 		if (VI)
 		{
-			VI->getPixels( device_id, (uchar*)_frame->imageData, false, true );
+			VI->getPixels( device_id, _frame.ptr(), false, true );
 			break;;
 		}
 #endif
@@ -383,18 +307,16 @@ void VideoInput::_post_init()
 #ifdef WIN32
 	if (VI)
 	{
-		if (_frame)
-			cvReleaseImage( &_frame );
 		int w = VI->getWidth(device_id), h = VI->getHeight(device_id);
-		_frame = cvCreateImage( cvSize(w,h), 8, 3 );
+		_frame.create( Size(w,h), CV_8UC3);
 	}
 #endif
 	_frame = get_frame();
 
 	if (_InputType == From_Video)
 	{
-		_fps = cvGetCaptureProperty(_capture, CV_CAP_PROP_FPS);
-		_codec = cvGetCaptureProperty(_capture, CV_CAP_PROP_FOURCC);
+		_fps = _capture.get(CV_CAP_PROP_FPS);
+		_codec = _capture.get(CV_CAP_PROP_FOURCC);
 		if (_fps == 0)
 			printf("Fps: unknown");
 		else
@@ -406,28 +328,14 @@ void VideoInput::_post_init()
 		_fps = 24;
 	}
 
-	_size.width = _frame->width;
-	_size.height = _frame->height;
+	_size.width = _frame.cols;
+	_size.height = _frame.rows;
 	_half_size.width  = _size.width/2;
 	_half_size.height  = _size.height/2;
-	_channel = _frame->nChannels;
+	_channel = _frame.channels();
 	_frame_num = 0;
 
 	printf("Size: <%d,%d>\n",  _size.width, _size.height);
-}
-
-VideoInput::~VideoInput()
-{
-// 	if (_capture != NULL)
-// 		cvReleaseCapture( &_capture );
-	//	if (_frame != NULL)
-	//		cvReleaseImage(&_frame);
-#ifdef WIN32
-	if (VI)
-	{//the IplImage is allocated by myself is using VI directly
-		cvReleaseImage(&_frame);
-	}
-#endif
 }
 
 #ifdef KINECT
@@ -438,17 +346,18 @@ bool VideoInput::init_kinect()
 }
 #endif
 
-void vHighPass(IplImage* src, IplImage* dst, int blurLevel/* = 10*/, int noiseLevel/* = 3*/)
+void vHighPass(const cv::Mat& src, const cv::Mat& dst, int blurLevel/* = 10*/, int noiseLevel/* = 3*/)
 {
 	if (blurLevel > 0 && noiseLevel > 0)
 	{
 		// create the unsharp mask using a linear average filter
-		cvSmooth(src, dst, CV_BLUR, blurLevel*2+1);
+		cv::blur(src, dst, blurLevel*2+1);
 
-		cvSub(src, dst, dst);
+		dst = src - dst;
+//		cvSub(src, dst, dst);
 
 		// filter out the noise using a median filter
-		cvSmooth(dst, dst, CV_MEDIAN, noiseLevel*2+1);
+		cv::medianBlur(dst, dst, noiseLevel*2+1);
 	}
 	else
 		cvCopy(src, dst);
@@ -508,118 +417,6 @@ void on_default(int )
 {
 
 }
-
-
-int BrightnessAdjust(const IplImage* srcImg,
-					 IplImage* dstImg,
-					 float brightness)
-{
-	assert(srcImg != NULL);
-	assert(dstImg != NULL);
-
-	int h = srcImg->height;
-	int w = srcImg->width;
-	int n = srcImg->nChannels;
-
-	int x,y,i;
-	float val;
-	for (i = 0; i < n; i++)//²ÊÉ«Í¼ÏñÐèÒª´¦Àí3¸öÍ¨µÀ£¬»Ò¶ÈÍ¼ÏñÕâÀï¿ÉÒÔÉ¾µô
-	{
-		for (y = 0; y < h; y++)
-		{
-			for (x = 0; x < w; x++)
-			{
-
-				val = ((uchar*)(srcImg->imageData + srcImg->widthStep*y))[x*n+i];
-				val += brightness;
-				//¶Ô»Ò¶ÈÖµµÄ¿ÉÄÜÒç³ö½øÐÐ´¦Àí
-				if(val>255)	val=255;
-				if(val<0) val=0;
-				((uchar*)(dstImg->imageData + dstImg->widthStep*y))[x*n+i] = (uchar)val;
-			}
-		}
-	}
-
-	return 0;
-}
-
-int ContrastAdjust(const IplImage* srcImg,
-				   IplImage* dstImg,
-				   float nPercent)
-{
-	assert(srcImg != NULL);
-	assert(dstImg != NULL);
-
-	int h = srcImg->height;
-	int w = srcImg->width;
-	int n = srcImg->nChannels;
-
-	int x,y,i;
-	float val;
-	for (i = 0; i < n; i++)//²ÊÉ«Í¼ÏñÐèÒª´¦Àí3¸öÍ¨µÀ£¬»Ò¶ÈÍ¼ÏñÕâÀï¿ÉÒÔÉ¾µô
-	{
-		for (y = 0; y < h; y++)
-		{
-			for (x = 0; x < w; x++)
-			{
-
-				val = ((uchar*)(srcImg->imageData + srcImg->widthStep*y))[x*n+i];
-				val = 128 + (val - 128) * nPercent;
-				//¶Ô»Ò¶ÈÖµµÄ¿ÉÄÜÒç³ö½øÐÐ´¦Àí
-				if(val>255) val=255;
-				if(val<0) val=0;
-				((uchar*)(dstImg->imageData + dstImg->widthStep*y))[x*n+i] = (uchar)val;
-			}
-		}
-	}
-	return 0;
-}
-
-void cvSkinSegment(IplImage* img, IplImage* mask)
-{
-	CvSize imageSize = cvSize(img->width, img->height);
-	IplImage *imgY = cvCreateImage(imageSize, IPL_DEPTH_8U, 1);
-	IplImage *imgCr = cvCreateImage(imageSize, IPL_DEPTH_8U, 1);
-	IplImage *imgCb = cvCreateImage(imageSize, IPL_DEPTH_8U, 1);
-
-
-	IplImage *imgYCrCb = cvCreateImage(imageSize, img->depth, img->nChannels);
-	cvCvtColor(img,imgYCrCb,CV_BGR2YCrCb);
-	cvSplit(imgYCrCb, imgY, imgCr, imgCb, 0);
-	int y, cr, cb, l, x1, y1, value;
-	unsigned char *pY, *pCr, *pCb, *pMask;
-
-	pY = (unsigned char *)imgY->imageData;
-	pCr = (unsigned char *)imgCr->imageData;
-	pCb = (unsigned char *)imgCb->imageData;
-	pMask = (unsigned char *)mask->imageData;
-	cvSetZero(mask);
-	l = img->height * img->width;
-	for (int i = 0; i < l; i++){
-		y  = *pY;
-		cr = *pCr;
-		cb = *pCb;
-		cb -= 109;
-		cr -= 152
-			;
-		x1 = (819*cr-614*cb)/32 + 51;
-		y1 = (819*cr+614*cb)/32 + 77;
-		x1 = x1*41/1024;
-		y1 = y1*73/1024;
-		value = x1*x1+y1*y1;
-		if(y<100)    (*pMask)=(value<700) ? 255:0;
-		else        (*pMask)=(value<850)? 255:0;
-		pY++;
-		pCr++;
-		pCb++;
-		pMask++;
-	}
-	cvReleaseImage(&imgY);
-	cvReleaseImage(&imgCr);
-	cvReleaseImage(&imgCb);
-	cvReleaseImage(&imgYCrCb);
-}
-
 
 void vFillPoly(IplImage* img, const vector<Point>& pt_list, const Scalar& clr/* = Scalar(255,255,255)*/)
 {

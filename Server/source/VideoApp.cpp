@@ -137,8 +137,8 @@ bool VideoApp::init(int argc, char** argv)
 	{
 		size = size*2;//hack: enlarge the size of camera with small resolution
 	}
-	total = cvCreateImage(cv::Size(size.width*1.5, size.height*1.5), 8, 3);
-	cvSet(total, CV_RGB(122,122,122));
+	total.create(cv::Size(size.width*1.5, size.height*1.5), CV_8UC3);
+	total = CV_GRAY;
 
 	float k = 0;
 	HalfWidth = size.width*0.75;
@@ -166,19 +166,20 @@ bool VideoApp::init(int argc, char** argv)
 
 	onParamFlip(theConfig.paramFlipX, theConfig.paramFlipY);
 
-	half_raw = cvCreateImage(half, 8, channels);
-	half_flip = cvCreateImage(half, 8, channels);
-	grayBlob = cvCreateImage(half, 8, 1);
-	frame = cvCreateImage(half, 8, channels);
-	black_frame = cvCreateImage(half, 8, channels);
-	white_frame = cvCreateImage(half, 8, channels);
-	kinect_frame = cvCreateImage(half, 8, 1);
-	grayBuffer = cvCreateImage(half, 8, 1);
-	prevBg = cvCreateImage(half, 8, channels);
+	half_raw.create(half, CV_8UC(channels));
+	half_flip.create(half, CV_8UC(channels));
+	frame.create(half, CV_8UC(channels));
+	black_frame.create(half, CV_8UC(channels));
+	white_frame.create(half, CV_8UC(channels));
+	prevBg.create(half, CV_8UC(channels));
 
-	cvSet(black_frame, CV_BLACK);
-	cvSet(white_frame, CV_WHITE);
-	cvSet(kinect_frame, CV_RGB(150,150,150));
+	grayBlob.create(half, CV_8UC(1));
+	kinect_frame.create(half, CV_8UC(1));
+	grayBuffer.create(half, CV_8UC(1));
+
+	black_frame = CV_BLACK;
+	black_frame = CV_WHITE;
+	black_frame = CV_GRAY;
 
 	if (theConfig.delay_for_run > 0)					// if necessary
 		SLEEP(theConfig.delay_for_run * 1000);	// sleep before the app shows up
@@ -209,8 +210,7 @@ void VideoApp::onParamFlip(int fx, int fy)
 			onRefreshBack();
 		else
 		{
-			/*			to_reset_back = false;		*/
-			Ptr<IplImage> temp = cvCloneImage(prevBg);
+			Mat temp = prevBg.clone();
 			vFlip(temp, abs(fx-g_prevFx), abs(fy-g_prevFy));
 			backModel->init(temp);
 		}

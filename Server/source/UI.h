@@ -20,7 +20,7 @@ namespace monitor_gui
 namespace param_gui
 {
 	extern void* handle;
-	extern cv::Ptr<IplImage> setting;
+	extern cv::Mat setting;
 	extern bool is_changing_layout;
 	void update();
 	void show(bool visible);

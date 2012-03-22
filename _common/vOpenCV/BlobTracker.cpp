@@ -3,14 +3,16 @@
 #include <list>
 #include <functional>
 
+#define OPENCV_VERSION CVAUX_STR(CV_MAJOR_VERSION)""CVAUX_STR(CV_MINOR_VERSION)""CVAUX_STR(CV_SUBMINOR_VERSION)
+
 #if defined _DEBUG
-#pragma comment(lib,"opencv_video232d.lib")
-#pragma comment(lib,"opencv_objdetect232d.lib")
-#pragma comment(lib,"opencv_features2d232d.lib")
+#pragma comment(lib,"opencv_video"OPENCV_VERSION"d.lib")
+#pragma comment(lib,"opencv_objdetect"OPENCV_VERSION"d.lib")
+#pragma comment(lib,"opencv_features2d"OPENCV_VERSION"d.lib")
 #else
-#pragma comment(lib,"opencv_video232.lib")
-#pragma comment(lib,"opencv_objdetect232.lib")
-#pragma comment(lib,"opencv_features2d232.lib")
+#pragma comment(lib,"opencv_video"OPENCV_VERSION".lib")
+#pragma comment(lib,"opencv_objdetect"OPENCV_VERSION".lib")
+#pragma comment(lib,"opencv_features2d"OPENCV_VERSION".lib")
 #endif
 
 using namespace cv;
@@ -102,7 +104,7 @@ void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea, int maxArea, b
 		}//END while (c != NULL)
 	}
 
-    if (!sort_func) sort_func = &cmp_blob_area;
+	if (!sort_func) sort_func = &cmp_blob_area;
 	std::sort(blobs.begin(), blobs.end(), sort_func);
 }
 
@@ -505,7 +507,7 @@ vHaarFinder::vHaarFinder()
 { 
 	scale = 1.2;
 }
- 
+
 bool vHaarFinder::init(char* cascade_name)
 {
 	return _cascade.load(cascade_name);
@@ -774,16 +776,16 @@ CvFGDStatModelParams cvFGDStatModelParams()
 	return  p;
 }
 
-void vBackFGDStat::init(IplImage* initial, void* param)
+void vBackFGDStat::init(cv::Mat initial, void* param)
 {
 	CvFGDStatModelParams* p = (CvFGDStatModelParams*)param;
-	bg_model = cvCreateFGDStatModel( initial, p );
+	bg_model = cvCreateFGDStatModel(&(IplImage)initial, p );
 }
 
-void vBackGaussian::init(IplImage* initial, void* param)
+void vBackGaussian::init(cv::Mat initial, void* param)
 {
 	CvGaussBGStatModelParams* p = (CvGaussBGStatModelParams*)param;
-	bg_model = cvCreateGaussianBGModel( initial, p );
+	bg_model = cvCreateGaussianBGModel(&(IplImage)initial, p );
 }
 
 void vBackGrayDiff::setIntParam(int idx, int value)
@@ -793,108 +795,106 @@ void vBackGrayDiff::setIntParam(int idx, int value)
 		dark_thresh = 255-value;
 }
 
-void vBackGrayDiff::init(IplImage* initial, void* param/* = NULL*/){
+void vBackGrayDiff::init(cv::Mat initial, void* param/* = NULL*/){
 	cv::Size size = cvGetSize(initial);
 
-	Frame.release();
-	Frame = cvCreateImage(size, 8, 1);
-	Bg.release();
-	Bg = cvCreateImage(size, 8, 1);
-	Fore.release();
-	Fore = cvCreateImage(size, 8, 1);
+	frame.create(size, CV_8UC1);
+	bg.create(size, CV_8UC1);
+	fore.create(size, CV_8UC1);
 
 	thresh = 50;
 	dark_thresh = 200;
 
-	if (initial->nChannels == 1)
-		cvCopy(initial, Bg);
+	if (initial.channels() == 1)
+		initial.copyTo(bg);
 	else
-		vGrayScale(initial, Bg);
+		vGrayScale(initial, bg);
 }
 
-void vBackGrayDiff::update(IplImage* image, int mode/* = 0*/){
-	if (image->nChannels == 1)
-		cvCopy(image, Frame);
+
+void vBackGrayDiff::update(cv::Mat image, int mode/* = 0*/){
+	if (image.channels() == 1)
+		image.copyTo(frame);
 	else
-		vGrayScale(image, Frame); 
+		vGrayScale(image, frame); 
 	if (mode == DETECT_BOTH)
 	{
-		BwImage frame(Frame);
-		BwImage bg(Bg);
-		BwImage fore(Fore);
+		// 		BwImage frame(Frame);
+		// 		BwImage bg(Bg);
+		// 		BwImage fore(Fore);
 
-		cvZero(Fore);
-		for (int y=0;y<image->height;y++)
-			for (int x=0;x<image->width;x++)
+		fore = CV_WHITE;
+		for (int y=0;y<image.rows;y++)
+			for (int x=0;x<image.cols;x++)
 			{
-				int delta = frame[y][x] - bg[y][x];
+				int delta = frame.at.at(y, x) - bg.at(y, x);
 				if (delta >= thresh || delta <= -dark_thresh)
-					fore[y][x] = 255;
+					fore.at(y, x) = 255;
 			}
 	}
 	else if (mode == DETECT_DARK)
 	{
-		cvSub(Bg, Frame, Fore);
-		vThresh(Fore, dark_thresh);
+		cvSub(bg, frame, fore);
+		vThresh(fore, dark_thresh);
 	}
 	else if (mode == DETECT_BRIGHT)
 	{
-		cvSub(Frame, Bg, Fore);
-		vThresh(Fore, thresh);
+		cvSub(frame, bg, fore);
+		vThresh(fore, thresh);
 	}
 }
 
 
-void vBackColorDiff::init(IplImage* initial, void* param/* = NULL*/){
+void vBackColorDiff::init(cv::Mat initial, void* param/* = NULL*/){
 	cv::Size size = cvGetSize(initial);
 	nChannels = initial->nChannels;
 
-	Frame.release();
-	Frame = cvCloneImage(initial);
-	Bg.release();
-	Bg = cvCloneImage(initial);
-	Fore.release();
-	Fore = cvCreateImage(size, 8, 1);
+	frame.release();
+	frame = cvCloneImage(initial);
+	bg.release();
+	bg = cvCloneImage(initial);
+	fore.release();
+	fore.create(size, CV_8UC1);
 
 	thresh = 220;
 	dark_thresh = 30;
 }
 
-void vBackColorDiff::update(IplImage* image, int mode/* = 0*/){
+void vBackColorDiff::update(cv::Mat image, int mode/* = 0*/){
 	//	vGrayScale(image, Frame);
-	cvCopy(image, Frame);
+	cvCopy(image, frame);
 	if (mode == DETECT_BOTH)
 	{
 		if (nChannels == 1)
 		{
-			BwImage frame(Frame);
-			BwImage bg(Bg);
-			BwImage fore(Fore);
+			// BwImage frame(Frame);
+			// BwImage bg(Bg);
+			// BwImage fore(Fore);
 
-			cvZero(Fore);
-			for (int y=0;y<image->height;y++)
-				for (int x=0;x<image->width;x++)
+			fore = CV_RGB(0,0,0);
+			for (int y=0;y<image.rows;y++)
+				for (int x=0;x<image.cols;x++)
 				{
-					int delta = frame[y][x] - bg[y][x];
+					int delta = frame.at(y, x) - bg.at(y, x);
 					if (delta >= thresh || delta <= -dark_thresh)
-						fore[y][x] = 255;
+						fore.at(y, x) = 255;
 				}
 		}
 		else
 		{
-			RgbImage frame(Frame);
-			RgbImage bg(Bg);
-			BwImage fore(Fore);
+			// RgbImage frame(Frame);
+			// RgbImage bg(Bg);
+			// BwImage fore(Fore);
 
 			int min_t = 255-thresh;
 			int max_t = 255-dark_thresh;
-			cvZero(Fore);
-			for (int y=0;y<image->height;y++)
-				for (int x=0;x<image->width;x++)
+			fore = CV_RGB(0,0,0);
+			for (int y=0;y<image.rows;y++)
+				for (int x=0;x<image.cols;x++)
 				{
-					int r = frame[y][x].r - bg[y][x].r;
-					int g = frame[y][x].g - bg[y][x].g;
-					int b = frame[y][x].b - bg[y][x].b;
+					int r = frame.at(y, x).r - bg.at(y, x).r;
+					int g = frame.at(y, x).g - bg.at(y, x).g;
+					int b = frame.at(y, x).b - bg.at(y, x).b;
 #if 1
 					if ((r >= thresh || r <= -dark_thresh)
 						&& (g >= thresh || g <= -dark_thresh)
@@ -903,67 +903,66 @@ void vBackColorDiff::update(IplImage* image, int mode/* = 0*/){
 					int delta = r*r+g*g+b*b;
 					if (delta >= min_t*min_t && delta <= max_t*max_t)
 #endif
-						fore[y][x] = 255;
+						fore.at(y, x) = 255;
 				}
 		}
 	}
 	else if (mode == DETECT_DARK)
 	{
-		cvSub(Bg, Frame, Fore);
-		vThresh(Fore, dark_thresh);
+		cvSub(bg, frame, fore);
+		vThresh(fore, dark_thresh);
 	}
 	else if (mode == DETECT_BRIGHT)
 	{
-		cvSub(Frame, Bg, Fore);
-		vThresh(Fore, thresh);
+		cvSub(frame, bg, fore);
+		vThresh(fore, thresh);
 	}
 }
 
-void vThreeFrameDiff::init(IplImage* initial, void* param/* = NULL*/)
+void vThreeFrameDiff::init(cv::Mat initial, void* param/* = NULL*/)
 {
 	cv::Size size = cvGetSize(initial);
 
-	grayFrameOne.release();
-	grayFrameOne = cvCreateImage(size, 8, 1);
-	vGrayScale(initial, grayFrameOne);
-	grayFrameTwo.release();
-	grayFrameTwo = cvCreateImage(size, 8, 1);
-	vGrayScale(initial, grayFrameTwo);
-	grayFrameThree.release();
-	grayFrameThree = cvCreateImage(size, 8, 1);
-	vGrayScale(initial, grayFrameThree);
-	grayDiff.release();
-	grayDiff = cvCreateImage(size, 8, 1);
+	for (int i=0;i<3;i++)
+	{	
+		grays[i].create(size, CV_8UC1);
+		vGrayScale(initial, grays[i]);
+	}
 }
 
-void vThreeFrameDiff::update(IplImage* image, int mode/* = 0*/){
-	vGrayScale(image, grayFrameThree);
+void vThreeFrameDiff::update(cv::Mat image, int mode/* = 0*/)
+{
+	vGrayScale(image, grays[2]);
 
-	BwImage one(grayFrameOne);
-	BwImage two(grayFrameTwo);
-	BwImage three(grayFrameThree);
-	BwImage diff(grayDiff);
+	// BwImage one(gray1);
+	// BwImage two(gray2);
+	// BwImage three(gray3);
+	// BwImage diff(grayDiff);
 
-	cvZero(grayDiff);
-	for (int y=0;y<image->height;y++)
-		for (int x=0;x<image->width;x++)
+	grayDiff = CV_RGB(0,0,0);
+
+	for (int y=0;y<image.rows;y++)
+	{
+		for (int x=0;x<image.cols;x++)
 		{
-			if (abs(one[y][x] - two[y][x]) > thresh ||
-				abs(three[y][x] - two[y][x]) > thresh)
-				diff[y][x] = 255;
+			if (abs(grays[0].at(y, x) - grays[1].at(y, x)) > thresh ||
+				abs(grays[2].at(y, x) - grays[1].at(y, x)) > thresh)
+				grayDiff.at(y, x) = 255;
 		}
+	}
 
-		show_image(grayFrameOne);
-		show_image(grayFrameTwo);
-		show_image(grayFrameThree);
-		cvCopy(grayFrameTwo, grayFrameOne);
-		cvCopy(grayFrameThree, grayFrameTwo);
+// 	show_mat(gray1);
+// 	show_mat(gray2);
+// 	show_mat(gray3);
 
-		//if (mode == DETECT_BOTH)
-		//	cvAbsDiff(grayFrame, grayBg, grayDiff);
-		//else if (mode == DETECT_DARK)
-		//	cvSub(grayBg, grayFrame, grayDiff);
-		//else if (mode == DETECT_BRIGHT)
-		//	cvSub(grayFrame, grayBg, grayDiff);
-		//vThresh(grayDiff, thresh);
+	grays[1].copyTo(grays[0]);
+	grays[2].copyTo(grays[1]);
+
+	//if (mode == DETECT_BOTH)
+	//	cvAbsDiff(grayFrame, grayBg, grayDiff);
+	//else if (mode == DETECT_DARK)
+	//	cvSub(grayBg, grayFrame, grayDiff);
+	//else if (mode == DETECT_BRIGHT)
+	//	cvSub(grayFrame, grayBg, grayDiff);
+	//vThresh(grayDiff, thresh);
 }

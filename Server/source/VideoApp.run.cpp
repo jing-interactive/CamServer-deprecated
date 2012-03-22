@@ -3,6 +3,8 @@
 #include "UI.h"
 #include "MiniTimer.h"
 
+using namespace cv;
+
 #ifndef WIN32
 #define VK_BACK 8
 #define VK_RETURN 13
@@ -29,14 +31,14 @@ void VideoApp::run()
 		timer.resetStartTime();
 		timer_total.resetStartTime();
 
-		IplImage* raw = input._frame;
-		if (!raw)
+		Mat raw = input._frame; 
+		if (raw.empty())
 			break;
 
-		if (raw->width == HalfWidth)
-			cvCopy(raw, half_raw);
+		if (raw.cols == HalfWidth)
+			raw.copyTo(half_raw);
 		else
-			cvResize(raw, half_raw);
+			resize(raw, half_raw, half);
 		timer.profileFunction("cvResize");
 
 		int key = cvWaitKey(1);
@@ -70,18 +72,19 @@ void VideoApp::run()
 			}break;
 		default:break;
 		}
-		vFlip(half_raw, g_Fx, g_Fy);
+		vFlip(cv::Mat(half_raw), g_Fx, g_Fy);
 		timer.profileFunction("cvFlip");
 
 		if (theConfig.corners[0] == cv::Point2f(0,0) && theConfig.corners[1] == cv::Point2f(HalfWidth,0)
 			&& theConfig.corners[3] == cv::Point2f(0,HalfHeight) && theConfig.corners[2] == cv::Point2f(HalfWidth,HalfHeight)
 			)
 		{//original ROI (region of interest), it saves time
-			cvCopy(half_raw, frame);
+			half_raw.copyTo(frame);
 		}
 		else
 		{//needs perspective transform
-			cvWarpPerspective(half_raw, frame, warp_matrix);
+			warpPerspective(half_raw, frame, Mat(warp_matrix), half);
+//			cvWarpPerspective(half_raw, frame, warp_matrix);
 		}
 		if (grab_thread->is_dirty())
 		{ 
@@ -90,11 +93,11 @@ void VideoApp::run()
 				//prevFrame->diff_Bg
 				vBackGrayDiff* diff = (vBackGrayDiff*)(IBackGround*)backModel;
 				if (channels == 3)
-					vGrayScale(prevBg, diff->Bg);
+					vGrayScale(prevBg, diff->bg);
 				else
-					cvCopy(prevBg, diff->Bg);
+					prevBg.copyTo(diff->bg);
 				//clean frame->prevFrame
-				cvCopy(frame, prevBg);
+				frame.copyTo(prevBg);
 			}
 		}
 		timer.profileFunction("vPerspectiveTransform");	
@@ -111,17 +114,17 @@ void VideoApp::run()
 					backModel->init(frame, (void*)&paramMoG);
 					g_prevFx = g_Fx;
 					g_prevFy = g_Fy;
-					cvCopy(frame, prevBg);
+					frame.copyTo(prevBg);
 				}break;
 			case BLACK_BG:
 				{
 					backModel->init(black_frame, (void*)&paramMoG);
-					cvCopy(black_frame, prevBg);
+					black_frame.copyTo(prevBg); 
 				}break;
 			case WHITE_BG:
 				{
 					backModel->init(white_frame, (void*)&paramMoG);
-					cvCopy(white_frame, prevBg);
+					white_frame.copyTo(prevBg);
 				}break;
 			case DIFF_BG:
 				{
@@ -139,16 +142,16 @@ void VideoApp::run()
 
 		if (theConfig.face_track)
 		{
-			haar.find(frame, theConfig.paramMinArea);
+			haar.find(&(IplImage)frame, theConfig.paramMinArea);
 			timer.profileFunction("haar.find");
 		}
 
-		IplImage* back = NULL;//for render only
-		IplImage* fore = NULL;
+		Mat back;//for render only
+		Mat fore;
 
 		if (theConfig.bg_mode == KINECT_BG)
 		{
-			cvInRangeS( frame, cvScalar(theConfig.paramDark), cvScalar(theConfig.paramBright), kinect_frame );
+			cv::inRange( frame, Scalar(theConfig.paramDark), Scalar(theConfig.paramBright), kinect_frame );
 			fore = kinect_frame;
 			back = kinect_frame;
 		}

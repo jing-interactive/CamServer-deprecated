@@ -14,7 +14,6 @@
 #include <stdarg.h>
 #include <time.h>
 #include <vector>
-#include <map>
 
 #include "point2d.h"
 
@@ -26,18 +25,21 @@ class ofxKinectCLNUI;
 #endif
 
 using std::vector;
-//using std::set;
-using std::map;
-//CV_FOURCC('P','I','M','1')    = MPEG-1 codec
-//CV_FOURCC('M','J','P','G')    = motion-jpeg codec (does not work well)
-//CV_FOURCC('M', 'P', '4', '2') = MPEG-4.2 codec
-//CV_FOURCC('D', 'I', 'V', '3') = MPEG-4.3 codec
-//CV_FOURCC('D', 'I', 'V', 'X') = MPEG-4 codec
-//CV_FOURCC('U', '2', '6', '3') = H263 codec
-//CV_FOURCC('I', '2', '6', '3') = H263I codec
-//CV_FOURCC('F', 'L', 'V', '1') = FLV1 codec
+
+// enum T_VideoCodec
+// {
+// 	T_MPEG = CV_FOURCC('P','I','M','1'),		//	= MPEG-1 codec
+// 	T_MJPG = CV_FOURCC('M','J','P','G') ,		//	= motion-jpeg codec (does not work well)
+// 	T_MP42 = CV_FOURCC('M', 'P', '4', '2'),		// = MPEG-4.2 codec
+// 	T_DIV3 = CV_FOURCC('D', 'I', 'V', '3'),		// = MPEG-4.3 codec
+// 	T_DIVX = CV_FOURCC('D', 'I', 'V', 'X'),		// = MPEG-4 codec
+// 	T_H263 = CV_FOURCC('U', '2', '6', '3'),		// = H263 codec
+// 	T_H263I = CV_FOURCC('I', '2', '6', '3'),	// = H263I codec
+// 	T_FLV = CV_FOURCC('F', 'L', 'V', '1'),		// = FLV1 codec
+// };
+
  
-void vFlip(CvArr* src, int flipX, int flipY);
+void vFlip(cv::Mat& src, int flipX, int flipY);
 
 template<class T> class Image
 {
@@ -93,23 +95,10 @@ CvScalar vDefaultColor(int idx);
 	cvShowImage(#img_name, img_name);}\
 	while(0);
 
-#define show_image2(img_name) do{\
-	cvNamedWindow(#img_name, 0);\
-	cvShowImage(#img_name, img_name);}\
-	while(0);
-
 #define show_mat(img_name) do{\
 	cv::namedWindow(#img_name);\
 	cv::imshow(#img_name, img_name);}\
 	while(0);
-
-//mask is 8bit，掩板图片，mask中像素的值 > thresh，则img对应位置为原色，否则为0
-//img is 24bit
-void feature_out(IplImage* img, IplImage* mask, int thresh);
-
-char* get_time(bool full_length = true);
-
-typedef vector<IplImage*> image_array_t;
 
 const CvScalar CV_RED = CV_RGB(255,0,0);
 const CvScalar CV_GREEN = CV_RGB(0,255,0);
@@ -161,18 +150,16 @@ return 0;
 #define READ_(key, var) fs[key]>>var
 #define READ_FS(var) fs[#var]>>(var)
 
-#define vGrayScale(clr, gray) cvCvtColor(clr, gray, CV_BGR2GRAY) 
-#define vColorFul(gray, clr) cvCvtColor(gray, clr , CV_GRAY2BGR) 
-#define vThresh(gray, thresh) cvThreshold( gray, gray, thresh, 255, CV_THRESH_BINARY )//if > thresh -> white
-#define vThreshInv(gray, thresh) cvThreshold( gray, gray, thresh, 255, CV_THRESH_BINARY_INV )//if < thresh -> white
-#define vAutoThresh(gray, max_value) cvAdaptiveThreshold(gray, gray, max_value)
-#define vOpen(img, times) cvMorphologyEx( img, img, NULL, NULL, CV_MOP_OPEN, times );//去除白色小区域
-#define vClose(img, times) cvMorphologyEx( img, img, NULL, NULL, CV_MOP_CLOSE, times );//去除黑色小区域
-#define vDilate(img, times) cvMorphologyEx( img, img, NULL, NULL, CV_MOP_DILATE, times );
-#define vErode(img, times) cvMorphologyEx( img, img, NULL, NULL, CV_MOP_ERODE, times );
+#define vGrayScale(clr, gray) cv::cvtColor(clr, gray, CV_BGR2GRAY) 
+#define vColorFul(gray, clr) cv::cvtColor(gray, clr , CV_GRAY2BGR) 
+#define vThresh(gray, thresh) cv::threshold( gray, gray, thresh, 255, CV_THRESH_BINARY )//if > thresh -> white
+#define vThreshInv(gray, thresh) cv::threshold( gray, gray, thresh, 255, CV_THRESH_BINARY_INV )//if < thresh -> white
+#define vOpen(img, times) cv::morphologyEx( img, img, NULL, NULL, CV_MOP_OPEN, times );//去除白色小区域
+#define vClose(img, times) cv::morphologyEx( img, img, NULL, NULL, CV_MOP_CLOSE, times );//去除黑色小区域
+#define vDilate(img, times) cv::morphologyEx( img, img, NULL, NULL, CV_MOP_DILATE, times );
+#define vErode(img, times) cv::morphologyEx( img, img, NULL, NULL, CV_MOP_ERODE, times );
 
-#define vFullScreen(win_name) \
-	cvSetWindowProperty(win_name, CV_WND_PROP_FULLSCREEN, 1);
+#define vFullScreen(win_name) cvSetWindowProperty(win_name, CV_WND_PROP_FULLSCREEN, 1);
 
 #define vCreateGray(clr) cvCreateImage(cvGetSize(clr), 8, 1);
 #define vCreateColor(clr) cvCreateImage(cvGetSize(clr), 8, 3);
@@ -196,11 +183,11 @@ struct VideoInput
 	int _argc;
 	char** _argv;
 
-	cv::Ptr<CvCapture> _capture;
+	cv::VideoCapture _capture;
 
 	void showSettingsDialog();
 
-	IplImage* _frame;
+	cv::Mat _frame;
 	int _cam_idx;
 	cv::Size _size;
 	cv::Size _half_size;
@@ -214,15 +201,12 @@ struct VideoInput
 	void resize(int w, int h);
 
 	bool init(int cam_idx);
-	bool init(char* video_file);
+	bool init(const std::string& video_file);
 	bool init(int argc, char** argv);
 
 	void wait(int t);
 
-	IplImage* get_frame();
-
-	~VideoInput();
-
+	cv::Mat get_frame();
 private:
 
 #ifdef KINECT
@@ -234,12 +218,13 @@ private:
 #endif
 	void _post_init();
 	char buffer[256];
+
 };
 
 
 void vRotateImage(IplImage* image, float angle, float centreX, float centreY);
 
-void vHighPass(IplImage* src, IplImage* dst, int blurLevel = 10, int noiseLevel = 3);
+void vHighPass(const cv::Mat& src, cv::Mat& dst, int blurLevel = 10, int noiseLevel = 3);
 
 void vPerspectiveTransform(const CvArr* src, CvArr* dst, cv::Point srcQuad[4], cv::Point dstQuad[4]);
 
@@ -247,31 +232,7 @@ CvFGDStatModelParams cvFGDStatModelParams();
 
 void vGetPerspectiveMatrix(CvMat*& warp_matrix, cv::Point2f xsrcQuad[4], cv::Point2f xdstQuad[4]);
 
-
-
 void on_default(int );
-
-//亮度变换，nPercent为正时变亮，负则变暗 
-int ContrastAdjust(const IplImage* srcImg,
-				   IplImage* dstImg,
-				   float nPercent);
-
-//对比度变换，brightness小于1降低对比度，大于1增强对比度
-int BrightnessAdjust(const IplImage* srcImg,
-					 IplImage* dstImg,
-					 float brightness);
-
-void convertRGBtoHSV(const IplImage *imageRGB, IplImage *imageHSV);
-void convertHSVtoRGB(const IplImage *imageHSV, IplImage *imageRGB);
-
-#define cv_try_begin() try{
-
-#define cv_try_end() 	}\
-	catch (cv::Exception& ex)\
-{\
-	printf("[cv::Exception] %s\n", ex.what());\
-}
-
 
 #define vAddWeighted(src, alpha, dst) cvAddWeighted(src, alpha, dst, 1-alpha, 0, dst);
  
@@ -286,15 +247,6 @@ inline bool isPointInsideRect(int x, int y, const cv::Rect& rect)
 	return (x >= rect.x && x <= rect.x+rect.width &&
 		y >= rect.y && y <= rect.height);
 }
-
-// inline bool vTestRectHitRect(const cv::Rect& A, const cv::Rect& B)
-// {
-// 	int AminX = A.x, AminY = A.y, BminX = B.x, BminY = B.y;
-// 	int AmaxX = A.x+A.width, AmaxY = A.y+A.height, BmaxX = B.x+B.width, BmaxY = B.y+B.height;
-// // 	return (AminX <= BmaxX && AminY <= BmaxY &&
-// // 		AmaxX >= BminX && AmaxY >= BminY);
-// 	return isPointInsideRect()
-// }
 
 // Object-to-object bounding-box collision detector:
 bool vTestRectHitRect(const cv::Rect& object1, const cv::Rect& object2);

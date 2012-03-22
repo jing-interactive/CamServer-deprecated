@@ -134,101 +134,121 @@ struct vOpticalFlowLK
 
 struct IBackGround
 {
+	virtual void init(cv::Mat initial, void* param = NULL) = 0;
+
+	virtual void update(cv::Mat image, int mode = 0) = 0;
+
+	virtual void setIntParam(int idx, int value){}
+	virtual cv::Mat getForeground() = 0;
+	virtual cv::Mat getBackground() = 0;
+
+	virtual ~IBackGround();
+};
+
+struct IAutoBackGround : IBackGround
+{
 	CvBGStatModel* bg_model;
 
-	int thresh;
-
-	IBackGround(){
-		bg_model = NULL;
-		thresh = 200;
-	}
-
-	virtual void init(IplImage* initial, void* param = NULL) = 0;
-
-	virtual void update(IplImage* image, int mode = 0){
-		cvUpdateBGStatModel( image, bg_model );
-	}
-	virtual void setIntParam(int idx, int value)
+	IAutoBackGround()
 	{
-		if (idx ==0) thresh = 255-value;
+		bg_model = NULL;
 	}
 
-	virtual IplImage* getForeground(){
+	virtual void init(cv::Mat initial, void* param = NULL) = 0;
+
+	virtual void update(cv::Mat image, int mode = 0)
+	{
+		cvUpdateBGStatModel(&(IplImage)image, bg_model );
+	}
+
+	virtual cv::Mat getForeground(){
 		return bg_model->foreground;
 	}
 
-	virtual IplImage* getBackground(){
+	virtual cv::Mat getBackground(){
 		return bg_model->background;
 	}
 
-	virtual ~IBackGround(){
+	virtual ~IAutoBackGround()
+	{
 		if (bg_model)
 			cvReleaseBGStatModel(&bg_model);
 	}
 };
 
-
-struct vBackFGDStat: public IBackGround
+struct vBackFGDStat: public IAutoBackGround
 {
-	void init(IplImage* initial, void* param = NULL);
+	void init(cv::Mat initial, void* param = NULL);
 };
 
-struct vBackGaussian: public IBackGround
+struct vBackGaussian: public IAutoBackGround
 {
-	void init(IplImage* initial, void* param = NULL);
+	void init(cv::Mat initial, void* param = NULL);
+};
+
+struct IStaticBackground : IBackGround
+{
+	int thresh;
+	IStaticBackground()
+	{
+		thresh = 200;
+	}
+	virtual void setIntParam(int idx, int value)
+	{
+		if (idx ==0) 
+			thresh = 255-value;
+	}
 };
 
 #define DETECT_BOTH 0
 #define DETECT_DARK 1
 #define DETECT_BRIGHT 2
 
-struct vBackGrayDiff: public IBackGround
+struct vBackGrayDiff: public IStaticBackground
 {
-	cv::Ptr<IplImage> Frame;
-	cv::Ptr<IplImage> Bg;
-	cv::Ptr<IplImage> Fore ;
+	cv::Mat frame;
+	cv::Mat bg;
+	cv::Mat fore;
 
 	int dark_thresh;
 
-	void init(IplImage* initial, void* param = NULL);
+	void init(cv::Mat initial, void* param = NULL);
 
 	void setIntParam(int idx, int value);
 	///mode: 0-> ¼ì²âÃ÷Óë°µ 1->¼ì²âºÚ°µ 2->¼ì²âÃ÷ÁÁ
-	void update(IplImage* image, int mode = DETECT_BOTH);
+	void update(cv::Mat image, int mode = DETECT_BOTH);
 
-	IplImage* getForeground(){
-		return Fore;
+	cv::Mat getForeground(){
+		return fore;
 	}
-	IplImage* getBackground(){
-		return Bg;
+	cv::Mat getBackground(){
+		return bg;
 	}
 };
 
-struct vBackColorDiff: public vBackGrayDiff
+struct vBackColorDiff: public IStaticBackground
 {
 	int nChannels;
-	void init(IplImage* initial, void* param = NULL);
+	void init(cv::Mat initial, void* param = NULL);
 
 	///mode: 0-> ¼ì²âÃ÷Óë°µ 1->¼ì²âºÚ°µ 2->¼ì²âÃ÷ÁÁ
-	void update(IplImage* image, int mode = DETECT_BOTH);
+	void update(cv::Mat image, int mode = DETECT_BOTH);
 };
 
 //ÈýÖ¡²îÖµ·¨
-struct vThreeFrameDiff: public IBackGround
+struct vThreeFrameDiff: public IStaticBackground
 {
-	cv::Ptr<IplImage> grayFrameOne;
-	cv::Ptr<IplImage> grayFrameTwo;
-	cv::Ptr<IplImage> grayFrameThree;
-	cv::Ptr<IplImage> grayDiff ;
+	cv::Mat grays[3];
+	cv::Mat grayDiff ;
 
-	void init(IplImage* initial, void* param = NULL);
+	void init(cv::Mat initial, void* param = NULL);
 
-	void update(IplImage* image, int mode = 0);
+	void update(cv::Mat image, int mode = 0);
 
-	IplImage* getForeground(){
+	cv::Mat getForeground(){
 		return grayDiff;
 	}
-	IplImage* getBackground(){
+	cv::Mat getBackground(){
 		return grayDiff;
 	}
 };

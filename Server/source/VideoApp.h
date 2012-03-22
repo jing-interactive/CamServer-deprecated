@@ -57,16 +57,14 @@ struct VideoApp
 	cv::Rect roi[4];
 	CvMat* warp_matrix;
 
-	//the IplImages
-	cv::Ptr<IplImage> total;
-	cv::Ptr<IplImage> frame, black_frame, white_frame, kinect_frame;
-	cv::Ptr<IplImage> prevBg;
-
-	//
-	cv::Ptr<IplImage> half_raw;
-	cv::Ptr<IplImage> half_flip;
-	cv::Ptr<IplImage> grayBlob;
-	cv::Ptr<IplImage> grayBuffer;
+	//the Mats
+	cv::Mat total;
+	cv::Mat frame, black_frame, white_frame, kinect_frame;
+	cv::Mat prevBg;
+	cv::Mat half_raw;
+	cv::Mat half_flip;
+	cv::Mat grayBlob;
+	cv::Mat grayBuffer;
 
 	cv::Size size;
 	int channels;

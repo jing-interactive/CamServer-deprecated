@@ -3,6 +3,8 @@
 #include "AppConfig.h"
 #include "VideoApp.h"
 
+using namespace cv;
+
 struct ButtonInfo
 {
 	int x;
@@ -78,7 +80,7 @@ namespace monitor_gui
 
 namespace param_gui
 {
-	cv::Ptr<IplImage> setting;
+	Mat setting;
 	bool is_changing_layout = false;
 
 	CvButtons buttons;

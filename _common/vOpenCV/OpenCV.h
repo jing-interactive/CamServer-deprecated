@@ -17,7 +17,7 @@
 
 #include "point2d.h"
 
-#ifdef WIN32
+#ifdef VIDEOINPUT_LIB
 class videoInput;
 #endif
 #ifdef KINECT
@@ -211,7 +211,7 @@ private:
 	cv::Ptr<ofxKinectCLNUI> _kinect;
 	bool init_kinect();
 #endif
-#ifdef WIN32
+#ifdef VIDEOINPUT_LIB
 	cv::Ptr<videoInput> VI;
 #endif
 	void _post_init();

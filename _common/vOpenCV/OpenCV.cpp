@@ -17,7 +17,7 @@
 #ifdef KINECT 
 #include "../clnui/ofxKinectCLNUI.h"
 #endif	//KINECT
-#ifdef WIN32 
+#ifdef VIDEOINPUT_LIB 
 #include "../videoInput/videoInput.h"
 #endif	//WIN32
 
@@ -131,7 +131,7 @@ VideoInput::VideoInput()
 
 void VideoInput::showSettingsDialog()
 {
-#if WIN32
+#if VIDEOINPUT_LIB
 	if (VI)
 		VI->showSettingsWindow(device_id);
 #endif
@@ -143,7 +143,7 @@ bool VideoInput::init(int cam_idx)
 	device_id = cam_idx;
 	do 
 	{
-#ifdef WIN32
+#ifdef VIDEOINPUT_LIB
 		//try direct show directly (VideoInput)
 		VI = new videoInput();
 		VI->setVerbose(false);
@@ -262,7 +262,7 @@ void VideoInput::resize( int w, int h )
 		return;
 	}
 
-#ifdef WIN32
+#ifdef VIDEOINPUT_LIB
 	if( w != VI->getWidth(device_id) || h != VI->getHeight(device_id) )
 	{
 		VI->stopDevice(device_id);
@@ -284,29 +284,31 @@ Mat VideoInput::get_frame()
 {
 	do 
 	{
-		if (_capture.isOpened())
+#ifdef KINECT
+		if (_kinect)
 		{
-			_capture >> _frame;
-			
-			// 			if (_frame == NULL)
-			// 			{
-			// 				cvReleaseCapture(&_capture);
-			// 				init(_argc, _argv);
-			// 			}
+			bool b = _kinect->getDepthBW();
+			_frame = _kinect->bwImage;
+			_frame_num ++;
 			break;
 		}
-#ifdef WIN32
+#endif
+#ifdef VIDEOINPUT_LIB
 		if (VI)
 		{
 			VI->getPixels( device_id, _frame.ptr(), false, true );
 			break;;
 		}
 #endif
-		if (_kinect)
+		if (_capture.isOpened())
 		{
-			bool b = _kinect->getDepthBW();
-			_frame = _kinect->bwImage;
-			_frame_num ++;
+			_capture >> _frame;
+
+			// 			if (_frame == NULL)
+			// 			{
+			// 				cvReleaseCapture(&_capture);
+			// 				init(_argc, _argv);
+			// 			}
 			break;
 		}
 	} while (0);
@@ -316,7 +318,7 @@ Mat VideoInput::get_frame()
 
 void VideoInput::_post_init()
 {
-#ifdef WIN32
+#ifdef VIDEOINPUT_LIB
 	if (VI)
 	{
 		int w = VI->getWidth(device_id), h = VI->getHeight(device_id);

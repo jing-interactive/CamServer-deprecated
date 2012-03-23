@@ -13,7 +13,7 @@ But it's a little bit outdated.
 
 使用说明
 
-CamServer.exe [-i camera/image/video] [-dos] [-log] [-minim] [-delay 5] [-client 192.168.1.122 ][-port 3333] [-face]
+CamServer.exe [-i camera/image/video] [-dos] [-log] [-minim] [-delay 5] [-client 192.168.1.122 ][-port 7777] [-face]
 
 第一个参数，可以是
 camera		摄像头的编号，默认为0，即第一个摄像头，同时支持使用CLEye驱动的ps3摄像头

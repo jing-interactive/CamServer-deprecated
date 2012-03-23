@@ -42,7 +42,7 @@ class vBlob
     for (int j=0; j<points.size();j++ )
     {
       PVector pos = (PVector)points.get(j);
-      vertex(pos.x, pos.y); 
+      vertex(pos.x, pos.y);
     }
     endShape(CLOSE); 
   }

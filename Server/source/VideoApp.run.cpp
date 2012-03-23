@@ -253,6 +253,6 @@ void VideoApp::run()
 		timer_total.profileFunction("total"); 
 	}
 
-	theConfig.save_to("config.xml");
+	theConfig.save_to(CONFIG_FILE);
 	cvDestroyAllWindows();
 }

@@ -98,7 +98,7 @@ bool AppConfig::load_from(char* filename)
 	FileStorage fs(filename, FileStorage::READ);
 	if (!fs.isOpened())
 	{
-		printf("config.xml does not exist, CamServer starts with default values.\n");
+		printf("%s does not exist, CamServer starts with default values.\n", filename);
 		return false;
 	}
 	else
@@ -123,7 +123,7 @@ bool AppConfig::load_from(char* filename)
 		READ_FS(gray_detect_mode);
 		READ_FS(bg_mode);
 		READ_FS(tuio_mode);
-		printf("config.xml loaded.\n");
+		printf("%s loaded.\n", filename);
 
 		return true;
 	}
@@ -131,10 +131,10 @@ bool AppConfig::load_from(char* filename)
 
 bool AppConfig::save_to(char* filename)
 {
-	FileStorage fs("config.xml", FileStorage::WRITE);
+	FileStorage fs(filename, FileStorage::WRITE);
 	if (!fs.isOpened())
 	{
-		printf("failed to open config.xml for writing.\n");
+		printf("failed to open %s for writing.\n", filename);
 		return false;
 	}
 	else
@@ -159,7 +159,7 @@ bool AppConfig::save_to(char* filename)
 		WRITE_FS(gray_detect_mode);
 		WRITE_FS(bg_mode);
 		WRITE_FS(tuio_mode);
-		printf("config.xml saved.\n");
+		printf("%s saved.\n", filename);
 		return true;
 	}
 }

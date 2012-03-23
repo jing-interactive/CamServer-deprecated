@@ -157,7 +157,7 @@ bool VideoApp::init(int argc, char** argv)
 	dstQuad[2] = Point(HalfWidth,HalfHeight);
 	dstQuad[3] = Point(0,HalfHeight);
 
-	if (!theConfig.load_from("config.xml"))
+	if (!theConfig.load_from(CONFIG_FILE))
 	{
 		theConfig.corners[0] = cv::Point2f(0,0);
 		theConfig.corners[1] = cv::Point2f(HalfWidth,0);

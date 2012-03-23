@@ -9,6 +9,8 @@
 #define		DIFF_BG	3		//diff 
 #define		KINECT_BG 4		//for kinect
 
+#define CONFIG_FILE "CamServer.config.xml"
+
 struct AppConfig
 {
 	AppConfig();

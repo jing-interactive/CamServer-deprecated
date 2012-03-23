@@ -149,7 +149,7 @@ bool VideoInput::init(int cam_idx)
 		VI->setVerbose(false);
 		if (VI)
 		{
-			int numDevices = VI->listDevices();
+	//		int numDevices = VI->listDevices();
 			if (opened = VI->setupDevice(cam_idx))
 				break;
 		}	
@@ -215,7 +215,7 @@ bool VideoInput::init(const std::string& file_name)
 	{
 		_frame = imread(file_name);
 
-		if (_frame.empty())
+		if (!_frame.empty())
 		{
 			printf("Reading from image %s.\n", file_name);
 			_InputType = From_Image;

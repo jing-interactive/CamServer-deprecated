@@ -18,12 +18,12 @@ struct StartThread: public MiniThread
 {
 	void threadedFunction()
 	{
-		printf("CamServer %s  vinjn.z@gmail.com.\n\n", VERSION);
-		for (int b=0;b<8;b++)
+		const int N = 7;
+		for (int b=0;b<N;b++)
 		{
 			if (theApp.input_inited)//if VideoInput is already initialized
 				break;				//exit the thread now
-			for (int i=0;i<10;i++)
+			for (int i=0;i<N;i++)
 				printf("%c ", rand()%3+1);
 			printf("\n");
 			BEEP(sin(b/20.0f*3.14)*300,100);
@@ -43,9 +43,10 @@ struct ReadyThread: public MiniThread
 
 void say_byebye()
 {
-	for (int b=8;b>1;b--)
+	const int N = 8;
+	for (int b=N;b>1;b--)
 	{
-		for (int j=0;j<8-b;j++)
+		for (int j=0;j<N-b;j++)
 			printf("\t");
 		printf("bye~\n");
 		BEEP(sin(b/20.0f*3.14)*300,100);
@@ -55,6 +56,8 @@ void say_byebye()
 int main(int argc, char** argv )
 {
 	enableMemleakCheck();
+
+	printf("\nCamServer %s  vinjn.z@gmail.com.\n\n", VERSION);
 
 	std::string input_src = theConfig.parse_args(argc, argv);
 	argc = 2;

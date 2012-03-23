@@ -54,27 +54,39 @@ void vFlip(Mat& src, int flipX, int flipY)
 
 	if (code != NO_FLIP)
 		flip(src, src, code);
-} 
-void vCopyImageTo(CvArr* tiny_image, IplImage* big_image, const CvRect& region)
-{
-	CV_Assert(tiny_image && big_image);
-	// Set the image ROI to display the current image
-	cvSetImageROI(big_image, region);
+}
 
-	IplImage* t = (IplImage*)tiny_image;
-	if (t->nChannels == 1 && big_image->nChannels == 3)
+void vFastCopyImageTo( const cv::Mat& src, cv::Mat& dst, const cv::Rect& roi )
+{
+	assert(src.size() == roi.size());
+	Mat sub = dst(roi);
+
+	if (src.channels() == 1 && dst.channels() == 3)
 	{
-		Ptr<IplImage> _tiny = cvCreateImage(cvGetSize(t), 8, 3);
-		cvCvtColor(tiny_image, _tiny, CV_GRAY2BGR);
-		cvResize(_tiny, big_image);
+		Mat src_clr(src.rows, src.cols, CV_8UC3);
+		vColorFul(src, src_clr);
+		src_clr.copyTo(sub);
 	}
 	else
 	{
-		// Resize the input image and copy the it to the Single Big Image
-		cvResize(tiny_image, big_image);
+		src.copyTo(sub);
 	}
-	// Reset the ROI in order to display the next image
-	cvResetImageROI(big_image);
+}
+
+void vCopyImageTo(const cv::Mat& src, cv::Mat& dst, const cv::Rect& roi)
+{
+	Mat sub = dst(roi);
+
+	if (src.channels() == 1 && dst.channels() == 3)
+	{
+		Mat src_clr(src.rows, src.cols, CV_8UC3);
+		vColorFul(src, src_clr);
+		resize(src_clr, sub, sub.size());
+	}
+	else
+	{
+		resize(src, sub, sub.size());
+	}
 }
 
 void vDrawText(cv::Mat& img, int x,int y,char* str, CvScalar clr)
@@ -346,12 +358,12 @@ bool VideoInput::init_kinect()
 }
 #endif
 
-void vHighPass(const cv::Mat& src, const cv::Mat& dst, int blurLevel/* = 10*/, int noiseLevel/* = 3*/)
+void vHighPass(const cv::Mat& src, cv::Mat& dst, int blurLevel/* = 10*/, int noiseLevel/* = 3*/)
 {
 	if (blurLevel > 0 && noiseLevel > 0)
 	{
 		// create the unsharp mask using a linear average filter
-		cv::blur(src, dst, blurLevel*2+1);
+		cv::blur(src, dst, Size(blurLevel*2+1, blurLevel*2+1));
 
 		dst = src - dst;
 //		cvSub(src, dst, dst);
@@ -360,7 +372,7 @@ void vHighPass(const cv::Mat& src, const cv::Mat& dst, int blurLevel/* = 10*/, i
 		cv::medianBlur(dst, dst, noiseLevel*2+1);
 	}
 	else
-		cvCopy(src, dst);
+		src.copyTo(dst);
 }
 
 void vGetPerspectiveMatrix(CvMat*& warp_matrix, cv::Point2f xsrcQuad[4], cv::Point2f xdstQuad[4])
@@ -410,12 +422,6 @@ void vPolyLine(cv::Mat& dst, vector<Point>& pts, CvScalar clr, int thick)
 bool operator < (const Point& a, const Point& b)
 {
 	return a.x < b.x && a.y < b.y;
-}
-
-
-void on_default(int )
-{
-
 }
 
 void vFillPoly(IplImage* img, const vector<Point>& pt_list, const Scalar& clr/* = Scalar(255,255,255)*/)

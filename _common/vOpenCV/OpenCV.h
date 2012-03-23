@@ -38,9 +38,6 @@ using std::vector;
 // 	T_FLV = CV_FOURCC('F', 'L', 'V', '1'),		// = FLV1 codec
 // };
 
- 
-void vFlip(cv::Mat& src, int flipX, int flipY);
-
 template<class T> class Image
 {
 private:
@@ -84,8 +81,9 @@ imgA[i][j].b = 111;
 imgA[i][j].g = 111;
 imgA[i][j].r = 111;
 */
-void vCopyImageTo(CvArr* small_image, IplImage* big_image, const CvRect& region);
-
+void vFastCopyImageTo(const cv::Mat& src, cv::Mat& dst, const cv::Rect& roi);
+void vCopyImageTo(const cv::Mat& src, cv::Mat& dst, const cv::Rect& roi);
+void vFlip(cv::Mat& src, int flipX, int flipY);
 void vDrawText(cv::Mat& img, int x,int y,char* str, CvScalar clr=CV_RGB(255,255,255));
 void vPolyLine(cv::Mat& dst, vector<cv::Point>& pts, CvScalar clr=CV_RGB(255,255,255), int thick = 1);
 CvScalar vDefaultColor(int idx);
@@ -114,7 +112,7 @@ inline CvScalar vRandomColor()
 	return CV_RGB(icolor&255, (icolor>>8)&255, (icolor>>16)&255);
 }
 
-#define vDrawRect(image, rc, clr) cvDrawRect(image, cvPoint(rc.x,rc.y), cvPoint(rc.x+rc.width,rc.y+rc.height), clr)
+#define vDrawRect(image, rc, clr) cv::rectangle(image, cv::Point(rc.x,rc.y), cv::Point(rc.x+rc.width,rc.y+rc.height), clr)
 
 /*
 
@@ -231,8 +229,6 @@ void vPerspectiveTransform(const CvArr* src, CvArr* dst, cv::Point srcQuad[4], c
 CvFGDStatModelParams cvFGDStatModelParams();
 
 void vGetPerspectiveMatrix(CvMat*& warp_matrix, cv::Point2f xsrcQuad[4], cv::Point2f xdstQuad[4]);
-
-void on_default(int );
 
 #define vAddWeighted(src, alpha, dst) cvAddWeighted(src, alpha, dst, 1-alpha, 0, dst);
  

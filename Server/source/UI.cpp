@@ -65,15 +65,15 @@ namespace monitor_gui
 	{
 		if (visible)
 		{
-			cvNamedWindow(MAIN_WINDOW);
-			cvResizeWindow(MAIN_WINDOW,640,480);
+			namedWindow(MAIN_WINDOW);
+			resizeWindow(MAIN_WINDOW,640,480);
 
-			cvSetMouseCallback(MAIN_WINDOW,onMonitorMouse);
+			setMouseCallback(MAIN_WINDOW,onMonitorMouse);
 			handle = cvGetWindowHandle(MAIN_WINDOW);
 		}
 		else
 		{
-			cvDestroyWindow(MAIN_WINDOW);
+			destroyWindow(MAIN_WINDOW);
 		}
 	}
 }
@@ -220,21 +220,20 @@ namespace param_gui
 
 	void update()
 	{
-		cvSet(setting, CV_RGB(122,122,122));
-		buttons.paintButtons(setting);
-		cvRectangle(setting, cvPoint(13,100), cvPoint(387,104), CV_RGB(122,10,10), CV_FILLED);
+		setting = CV_GRAY;
+		buttons.paintButtons(&(IplImage)setting);
+		rectangle(setting, cvPoint(13,100), cvPoint(387,104), CV_RGB(122,10,10), CV_FILLED);
 
 		const int x0 = 13;
 		const int y0 = 70;
 
 		int idx = theConfig.bg_mode;
-		cvRectangle(setting, cvPoint(x0+dw*idx,y0), cvPoint(x0+dw*idx+_w,y0+_h), CV_RGB(10,10,122), 3);
+		rectangle(setting, cvPoint(x0+dw*idx,y0), cvPoint(x0+dw*idx+_w,y0+_h), CV_RGB(10,10,122), 3);
 	}
 
 	void init()
 	{
-		setting.release();
-		setting = cvCreateImage(cvSize(400,120),8,3);
+		setting.create(Size(400,120), CV_8UC3);
 		buttons.release();
 
 		for (int i=0;i<num_btns;i++)
@@ -257,14 +256,14 @@ namespace param_gui
 		if (visible)
 		{
 			is_changing_layout = true;
-			cvDestroyWindow(PARAM_WINDOW);
+			destroyWindow(PARAM_WINDOW);
 			is_changing_layout = false;
-			cvNamedWindow(PARAM_WINDOW);
-			cvResizeWindow(PARAM_WINDOW,400,480);
+			namedWindow(PARAM_WINDOW);
+			resizeWindow(PARAM_WINDOW,400,480);
 
 			handle = cvGetWindowHandle(PARAM_WINDOW);
 
-			cvSetMouseCallback( PARAM_WINDOW, onParamMouse, &buttons);
+			setMouseCallback( PARAM_WINDOW, onParamMouse, &buttons);
 
 			if (theConfig.fixed_back_mode)
 			{
@@ -273,18 +272,18 @@ namespace param_gui
 				//	backModel = new vBackColorDiff();
 				//	backModel = new vThreeFrameDiff();
 				if (theConfig.bg_mode == WHITE_BG)
-					cvCreateTrackbar("Darkness",PARAM_WINDOW,&theConfig.paramDark,PARAM_DARK, NULL);
+					createTrackbar("Darkness",PARAM_WINDOW,&theConfig.paramDark,PARAM_DARK);
 				else if (theConfig.bg_mode == BLACK_BG)
-					cvCreateTrackbar("Brightness",PARAM_WINDOW,&theConfig.paramBright,PARAM_BRIGHT, NULL);
+					createTrackbar("Brightness",PARAM_WINDOW,&theConfig.paramBright,PARAM_BRIGHT);
 				else if (theConfig.bg_mode == KINECT_BG)
 				{
-					cvCreateTrackbar("Near",PARAM_WINDOW,&theConfig.paramDark,PARAM_DARK, NULL);
-					cvCreateTrackbar("Far",PARAM_WINDOW,&theConfig.paramBright,PARAM_BRIGHT, NULL);
+					createTrackbar("Near",PARAM_WINDOW,&theConfig.paramDark,PARAM_DARK);
+					createTrackbar("Far",PARAM_WINDOW,&theConfig.paramBright,PARAM_BRIGHT);
 				}
 				else
 				{
-					cvCreateTrackbar("Below",PARAM_WINDOW,&theConfig.paramDark,PARAM_DARK, NULL);
-					cvCreateTrackbar("Above",PARAM_WINDOW,&theConfig.paramBright,PARAM_BRIGHT, NULL);
+					createTrackbar("Below",PARAM_WINDOW,&theConfig.paramDark,PARAM_DARK);
+					createTrackbar("Above",PARAM_WINDOW,&theConfig.paramBright,PARAM_BRIGHT);
 				}
 			}
 			else
@@ -293,16 +292,16 @@ namespace param_gui
 				// 			cvCreateTrackbar("Auto",PARAM_WINDOW,&theConfig.paramAuto,PARAM_AUTO, onParamAuto);
 				// 			onParamAuto(paramAuto);
 			}
-			cvCreateTrackbar("Blur",PARAM_WINDOW,&theConfig.paramBlur1,PARAM_BLUR1, NULL);
-			cvCreateTrackbar("Noise",PARAM_WINDOW,&theConfig.paramBlur2,PARAM_BLUR2, NULL);
+			createTrackbar("Blur",PARAM_WINDOW,&theConfig.paramBlur1,PARAM_BLUR1);
+			createTrackbar("Noise",PARAM_WINDOW,&theConfig.paramBlur2,PARAM_BLUR2);
 			//	cvCreateTrackbar("形态",PARAM_WINDOW,&paramNoise,PARAM_NOISE, NULL);
 
-			cvCreateTrackbar("MinArea",PARAM_WINDOW,&theConfig.paramMinArea, PARAM_MAXAREA, NULL);
-			cvCreateTrackbar("MaxArea",PARAM_WINDOW,&theConfig.paramMaxArea,PARAM_MAXAREA, NULL);
+			createTrackbar("MinArea",PARAM_WINDOW,&theConfig.paramMinArea, PARAM_MAXAREA);
+			createTrackbar("MaxArea",PARAM_WINDOW,&theConfig.paramMaxArea,PARAM_MAXAREA);
 		}
 		else
 		{
-			cvDestroyWindow(PARAM_WINDOW);
+			destroyWindow(PARAM_WINDOW);
 		}
 		update();
 	}

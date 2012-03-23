@@ -167,7 +167,8 @@ void VideoApp::run()
 		timer.profileFunction("backModel->update");
 		//fore->blobs
 		vHighPass(fore, grayBuffer, theConfig.paramBlur1, theConfig.paramBlur2);		
-		cvCopy(grayBuffer, fore);
+		grayBuffer.copyTo(fore);
+
 		timer.profileFunction("vHighPass");
 
 		const int scale =HalfWidth*HalfHeight/PARAM_MAXAREA;
@@ -186,7 +187,7 @@ void VideoApp::run()
 				{
 					for (int f=0;f<finger.ppico.size();f++)
 					{	
-						cvCircle(frame, finger.ppico[f], 10, vRandomColor());
+						circle(frame, finger.ppico[f], 10, vRandomColor());
 					}
 				}
 			}
@@ -208,24 +209,24 @@ void VideoApp::run()
 
 		if (monitorVisible)
 		{
-			vCopyImageTo(half_raw, total, roi[0]);
-			vCopyImageTo(frame, total, roi[1]);
-			vCopyImageTo(fore, total, roi[2]);
-			vCopyImageTo(back, total, roi[3]);
+			half_raw.copyTo(total(roi[0]));
+			frame.copyTo(total(roi[1]));
+			vFastCopyImageTo(fore, total, roi[2]);
+			vFastCopyImageTo(back, total, roi[3]);
 
 			const Point2f kk(5,5);
 			for (int i=0;i<4;i++)
 			{
-				cvLine(total, theConfig.corners[i], theConfig.corners[(i+1)%4], CV_RGB(255,0,0),2);
-				cvRectangle(total, theConfig.corners[i] - kk, theConfig.corners[i] + kk, CV_RGB(255,0,0), CV_FILLED);
+				line(total, theConfig.corners[i], theConfig.corners[(i+1)%4], CV_RGB(255,0,0),2);
+				rectangle(total, theConfig.corners[i] - kk, theConfig.corners[i] + kk, CV_RGB(255,0,0), CV_FILLED);
 			}
 			if (selected)
-				cvRectangle(total, *selected - kk, *selected + kk, CV_RGB(0,0,255), CV_FILLED);
+				rectangle(total, *selected - kk, *selected + kk, CV_RGB(0,0,255), CV_FILLED);
 
 			const int spac = HalfWidth*0.1;
-			cvLine(total, cvPoint(HalfWidth-spac, HalfHeight), cvPoint(HalfWidth+spac, HalfHeight), CV_BLUE);
-			cvLine(total, cvPoint(HalfWidth, HalfHeight-spac), cvPoint(HalfWidth, HalfHeight+spac), CV_BLUE);
-			cvShowImage(MAIN_WINDOW,total);
+			line(total, cvPoint(HalfWidth-spac, HalfHeight), cvPoint(HalfWidth+spac, HalfHeight), CV_BLUE);
+			line(total, cvPoint(HalfWidth, HalfHeight-spac), cvPoint(HalfWidth, HalfHeight+spac), CV_BLUE);
+			imshow(MAIN_WINDOW,total);
 
 			timer.profileFunction("show Monitor");
 		}
@@ -242,11 +243,11 @@ void VideoApp::run()
 		sprintf(g_buffer, "FPS {Cam %d Server %d} %d object", grab_thread->fps, fps, blobs.size());
 		if (theConfig.face_track)
 			sprintf(g_buffer, "%s %d face", g_buffer, haar.blobs.size()); 
-		cvRectangle(param_gui::setting, Point(0,0), Point(400,30), CV_RGB(122,122,122), CV_FILLED);
+		rectangle(param_gui::setting, Point(0,0), Point(400,30), CV_RGB(122,122,122), CV_FILLED);
 		cv::Mat m = param_gui::setting;
 		vDrawText(m, 20,20, g_buffer);
 
-		cvShowImage(PARAM_WINDOW, param_gui::setting);
+		imshow(PARAM_WINDOW, param_gui::setting);
 		timer.profileFunction("show Param Panel");
 
 		timer_total.profileFunction("total"); 

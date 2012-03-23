@@ -2,7 +2,7 @@
 #include "VideoApp.h"
 #include "AppConfig.h"
 
-#define VERSION "0.6.4"
+#define VERSION "0.6.5"
 
 void enableMemleakCheck(int breakpt = 0)
 {

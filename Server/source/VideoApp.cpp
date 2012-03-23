@@ -98,7 +98,9 @@ bool VideoApp::init(int argc, char** argv)
 	if (!input.init(argc,argv))
 	{
 		input_inited = true;
+#ifdef WIN32
 		system("pause");
+#endif
 		return false;
 	}
 #ifdef MODE_320X240
@@ -178,8 +180,8 @@ bool VideoApp::init(int argc, char** argv)
 	grayBuffer.create(half, CV_8UC(1));
 
 	black_frame = CV_BLACK;
-	black_frame = CV_WHITE;
-	black_frame = CV_GRAY;
+	white_frame = CV_WHITE;
+	kinect_frame = CV_GRAY;
 
 	if (theConfig.delay_for_run > 0)					// if necessary
 		SLEEP(theConfig.delay_for_run * 1000);	// sleep before the app shows up

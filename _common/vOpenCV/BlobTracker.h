@@ -30,7 +30,7 @@
 // poly1_hull0	If set, approximate connected component by (DEFAULT) polygon, or else convex hull (false)
 // areaScale 	Area = image (width*height)*areaScale.  If contour area < this, delete that contour (DEFAULT: 0.1)
 //
-
+void vFindBlobs(cv::Mat& src, vector<vBlob>& blobs, int minArea = 1, int maxArea = 3072000, bool convexHull=false, bool (*sort_func)(const vBlob& a, const vBlob& b)  = NULL);
 void vFindBlobs(IplImage *src, vector<vBlob>& blobs, int minArea = 1, int maxArea = 3072000, bool convexHull=false, bool (*sort_func)(const vBlob& a, const vBlob& b)  = NULL);
 
 void vFindBlobs(IplImage *mask,	int minArea = 1, int maxArea = 3072000, bool convexHull=false);//draw trackedBlobs only
@@ -99,7 +99,7 @@ struct vHaarFinder
 	float scale;
 	//
 	bool init(char* cascade_name);
-	void find(IplImage* img, int minArea = 1, bool findAllFaces = true);
+	void find(const cv::Mat& img, int minArea = 1, bool findAllFaces = true);
 
 	vHaarFinder();
 
@@ -111,9 +111,9 @@ protected:
 struct vOpticalFlowLK
 {
 	//blocksize must be odd
-        vOpticalFlowLK(IplImage* gray, int blocksize = 5);
+        vOpticalFlowLK(const cv::Mat& gray, int blocksize = 5);
 
-		void update(IplImage* gray);
+		void update(const cv::Mat& gray);
 
 		cv::point2df flowAtPoint(int x, int y);
 		bool flowInRegion(int x, int y, int w, int h, cv::point2df& vec) ;
@@ -125,9 +125,9 @@ struct vOpticalFlowLK
         int width;
         int height;
 
-		cv::Ptr<IplImage> vel_x;
-        cv::Ptr<IplImage> vel_y;
-		cv::Ptr<IplImage> prev;
+		cv::Mat vel_x;
+        cv::Mat vel_y;
+		cv::Mat prev;
 
 		int block_size;
 };
@@ -139,10 +139,10 @@ struct IBackGround
 	virtual void update(cv::Mat image, int mode = 0) = 0;
 
 	virtual void setIntParam(int idx, int value){}
-	virtual cv::Mat getForeground() = 0;
-	virtual cv::Mat getBackground() = 0;
+	virtual cv::Mat& getForeground() = 0;
+	virtual cv::Mat& getBackground() = 0;
 
-	virtual ~IBackGround();
+	virtual ~IBackGround(){}
 };
 
 struct IAutoBackGround : IBackGround
@@ -156,24 +156,13 @@ struct IAutoBackGround : IBackGround
 
 	virtual void init(cv::Mat initial, void* param = NULL) = 0;
 
-	virtual void update(cv::Mat image, int mode = 0)
-	{
-		cvUpdateBGStatModel(&(IplImage)image, bg_model );
-	}
+	virtual void update(cv::Mat image, int mode = 0);
 
-	virtual cv::Mat getForeground(){
-		return bg_model->foreground;
-	}
+	cv::Mat& getForeground();
 
-	virtual cv::Mat getBackground(){
-		return bg_model->background;
-	}
+	cv::Mat& getBackground();
 
-	virtual ~IAutoBackGround()
-	{
-		if (bg_model)
-			cvReleaseBGStatModel(&bg_model);
-	}
+	virtual ~IAutoBackGround();
 };
 
 struct vBackFGDStat: public IAutoBackGround
@@ -187,17 +176,19 @@ struct vBackGaussian: public IAutoBackGround
 };
 
 struct IStaticBackground : IBackGround
-{
-	int thresh;
-	IStaticBackground()
-	{
-		thresh = 200;
-	}
-	virtual void setIntParam(int idx, int value)
-	{
-		if (idx ==0) 
-			thresh = 255-value;
-	}
+{	
+	cv::Mat frame;
+	cv::Mat bg;
+	cv::Mat fore;
+
+	int threshes[2];
+
+	IStaticBackground();
+
+	virtual ~IStaticBackground();
+	virtual void setIntParam(int idx, int value);
+	cv::Mat& getForeground();
+	cv::Mat& getBackground();
 };
 
 #define DETECT_BOTH 0
@@ -206,24 +197,9 @@ struct IStaticBackground : IBackGround
 
 struct vBackGrayDiff: public IStaticBackground
 {
-	cv::Mat frame;
-	cv::Mat bg;
-	cv::Mat fore;
-
-	int dark_thresh;
-
 	void init(cv::Mat initial, void* param = NULL);
-
-	void setIntParam(int idx, int value);
 	///mode: 0-> ¼ì²âÃ÷Óë°µ 1->¼ì²âºÚ°µ 2->¼ì²âÃ÷ÁÁ
 	void update(cv::Mat image, int mode = DETECT_BOTH);
-
-	cv::Mat getForeground(){
-		return fore;
-	}
-	cv::Mat getBackground(){
-		return bg;
-	}
 };
 
 struct vBackColorDiff: public IStaticBackground
@@ -238,6 +214,7 @@ struct vBackColorDiff: public IStaticBackground
 //ÈýÖ¡²îÖµ·¨
 struct vThreeFrameDiff: public IStaticBackground
 {
+	//TODO: how to deal with gray
 	cv::Mat grays[3];
 	cv::Mat grayDiff ;
 
@@ -245,10 +222,6 @@ struct vThreeFrameDiff: public IStaticBackground
 
 	void update(cv::Mat image, int mode = 0);
 
-	cv::Mat getForeground(){
-		return grayDiff;
-	}
-	cv::Mat getBackground(){
-		return grayDiff;
-	}
+	cv::Mat& getForeground();
+	cv::Mat& getBackground();
 };

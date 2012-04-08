@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "Blob.h"
+#include <opencv2/legacy/legacy.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -144,6 +145,8 @@ struct IBackGround
 
 	virtual ~IBackGround(){}
 };
+
+CvFGDStatModelParams cvFGDStatModelParams();
 
 struct IAutoBackGround : IBackGround
 {

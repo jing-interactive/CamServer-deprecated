@@ -226,8 +226,6 @@ void vHighPass(const cv::Mat& src, cv::Mat& dst, int blurLevel = 10, int noiseLe
 
 void vPerspectiveTransform(const CvArr* src, CvArr* dst, cv::Point srcQuad[4], cv::Point dstQuad[4]);
 
-CvFGDStatModelParams cvFGDStatModelParams();
-
 void vGetPerspectiveMatrix(CvMat*& warp_matrix, cv::Point2f xsrcQuad[4], cv::Point2f xdstQuad[4]);
 
 #define vAddWeighted(src, alpha, dst) cvAddWeighted(src, alpha, dst, 1-alpha, 0, dst);

@@ -9,10 +9,12 @@
 #pragma comment(lib,"opencv_video"OPENCV_VERSION"d.lib")
 #pragma comment(lib,"opencv_objdetect"OPENCV_VERSION"d.lib")
 #pragma comment(lib,"opencv_features2d"OPENCV_VERSION"d.lib")
+#pragma comment(lib,"opencv_legacy"OPENCV_VERSION"d.lib")
 #else
 #pragma comment(lib,"opencv_video"OPENCV_VERSION".lib")
 #pragma comment(lib,"opencv_objdetect"OPENCV_VERSION".lib")
 #pragma comment(lib,"opencv_features2d"OPENCV_VERSION".lib")
+#pragma comment(lib,"opencv_legacy"OPENCV_VERSION".lib")
 #endif
 
 using namespace cv;
@@ -669,20 +671,20 @@ void vBlobTracker::trackBlobs( const vector<vBlob>& newBlobs )
 
 	if (n_old != 0 && n_new != 0)
 	{
-		Mat ma(trackedBlobs.size(),2,CV_32SC1);
-		Mat mb(newBlobs.size(),2,CV_32SC1);
+		Mat1f ma(trackedBlobs.size(),2);
+		Mat1f mb(newBlobs.size(),2);
 		for (int i=0;i<n_old;i++)
 		{
-			ma.at<int>(i,0) = trackedBlobs[i].center.x;
-			ma.at<int>(i,1) = trackedBlobs[i].center.y;
+			ma(i,0) = trackedBlobs[i].center.x;
+			ma(i,1) = trackedBlobs[i].center.y;
 		}
 		for (int i=0;i<n_new;i++)
 		{
-			mb.at<int>(i,0) = newTrackedBlobs[i].center.x;
-			mb.at<int>(i,1) = newTrackedBlobs[i].center.y;
+			mb(i,0) = newTrackedBlobs[i].center.x;
+			mb(i,1) = newTrackedBlobs[i].center.y;
 		}
 
-		BruteForceMatcher<L2<int> > matcher;
+		BFMatcher matcher(NORM_L2);
 		vector<DMatch> matches;
 		matcher.match(mb, ma, matches);
 		const int n_matches = matches.size();
@@ -693,7 +695,8 @@ void vBlobTracker::trackBlobs( const vector<vBlob>& newBlobs )
 			int q_id = match.queryIdx;
 			float dist = match.distance;
 
-			if (dist < 500 && dist < dist_of_a[t_id])
+			//TODO: 200 -> param
+			if (dist < 200 && dist < dist_of_a[t_id])
 			{
 				dist_of_a[t_id] = dist;
 				nn_of_a[t_id] = q_id;

@@ -52,7 +52,7 @@ void setup() {
   frameRate(60);
   smooth();
 
-  oscP5 = new OscP5(this,3333);
+  oscP5 = new OscP5(this,7777);
 
   initPhysics();
 }

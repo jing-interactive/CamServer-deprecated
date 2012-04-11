@@ -7,7 +7,7 @@ void setup() {
   frameRate(30);
   bg = loadImage("back.jpg");
   size(bg.width, bg.height);
-  oscP5 = new OscP5(this, 3333);
+  oscP5 = new OscP5(this, 7777);
   rectMode(CENTER);
   setupFire();
 }

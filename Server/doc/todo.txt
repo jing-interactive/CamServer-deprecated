@@ -24,3 +24,4 @@ to do
 23.消除抖动
 24.更新osc_protocol.txt
 25.与KinServer接口一致
+26.精简dll依赖

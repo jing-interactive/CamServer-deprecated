@@ -20,7 +20,7 @@ void setup() {
   frameRate(30);
   bg = loadImage("back.jpg");
 
-  oscP5 = new OscP5(this,3333);
+  oscP5 = new OscP5(this,7777);
 
   myFont = createFont("黑体", 32);
   textFont(myFont);

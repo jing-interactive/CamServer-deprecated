@@ -3,7 +3,7 @@ http://www.benchun.net/flosc/
 processing版本的OSC
 http://www.sojamo.de/libraries/oscP5/
 
-客户端需要监听的端口为本地的3333，可以通过-p 1234修改服务端的端口号
+客户端需要监听的端口为本地的7777，可以通过-p 333修改服务端的端口号为3333
 
 每一个循环中收到的消息依次为
 /start，表示循环的开始

@@ -29,16 +29,9 @@ http://www.sojamo.de/libraries/oscP5/
 	11:	x1
 	12:	y1
 
-【未完整实现】
 /face，表示检测到一个脸，根据具体情况，会出现多个/face或者一个都没有
 需开启-face
 所有参数与/blob一致
-	
-【未完整实现】
-/hand，表示检测到一只手，根据具体情况，会出现多个/hand或者一个都没有
-需开启-hand
-所有参数与/blob一致
-	
 
 /end，表示循环的结束
 

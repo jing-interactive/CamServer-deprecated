@@ -38,9 +38,13 @@ AppConfig::AppConfig():CLIENT("localhost")
 	paramNoise = 0;
 	paramMinArea = 1;
 	paramMaxArea = 50; 
-};
 
-bool using_debug_file = true;
+#ifdef _DEBUG
+	log_file = true;
+#else
+	log_file = false;
+#endif
+};
 
 char* hack_cam_str[]=
 {
@@ -59,7 +63,8 @@ std::string AppConfig::parse_args(int argc, char** argv)
 		"{finger||false|enable finger track}"
 //		"{hand||false|enable hand track}"
 //		"{a|aut|false|auto background mode}"
-		"{1| |0|the input source, could be camera_idx/picture}"
+
+		"{1| |0|the input source, could be camera_idx/video/picture}"
 		"{h|help|false|display this help text}"
 	};
 
@@ -77,9 +82,7 @@ std::string AppConfig::parse_args(int argc, char** argv)
 
 	fixed_back_mode = !args.get<bool>("a");
 	CLIENT = args.get<std::string>("client");
-#ifndef _DEBUG
-	using_debug_file = args.get<bool>("log");
-#endif
+	log_file = args.get<bool>("log");
 	minim_window = args.get<bool>("minim");
 	delay_for_run = args.get<int>("delay");
 	finger_track = args.get<bool>("finger");

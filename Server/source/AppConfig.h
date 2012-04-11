@@ -45,6 +45,8 @@ struct AppConfig
 	int paramMaxArea;
 	int n_diff_frames;
 
+	bool log_file;
+
 	cv::Point2f corners[4];
 };
 

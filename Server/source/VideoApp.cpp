@@ -45,7 +45,7 @@ void VideoGrabThread::threadedFunction()
 		timer.resetStartTime();
 		_input.get_frame();
 		_dirty = true; 
-		if (_input._InputType == _input.From_Video)
+		if (_input._InputType == VideoInput::From_Video || _input._InputType == VideoInput::From_Image)
 		{
 			unsigned int elapse = timer.getTimeElapsedMS();
 			if (elapse < 40)

@@ -7,7 +7,7 @@ to do
 6.hand
 [done]7.main重构
 [done]8.xml
-[WNF]9.正常的关闭
+[done]9.正常的关闭
 [done]10.ofxOsc lib build inside
 [done]11.p5更新
 [done]12.UI多线程
@@ -18,3 +18,9 @@ to do
 [done]17.前后帧差模式
 18.增加特定颜色模式
 [done]19.用Mat取代IplImage
+20.hole/contour之间要区分
+21.提高fps/优化highpass算法的复杂度
+22.使用新的Background API
+23.消除抖动
+24.更新osc_protocol.txt
+25.与KinServer接口一致

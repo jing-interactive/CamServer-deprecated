@@ -15,14 +15,15 @@
 #include "MiniLog.h"
 #else
 #include <stdio.h>
-#define MiniLog(str) 
+#define MiniLog(str) printf(str)
 #endif
 
 class MiniTimer
 {
 public:
-	MiniTimer()
+	MiniTimer(bool log_enabled = true)
 	{
+		enableLog(log_enabled);
 		resetStartTime();
 	}
     
@@ -54,11 +55,8 @@ public:
 
 	void profileFunction(char* funcName)
 	{
-#ifdef USING_FLO_WRITE
-		MiniLog("%s[%s] : %d ms\n", getProperBlank(), funcName, getTimeElapsedMS());
-#else
-		printf("%s[%s] : %d ms\n", getProperBlank(), funcName, getTimeElapsedMS());	
-#endif
+		if (_log_enabled)
+			MiniLog("%s[%s] : %d ms\n", getProperBlank(), funcName, getTimeElapsedMS());
 		resetStartTime();
 	}
 
@@ -68,7 +66,13 @@ public:
 	}
 
 private:
+	void enableLog(bool enable)
+	{
+		_log_enabled = enable;
+	}
+
 	unsigned int _start_time;
+	bool _log_enabled;
 };
 
 #endif

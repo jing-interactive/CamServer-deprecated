@@ -1,0 +1,3 @@
+[submodule "vOpenCV"]
+	path = _common/vOpenCV
+	url = https://vinjn@github.com/vinjn/vOpenCV.git

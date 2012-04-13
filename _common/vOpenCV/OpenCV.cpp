@@ -49,7 +49,7 @@ void vFlip(Mat& src, int flipX, int flipY)
 {
 	assert (flipX == 0 ||flipX == 1);
 	assert (flipY == 0 ||flipY == 1);
-	static int mapper[2][2] = {{1,-1},{NO_FLIP,0}};
+	static int mapper[2][2] = {{NO_FLIP,0},{1,-1}};
 	int code = mapper[flipY][flipX];
 
 	if (code != NO_FLIP)

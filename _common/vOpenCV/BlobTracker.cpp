@@ -684,7 +684,11 @@ void vBlobTracker::trackBlobs( const vector<vBlob>& newBlobs )
 			mb(i,1) = newTrackedBlobs[i].center.y;
 		}
 
+#if CV_MINOR_VERSION < 4
+		BruteForceMatcher<L2<float>> matcher;
+#else
 		BFMatcher matcher(NORM_L2);
+#endif
 		vector<DMatch> matches;
 		matcher.match(mb, ma, matches);
 		const int n_matches = matches.size();

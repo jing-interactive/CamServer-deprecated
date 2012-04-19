@@ -1,3 +1,3 @@
-[submodule "vOpenCV"]
+[submodule "_common/vOpenCV"]
 	path = _common/vOpenCV
-	url = https://vinjn@github.com/vinjn/vOpenCV.git
+	url = https://github.com/vinjn/vOpenCV

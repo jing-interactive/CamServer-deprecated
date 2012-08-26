@@ -18,15 +18,16 @@ using namespace cv;
 
 void VideoApp::run()
 {	
-	MiniTimer timer;
-	MiniTimer timer_total;
+	MiniTimer timer(theConfig.log_file);
+	MiniTimer timer_total(theConfig.log_file);
 	int _ms_counter = 0;
 	int _frm_counter = 0;
 	int fps=0;
 
 	while (app_running)
-	{ 
-		MiniLog("\n");
+	{
+		if (theConfig.log_file)
+			MiniLog("\n");
 
 		timer.resetStartTime();
 		timer_total.resetStartTime();

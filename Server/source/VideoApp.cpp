@@ -34,7 +34,7 @@ bool VideoGrabThread::is_dirty()
 
 void VideoGrabThread::threadedFunction()
 {
-	MiniTimer timer;
+	MiniTimer timer(theConfig.log_file);
 	int frame_counter = 0;
 	int ms_counter = 0;	
 	while(true)

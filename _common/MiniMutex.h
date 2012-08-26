@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _MINI_MUTEX_H_
+#define _MINI_MUTEX_H_
 
 #include <windows.h>
 
@@ -95,3 +96,5 @@ public:
 private:
 	HANDLE _handle;
 };
+
+#endif //_MINI_MUTEX_H_

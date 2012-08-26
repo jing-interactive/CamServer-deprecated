@@ -9,9 +9,9 @@
 #endif
  
 //uncomment this if u have "MiniLog.h"
-//#define USING_FLO_WRITE
+//#define USING_MINI_LOG
 
-#ifdef USING_FLO_WRITE
+#ifdef USING_MINI_LOG
 #include "MiniLog.h"
 #else
 #include <stdio.h>
@@ -75,4 +75,4 @@ private:
 	bool _log_enabled;
 };
 
-#endif
+#endif	//_MINI_TIMER_H_

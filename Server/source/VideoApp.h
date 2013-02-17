@@ -89,6 +89,7 @@ struct VideoApp
 	void onParamAuto(int v);
 
 	void run();
+    void renderMainWindow();
 
 private:
 	void parse_args(int argc, char** argv);

@@ -2,8 +2,10 @@
 #include "AppConfig.h"
 #include "UI.h"
 #include "MiniTimer.h"
+#include <opencv2/flann/logger.h>
 
 using namespace cv;
+using cvflann::Logger;
 
 #ifndef WIN32
 #define VK_BACK 8
@@ -27,7 +29,11 @@ void VideoApp::run()
 	while (app_running)
 	{
 		if (theConfig.log_file)
+        {
 			MiniLog("\n");
+            //todo: replace MiniLog with 
+            //Logger::info();
+        }
 
 		timer.resetStartTime();
 		timer_total.resetStartTime();
@@ -245,4 +251,9 @@ void VideoApp::run()
 
 	theConfig.save_to(CONFIG_FILE);
 	cvDestroyAllWindows();
+}
+
+void VideoApp::renderMainWindow()
+{
+    //todo:
 }

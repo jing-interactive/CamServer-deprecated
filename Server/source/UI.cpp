@@ -20,6 +20,7 @@ namespace monitor_gui
 
 	void onMonitorMouse(int Event,int x,int y,int flags,void* param )
 	{
+        //todo: why 1000?
 		if (x < 0 || x > 1000)
 			x = 0;
 		else if (x > theApp.HalfWidth ) x = theApp.HalfWidth;
@@ -38,6 +39,7 @@ namespace monitor_gui
 			{
 				theApp.selected = NULL;
 
+                //todo
 				for (int i=0;i<4;i++)
 				{
 					cv::Point2f* pt = &theConfig.corners[i];
@@ -61,14 +63,21 @@ namespace monitor_gui
 
 	void* handle = NULL;
 
+    void OpenGlDrawCallback(void* userdata)
+    {
+        theApp.renderMainWindow();
+    }
+
 	void show(bool visible)
 	{
 		if (visible)
 		{
-			namedWindow(MAIN_WINDOW);
+			namedWindow(MAIN_WINDOW, WINDOW_OPENGL);
 			resizeWindow(MAIN_WINDOW,640,480);
 
+            setOpenGlContext(MAIN_WINDOW);
 			setMouseCallback(MAIN_WINDOW,onMonitorMouse);
+            setOpenGlDrawCallback(MAIN_WINDOW, OpenGlDrawCallback);
 			handle = cvGetWindowHandle(MAIN_WINDOW);
 		}
 		else

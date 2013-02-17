@@ -360,6 +360,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\_common\vOpenCV\OpenGL.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\_common\vOpenCV\point2d.h"
 				>
 			</File>

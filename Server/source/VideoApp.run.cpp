@@ -132,10 +132,6 @@ void VideoApp::run()
 					//copy it in case huge blobs generated
 					backModel->init(frame, (void*)&paramMoG);
 				}break;
-			case KINECT_BG:
-				{
-
-				}break;
 			default:
 				break;
 			}
@@ -150,13 +146,6 @@ void VideoApp::run()
 		Mat back;//for render only
 		Mat fore;
 
-		if (theConfig.bg_mode == KINECT_BG)
-		{
-			cv::inRange( frame, Scalar(theConfig.paramDark), Scalar(theConfig.paramBright), kinect_frame );
-			fore = kinect_frame;
-			back = kinect_frame;
-		}
-		else
 		{
 			backModel->setIntParam(0, theConfig.paramBright);
 			backModel->setIntParam(1, theConfig.paramDark);

@@ -27,6 +27,5 @@ namespace param_gui
 	void init();
 
 	void on_realbg(int = 0);
-	void on_kinectbg(int = 0);
 }
 

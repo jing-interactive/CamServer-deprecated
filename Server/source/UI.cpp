@@ -186,15 +186,6 @@ namespace param_gui
 		theApp.onRefreshBack();
 	}
 
-	void on_kinectbg(int t)
-	{
-		if (theConfig.bg_mode != KINECT_BG)
-		{
-			theConfig.bg_mode = KINECT_BG;
-			show(true);			
-		}
-		theApp.onRefreshBack();
-	}
 	ButtonInfo btn_infs[]=
 	{
 		{ w=13, h=35,  "- X -", on_x, &theConfig.paramFlipX},
@@ -211,9 +202,6 @@ namespace param_gui
 		{ w+=dw, h,  "white", on_whitebg, NULL},
 		{ w+=dw, h,  "black", on_blackbg, NULL},
 		{ w+=dw, h,  "diff", on_diffbg, NULL},
-#ifdef KINECT
-		{ w+=dw, h,  "kinect", on_kinectbg, NULL},
-#endif
 	};
 	
 	int num_btns = sizeof(btn_infs)/sizeof(btn_infs[0]);
@@ -275,11 +263,6 @@ namespace param_gui
 					createTrackbar("Darkness",PARAM_WINDOW,&theConfig.paramDark,PARAM_DARK);
 				else if (theConfig.bg_mode == BLACK_BG)
 					createTrackbar("Brightness",PARAM_WINDOW,&theConfig.paramBright,PARAM_BRIGHT);
-				else if (theConfig.bg_mode == KINECT_BG)
-				{
-					createTrackbar("Near",PARAM_WINDOW,&theConfig.paramDark,PARAM_DARK);
-					createTrackbar("Far",PARAM_WINDOW,&theConfig.paramBright,PARAM_BRIGHT);
-				}
 				else
 				{
 					createTrackbar("Below",PARAM_WINDOW,&theConfig.paramDark,PARAM_DARK);

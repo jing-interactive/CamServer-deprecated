@@ -59,7 +59,7 @@ struct VideoApp
 
 	//the Mats
 	cv::Mat total;
-	cv::Mat frame, black_frame, white_frame, kinect_frame;
+	cv::Mat frame, black_frame, white_frame;
 	cv::Mat prevBg;
 	cv::Mat half_raw;
 	cv::Mat half_flip;

@@ -176,18 +176,13 @@ bool VideoApp::init(int argc, char** argv)
 	prevBg.create(half, CV_8UC(channels));
 
 	grayBlob.create(half, CV_8UC(1));
-	kinect_frame.create(half, CV_8UC(1));
 	grayBuffer.create(half, CV_8UC(1));
 
 	black_frame = CV_BLACK;
 	white_frame = CV_WHITE;
-	kinect_frame = CV_GRAY;
 
 	if (theConfig.delay_for_run > 0)					// if necessary
 		SLEEP(theConfig.delay_for_run * 1000);	// sleep before the app shows up
-
-	if (input._InputType == VideoInput::From_Kinect)
-		theConfig.bg_mode = KINECT_BG;
 
 	monitor_gui::show(true);
 	param_gui::show(true);

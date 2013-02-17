@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../../../_common"
-				PreprocessorDefinitions="KINECT;VIDEOINPUT_LIB;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;USING_MINI_LOG"
+				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;USING_MINI_LOG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -63,7 +63,7 @@
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)\$(ProjectName)_d.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="../../../_common/CLNUI;../../../_common/CLEye"
+				AdditionalLibraryDirectories="../../../_common/CLEye"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -123,7 +123,7 @@
 				OmitFramePointers="true"
 				EnableFiberSafeOptimizations="true"
 				AdditionalIncludeDirectories="../../../_common"
-				PreprocessorDefinitions="KINECT;VIDEOINPUT_LIB;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;USING_MINI_LOG"
+				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;USING_MINI_LOG"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -142,7 +142,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="../../../_common/CLNUI;../../../_common/CLEye"
+				AdditionalLibraryDirectories="../../../_common/CLEye"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -393,34 +393,6 @@
 			</File>
 			<File
 				RelativePath="..\..\source\res\resource.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Kinect"
-			>
-			<File
-				RelativePath="..\..\..\_common\CLNUI\CLNUIDevice.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\_common\CLNUI\ofxKinectCLNUI.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\_common\CLNUI\ofxKinectCLNUI.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="videoInput"
-			>
-			<File
-				RelativePath="..\..\..\_common\videoInput\videoInput.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\_common\videoInput\videoInput.h"
 				>
 			</File>
 		</Filter>

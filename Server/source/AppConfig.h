@@ -10,6 +10,8 @@
 
 #define CONFIG_FILE "CamServer.config.xml"
 
+#define VERSION "0.7.0 [Viva OpenGL] "
+
 struct AppConfig
 {
 	AppConfig();

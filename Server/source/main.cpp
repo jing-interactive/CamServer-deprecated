@@ -2,8 +2,6 @@
 #include "VideoApp.h"
 #include "AppConfig.h"
 
-#define VERSION "0.7.0 OpenGL Comes"
-
 void enableMemleakCheck(int breakpt = 0)
 {
 	#if defined _DEBUG && defined _MSC_VER

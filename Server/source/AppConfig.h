@@ -1,5 +1,12 @@
 ﻿#pragma once
 
+//////////////////////////////////////////////////////////////////////////
+#define VERSION "0.7.0 [Viva OpenGL] "
+#define VERSION_OPENGL_COMES
+#undef FACE_DETECTION_ENABLED
+#undef VIDEO_INPUT_LIB_USED
+//////////////////////////////////////////////////////////////////////////
+
 #include <opencv2/core/core.hpp>
 #include <string>
 
@@ -9,8 +16,6 @@
 #define		DIFF_BG	3		//diff 
 
 #define CONFIG_FILE "CamServer.config.xml"
-
-#define VERSION "0.7.0 [Viva OpenGL] "
 
 struct AppConfig
 {

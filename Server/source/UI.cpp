@@ -3,8 +3,6 @@
 #include "AppConfig.h"
 #include "VideoApp.h"
 
-#define VERSION_OPENGL_COMES
-
 using namespace cv;
 
 struct ButtonInfo
@@ -203,13 +201,15 @@ namespace param_gui
 		{ w=13, h=35,  "- X -", on_x, &theConfig.paramFlipX},
 		{ w+=dw, h,  "- Y -", on_y, &theConfig.paramFlipY},
 		{ w+=dw, h,  "tuio", on_tuio, &theConfig.tuio_mode},
+#ifdef FACE_DETECTION_ENABLED
 		{ w+=dw, h,  "face", on_face, &theConfig.face_track},
+#endif
 		{ w+=dw, h,  "hull", on_hull, &theConfig.hull_mode},
 //		{ w+=dw, h,  "gray", on_mode, &theConfig.gray_detect_mode},
 //		{ w=13, h+=dh,  "expo", on_expo, &theConfig.auto_explosure},
-#ifdef WIN32
+#ifdef VIDEO_INPUT_LIB_USED
 		{ w+=dw, h,  "dialog", on_dialog, &minus_one},
-#endif // WIN32
+#endif // VIDEO_INPUT_LIB_USED
 		{ w=13, h+=dh,  "now", on_realbg, NULL},
 		{ w+=dw, h,  "white", on_whitebg, NULL},
 		{ w+=dw, h,  "black", on_blackbg, NULL},

@@ -4,7 +4,6 @@
 #include "MiniTimer.h"
 
 using namespace cv;
-//#define DISABLE_FACE_DETECTION
 
 VideoApp theApp;//global
 
@@ -124,7 +123,7 @@ bool VideoApp::init(int argc, char** argv)
 
 	//theConfig.auto_explosure = _input.getAutoExplosure();
 	/*if (face_track)*/
-#ifndef DISABLE_FACE_DETECTION
+#ifdef FACE_DETECTION_ENABLED
 	if (!haar.init("../../data/haarcascade_frontalface_alt.xml"))
 	{//try another folder
 		haar.init("../data/haarcascade_frontalface_alt.xml");

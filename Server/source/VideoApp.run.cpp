@@ -256,7 +256,7 @@ void VideoApp::renderMainWindow()
 
     std::vector<Point3f> lines;
     {
-#if 0
+#ifndef VERSION_OPENGL_COMES
         const Point2f kk(5,5);
         for (int i=0;i<4;i++)
         {

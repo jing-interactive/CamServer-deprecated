@@ -4,7 +4,8 @@
 
 #ifdef WIN32
 #pragma comment(lib,"VFW32.lib")
-#pragma comment(lib,"comctl32.lib" )
+#pragma comment(lib,"comctl32.lib")
+#pragma comment(lib,"glu32.lib")
 #ifdef _DEBUG
 #pragma comment(lib,"IlmImfd.lib")
 #pragma comment(lib,"libjasperd.lib")

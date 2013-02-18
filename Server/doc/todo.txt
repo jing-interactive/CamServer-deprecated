@@ -24,6 +24,5 @@ to do
 23.消除抖动
 24.更新osc_protocol.txt
 [WNF]25.与KinServer接口一致
-26.精简dll依赖
-    OpenCV  world module?
+[done]26.精简dll依赖，使用静态库
 27.OpenGL渲染

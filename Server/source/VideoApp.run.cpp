@@ -85,11 +85,13 @@ void VideoApp::run()
 		if (theConfig.corners[0] == cv::Point2f(0,0) && theConfig.corners[1] == cv::Point2f(HalfWidth,0)
 			&& theConfig.corners[3] == cv::Point2f(0,HalfHeight) && theConfig.corners[2] == cv::Point2f(HalfWidth,HalfHeight)
 			)
-		{//original ROI (region of interest), it saves time
+		{
+            // if original ROI (region of interest), it saves time
 			half_raw.copyTo(frame);
 		}
 		else
-		{//needs perspective transform
+		{
+            // needs perspective transform
 			warpPerspective(half_raw, frame, Mat(warp_matrix), half);
 //			cvWarpPerspective(half_raw, frame, warp_matrix);
 		}
@@ -149,9 +151,6 @@ void VideoApp::run()
 			timer.profileFunction("haar.find");
 		}
 
-		Mat back;//for render only
-		Mat fore;
-
 		{
 			backModel->setIntParam(0, theConfig.paramBright);
 			backModel->setIntParam(1, theConfig.paramDark);
@@ -205,26 +204,17 @@ void VideoApp::run()
 
 		if (monitorVisible)
 		{
-			half_raw.copyTo(total(roi[0]));
-			frame.copyTo(total(roi[1]));
-			vFastCopyImageTo(fore, total, roi[2]);
-			vFastCopyImageTo(back, total, roi[3]);
+            setOpenGlContext(MAIN_WINDOW);
 
-			const Point2f kk(5,5);
-			for (int i=0;i<4;i++)
-			{
-				line(total, theConfig.corners[i], theConfig.corners[(i+1)%4], CV_RGB(255,0,0),2);
-				rectangle(total, theConfig.corners[i] - kk, theConfig.corners[i] + kk, CV_RGB(255,0,0), CV_FILLED);
-			}
-			if (selected)
-				rectangle(total, *selected - kk, *selected + kk, CV_RGB(0,0,255), CV_FILLED);
+            mTexMainWindows[0]->copyFrom(half_raw);
+            mTexMainWindows[1]->copyFrom(frame);
+            mTexMainWindows[2]->copyFrom(fore);
+            mTexMainWindows[3]->copyFrom(back);
 
-			const int spac = HalfWidth*0.1;
-			line(total, cvPoint(HalfWidth-spac, HalfHeight), cvPoint(HalfWidth+spac, HalfHeight), CV_BLUE);
-			line(total, cvPoint(HalfWidth, HalfHeight-spac), cvPoint(HalfWidth, HalfHeight+spac), CV_BLUE);
-			imshow(MAIN_WINDOW,total);
-
-			timer.profileFunction("show Monitor");
+            updateWindow(MAIN_WINDOW);
+            // InvalidateRect --> issue WM_PAINT
+            // HighGUIProc --> drawGl(window); 
+            // VideoApp::renderMainWindow
 		}
 
 		_frm_counter++;
@@ -255,5 +245,43 @@ void VideoApp::run()
 
 void VideoApp::renderMainWindow()
 {
-    //todo:
+    if (!monitorVisible)
+        return;
+
+    mCam2d.setupProjectionMatrix();
+    for (int i=0;i<4;i++)
+    {
+        render(*mTexMainWindows[i], mRoiMainWindows[i]);
+    }
+
+    std::vector<Point3f> lines;
+    {
+#if 0
+        const Point2f kk(5,5);
+        for (int i=0;i<4;i++)
+        {
+            line(total, theConfig.corners[i], theConfig.corners[(i+1)%4], CV_RGB(255,0,0),2);
+            rectangle(total, theConfig.corners[i] - kk, theConfig.corners[i] + kk, CV_RGB(255,0,0), CV_FILLED);
+        }
+        if (selected)
+            rectangle(total, *selected - kk, *selected + kk, CV_RGB(0,0,255), CV_FILLED);
+#endif
+        const float spac = 0.05f;
+        lines.push_back(Point3f(0.5f-spac,  0.5f,       0));
+        lines.push_back(Point3f(0.5f+spac,  0.5f,       0));
+        lines.push_back(Point3f(0.5f,       0.5f-spac,  0));
+        lines.push_back(Point3f(0.5f,       0.5f+spac,  0));
+    }
+    mVboLines->setVertexArray(lines);
+    render(*mVboLines, RenderMode::LINES, CV_BLUE);
+}
+
+void VideoApp::setupOpenglResources()
+{
+    setOpenGlContext(MAIN_WINDOW);
+    for (int i=0;i<4;i++)
+    {
+        mTexMainWindows[i] = new cv::GlTexture;
+    }
+    mVboLines = new cv::GlArrays;
 }

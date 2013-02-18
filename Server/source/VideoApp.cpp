@@ -147,10 +147,11 @@ bool VideoApp::init(int argc, char** argv)
 	HalfHeight = size.height*0.75;
 	half = cv::Size(HalfWidth-k, HalfHeight-k);
 
-	roi[0] = cv::Rect(Point(k,k), half);
-	roi[1] = cv::Rect(Point(k+HalfWidth,k), half);
-	roi[2] = cv::Rect(Point(k,k+HalfHeight), half);
-	roi[3] = cv::Rect(Point(k+HalfWidth,k+HalfHeight), half);	
+    cv::Size_<double> halfRoiSize(0.5, 0.5);
+	mRoiMainWindows[0] = cv::Rect_<double>(Point2d(0  ,0),      halfRoiSize);
+	mRoiMainWindows[1] = cv::Rect_<double>(Point2d(0.5,0),      halfRoiSize);
+	mRoiMainWindows[2] = cv::Rect_<double>(Point2d(0  ,0.5),    halfRoiSize);
+	mRoiMainWindows[3] = cv::Rect_<double>(Point2d(0.5, 0.5),   halfRoiSize);	
 
 	dstQuad[0] = Point(0,0);
 	dstQuad[1] = Point(HalfWidth,0);
@@ -169,13 +170,11 @@ bool VideoApp::init(int argc, char** argv)
 	onParamFlip(theConfig.paramFlipX, theConfig.paramFlipY);
 
 	half_raw.create(half, CV_8UC(channels));
-	half_flip.create(half, CV_8UC(channels));
 	frame.create(half, CV_8UC(channels));
 	black_frame.create(half, CV_8UC(channels));
 	white_frame.create(half, CV_8UC(channels));
 	prevBg.create(half, CV_8UC(channels));
 
-	grayBlob.create(half, CV_8UC(1));
 	grayBuffer.create(half, CV_8UC(1));
 
 	black_frame = CV_BLACK;

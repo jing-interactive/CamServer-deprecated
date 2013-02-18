@@ -54,7 +54,6 @@ struct VideoApp
 	cv::Point2f* selected;
 	cv::Point2f dstQuad[4];
 	vector<vBlob> blobs;
-	cv::Rect roi[4];
 	CvMat* warp_matrix;
 
 	//the Mats
@@ -62,9 +61,10 @@ struct VideoApp
 	cv::Mat frame, black_frame, white_frame;
 	cv::Mat prevBg;
 	cv::Mat half_raw;
-	cv::Mat half_flip;
-	cv::Mat grayBlob;
 	cv::Mat grayBuffer;
+
+    cv::Mat back;//for render only
+    cv::Mat fore;
 
 	cv::Size size;
 	int channels;
@@ -89,12 +89,22 @@ struct VideoApp
 	void onParamAuto(int v);
 
 	void run();
-    void renderMainWindow();
 
 private:
 	void parse_args(int argc, char** argv);
 	void send_custom_msg();
 	void send_tuio_msg();
+
+    // opengl related
+public:
+    void renderMainWindow();
+    void setupOpenglResources();
+
+private:
+    cv::Ptr<cv::GlTexture>  mTexMainWindows[4];
+    cv::Rect_<double>       mRoiMainWindows[4];
+    cv::Ptr<cv::GlArrays>   mVboLines;
+    cv::GlCamera            mCam2d;
 };
 
 extern VideoApp theApp;

@@ -2,7 +2,7 @@
 #include "VideoApp.h"
 #include "AppConfig.h"
 
-#define VERSION "0.6.6"
+#define VERSION "0.7.0 OpenGL Comes"
 
 void enableMemleakCheck(int breakpt = 0)
 {

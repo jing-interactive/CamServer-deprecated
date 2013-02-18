@@ -19,9 +19,11 @@ to do
 18.增加特定颜色模式
 [done]19.用Mat取代IplImage
 20.hole/contour之间要区分
-21.提高fps/优化highpass算法的复杂度
+[WNF]21.提高fps/优化highpass算法的复杂度
 22.使用新的Background API
 23.消除抖动
 24.更新osc_protocol.txt
-25.与KinServer接口一致
+[WNF]25.与KinServer接口一致
 26.精简dll依赖
+    OpenCV  world module?
+27.OpenGL渲染

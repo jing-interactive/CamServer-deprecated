@@ -3,6 +3,8 @@
 #include "AppConfig.h"
 #include "VideoApp.h"
 
+#define VERSION_OPENGL_COMES
+
 using namespace cv;
 
 struct ButtonInfo
@@ -73,10 +75,11 @@ namespace monitor_gui
 		if (visible)
 		{
 			namedWindow(MAIN_WINDOW, WINDOW_OPENGL);
-			resizeWindow(MAIN_WINDOW,640,480);
-
-            setOpenGlContext(MAIN_WINDOW);
-			setMouseCallback(MAIN_WINDOW,onMonitorMouse);
+			resizeWindow(MAIN_WINDOW, 640, 480);
+            theApp.setupOpenglResources();
+#ifdef VERSION_OPENGL_COMES
+			setMouseCallback(MAIN_WINDOW, onMonitorMouse);
+#endif
             setOpenGlDrawCallback(MAIN_WINDOW, OpenGlDrawCallback);
 			handle = cvGetWindowHandle(MAIN_WINDOW);
 		}

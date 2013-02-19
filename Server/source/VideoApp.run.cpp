@@ -240,7 +240,10 @@ void VideoApp::run()
 	}
 
 	theConfig.save_to(CONFIG_FILE);
-	cvDestroyAllWindows();
+
+    setupOpenglResources();// fix pure virtual function call occurred when built statically
+
+    cv::destroyAllWindows();
 }
 
 void VideoApp::renderMainWindow()

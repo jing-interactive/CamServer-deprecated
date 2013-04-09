@@ -14,7 +14,7 @@ AppConfig theConfig;
 
 AppConfig::AppConfig():CLIENT("localhost")
 {
-	PORT = 7777;
+	PORT = 3333;
 	fixed_back_mode = TRUE;
 	tuio_mode = TRUE;
 	face_track = FALSE;
@@ -57,10 +57,10 @@ std::string AppConfig::parse_args(int argc, char** argv)
 	{
 		"{delay||0|delay ms}"
 		"{client||localhost|specify the client ip}"
-		"{port||7777|specify the client port}"
+		"{port||3333|specify the client port}"
 		"{log||false|write log to file}"
-		"{minim||false|minim windows mode}"
-		"{finger||false|enable finger track}"
+		//"{minim||false|minim windows mode}"
+		//"{finger||false|enable finger track}"
 //		"{hand||false|enable hand track}"
 //		"{a|aut|false|auto background mode}"
 

@@ -1,4 +1,4 @@
-﻿#include "../../_common/vOpenCV/cvButtons.h"
+﻿#include "../../_common/OpenCV/cvButtons.h"
 #include "UI.h"
 #include "AppConfig.h"
 #include "VideoApp.h"

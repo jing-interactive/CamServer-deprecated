@@ -206,7 +206,7 @@
 				OmitFramePointers="true"
 				EnableFiberSafeOptimizations="true"
 				AdditionalIncludeDirectories="../../../_common;$(OPENCV_INCLUDE)"
-				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;USING_MINI_LOG"
+				PreprocessorDefinitions="STAITC_RELEASE;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;USING_MINI_LOG"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -412,42 +412,34 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="vOpenCV"
+			Name="OpenCV"
 			>
 			<File
-				RelativePath="..\..\..\_common\vOpenCV\Blob.h"
+				RelativePath="..\..\..\_common\OpenCV\Blob.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\vOpenCV\BlobTracker.cpp"
+				RelativePath="..\..\..\_common\OpenCV\BlobTracker.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\vOpenCV\BlobTracker.h"
+				RelativePath="..\..\..\_common\OpenCV\BlobTracker.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\vOpenCV\cvButtons.cpp"
+				RelativePath="..\..\..\_common\OpenCV\cvButtons.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\vOpenCV\cvButtons.h"
+				RelativePath="..\..\..\_common\OpenCV\cvButtons.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\vOpenCV\OpenCV.cpp"
+				RelativePath="..\..\..\_common\OpenCV\OpenCV.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\vOpenCV\OpenCV.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\_common\vOpenCV\OpenGL.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\_common\vOpenCV\point2d.h"
+				RelativePath="..\..\..\_common\OpenCV\OpenCV.h"
 				>
 			</File>
 		</Filter>

@@ -1,1 +1,0 @@
-Linux version CamServer is to be supported soon.

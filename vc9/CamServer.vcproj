@@ -18,7 +18,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="../../bin/Win32-VisualStudio"
+			OutputDirectory="../bin"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="2"
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../../_common;$(OPENCV_INCLUDE)"
+				AdditionalIncludeDirectories="../_common;$(OPENCV_INCLUDE)"
 				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;USING_MINI_LOG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -93,7 +93,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="../../bin/Win32-VisualStudio"
+			OutputDirectory="../bin"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="2"
@@ -122,7 +122,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				EnableFiberSafeOptimizations="true"
-				AdditionalIncludeDirectories="../../../_common;$(OPENCV_INCLUDE)"
+				AdditionalIncludeDirectories="../_common;$(OPENCV_INCLUDE)"
 				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;USING_MINI_LOG"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -205,7 +205,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				EnableFiberSafeOptimizations="true"
-				AdditionalIncludeDirectories="../../../_common;$(OPENCV_INCLUDE)"
+				AdditionalIncludeDirectories="../_common;$(OPENCV_INCLUDE)"
 				PreprocessorDefinitions="STAITC_RELEASE;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;USING_MINI_LOG"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -267,19 +267,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\_common\MiniLog.h"
+				RelativePath="..\_common\MiniLog.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\MiniMutex.h"
+				RelativePath="..\_common\MiniMutex.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\MiniThread.h"
+				RelativePath="..\_common\MiniThread.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\MiniTimer.h"
+				RelativePath="..\_common\MiniTimer.h"
 				>
 			</File>
 		</Filter>
@@ -287,126 +287,126 @@
 			Name="ofxOsc"
 			>
 			<File
-				RelativePath="..\..\..\_common\ofxOsc\ofxOsc.h"
+				RelativePath="..\_common\ofxOsc\ofxOsc.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\ofxOsc\ofxOscArg.h"
+				RelativePath="..\_common\ofxOsc\ofxOscArg.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\ofxOsc\ofxOscBundle.cpp"
+				RelativePath="..\_common\ofxOsc\ofxOscBundle.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\ofxOsc\ofxOscBundle.h"
+				RelativePath="..\_common\ofxOsc\ofxOscBundle.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\ofxOsc\ofxOscMessage.cpp"
+				RelativePath="..\_common\ofxOsc\ofxOscMessage.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\ofxOsc\ofxOscMessage.h"
+				RelativePath="..\_common\ofxOsc\ofxOscMessage.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\ofxOsc\ofxOscReceiver.cpp"
+				RelativePath="..\_common\ofxOsc\ofxOscReceiver.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\ofxOsc\ofxOscReceiver.h"
+				RelativePath="..\_common\ofxOsc\ofxOscReceiver.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\ofxOsc\ofxOscSender.cpp"
+				RelativePath="..\_common\ofxOsc\ofxOscSender.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\ofxOsc\ofxOscSender.h"
+				RelativePath="..\_common\ofxOsc\ofxOscSender.h"
 				>
 			</File>
 			<Filter
 				Name="oscpack"
 				>
 				<File
-					RelativePath="..\..\..\_common\ofxOsc\oscpack\IpEndpointName.cpp"
+					RelativePath="..\_common\ofxOsc\oscpack\IpEndpointName.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\_common\ofxOsc\oscpack\IpEndpointName.h"
+					RelativePath="..\_common\ofxOsc\oscpack\IpEndpointName.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\_common\ofxOsc\oscpack\MessageMappingOscPacketListener.h"
+					RelativePath="..\_common\ofxOsc\oscpack\MessageMappingOscPacketListener.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\_common\ofxOsc\oscpack\win32\NetworkingUtils.cpp"
+					RelativePath="..\_common\ofxOsc\oscpack\win32\NetworkingUtils.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\_common\ofxOsc\oscpack\NetworkingUtils.h"
+					RelativePath="..\_common\ofxOsc\oscpack\NetworkingUtils.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\_common\ofxOsc\oscpack\OscException.h"
+					RelativePath="..\_common\ofxOsc\oscpack\OscException.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\_common\ofxOsc\oscpack\OscHostEndianness.h"
+					RelativePath="..\_common\ofxOsc\oscpack\OscHostEndianness.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\_common\ofxOsc\oscpack\OscOutboundPacketStream.cpp"
+					RelativePath="..\_common\ofxOsc\oscpack\OscOutboundPacketStream.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\_common\ofxOsc\oscpack\OscOutboundPacketStream.h"
+					RelativePath="..\_common\ofxOsc\oscpack\OscOutboundPacketStream.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\_common\ofxOsc\oscpack\OscPacketListener.h"
+					RelativePath="..\_common\ofxOsc\oscpack\OscPacketListener.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\_common\ofxOsc\oscpack\OscPrintReceivedElements.cpp"
+					RelativePath="..\_common\ofxOsc\oscpack\OscPrintReceivedElements.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\_common\ofxOsc\oscpack\OscPrintReceivedElements.h"
+					RelativePath="..\_common\ofxOsc\oscpack\OscPrintReceivedElements.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\_common\ofxOsc\oscpack\OscReceivedElements.cpp"
+					RelativePath="..\_common\ofxOsc\oscpack\OscReceivedElements.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\_common\ofxOsc\oscpack\OscReceivedElements.h"
+					RelativePath="..\_common\ofxOsc\oscpack\OscReceivedElements.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\_common\ofxOsc\oscpack\OscTypes.cpp"
+					RelativePath="..\_common\ofxOsc\oscpack\OscTypes.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\_common\ofxOsc\oscpack\OscTypes.h"
+					RelativePath="..\_common\ofxOsc\oscpack\OscTypes.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\_common\ofxOsc\oscpack\PacketListener.h"
+					RelativePath="..\_common\ofxOsc\oscpack\PacketListener.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\_common\ofxOsc\oscpack\TimerListener.h"
+					RelativePath="..\_common\ofxOsc\oscpack\TimerListener.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\_common\ofxOsc\oscpack\win32\UdpSocket.cpp"
+					RelativePath="..\_common\ofxOsc\oscpack\win32\UdpSocket.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\_common\ofxOsc\oscpack\UdpSocket.h"
+					RelativePath="..\_common\ofxOsc\oscpack\UdpSocket.h"
 					>
 				</File>
 			</Filter>
@@ -415,47 +415,31 @@
 			Name="OpenCV"
 			>
 			<File
-				RelativePath="..\..\..\_common\OpenCV\Blob.h"
+				RelativePath="..\_common\OpenCV\Blob.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\OpenCV\BlobTracker.cpp"
+				RelativePath="..\_common\OpenCV\BlobTracker.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\OpenCV\BlobTracker.h"
+				RelativePath="..\_common\OpenCV\BlobTracker.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\OpenCV\cvButtons.cpp"
+				RelativePath="..\_common\OpenCV\cvButtons.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\OpenCV\cvButtons.h"
+				RelativePath="..\_common\OpenCV\cvButtons.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\OpenCV\OpenCV.cpp"
+				RelativePath="..\_common\OpenCV\OpenCV.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\_common\OpenCV\OpenCV.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="doc"
-			>
-			<File
-				RelativePath="..\..\doc\osc_protocol.txt"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\README.md"
-				>
-			</File>
-			<File
-				RelativePath="..\..\doc\todo.txt"
+				RelativePath="..\_common\OpenCV\OpenCV.h"
 				>
 			</File>
 		</Filter>
@@ -463,48 +447,48 @@
 			Name="res"
 			>
 			<File
-				RelativePath="..\..\source\res\CamServer.rc"
+				RelativePath="..\src\res\CamServer.rc"
 				>
 			</File>
 			<File
-				RelativePath="..\..\source\res\icon.ico"
+				RelativePath="..\src\res\icon.ico"
 				>
 			</File>
 			<File
-				RelativePath="..\..\source\res\resource.h"
+				RelativePath="..\src\res\resource.h"
 				>
 			</File>
 		</Filter>
 		<File
-			RelativePath="..\..\source\AppConfig.cpp"
+			RelativePath="..\src\AppConfig.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\source\AppConfig.h"
+			RelativePath="..\src\AppConfig.h"
 			>
 		</File>
 		<File
-			RelativePath="..\..\source\main.cpp"
+			RelativePath="..\src\main.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\source\UI.cpp"
+			RelativePath="..\src\UI.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\source\UI.h"
+			RelativePath="..\src\UI.h"
 			>
 		</File>
 		<File
-			RelativePath="..\..\source\VideoApp.cpp"
+			RelativePath="..\src\VideoApp.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\source\VideoApp.h"
+			RelativePath="..\src\VideoApp.h"
 			>
 		</File>
 		<File
-			RelativePath="..\..\source\VideoApp.run.cpp"
+			RelativePath="..\src\VideoApp.run.cpp"
 			>
 		</File>
 	</Files>

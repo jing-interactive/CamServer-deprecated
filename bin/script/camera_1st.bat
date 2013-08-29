@@ -1,2 +1,2 @@
-cd ../bin/Win32-VisualStudio
+cd ..
 CamServer 0

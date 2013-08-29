@@ -1,4 +1,4 @@
-﻿#include "../../_common/OpenCV/cvButtons.h"
+﻿#include "../_common/OpenCV/cvButtons.h"
 #include "UI.h"
 #include "AppConfig.h"
 #include "VideoApp.h"
@@ -20,7 +20,7 @@ namespace monitor_gui
 
 	void onMonitorMouse(int Event,int x,int y,int flags,void* param )
 	{
-        //todo: why 1000?
+        // TODO: why 1000?
 		if (x < 0 || x > 1000)
 			x = 0;
 		else if (x > theApp.HalfWidth ) x = theApp.HalfWidth;

@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CamServer", "CamServer.vcproj", "{895C363F-54A5-4D5C-A3F3-D43882A9A169}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ofxOsc", "..\_common\ofxOsc\ofxOsc.vcproj", "{1C61739D-8269-467C-A1D7-28319DFED3D8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -16,6 +18,12 @@ Global
 		{895C363F-54A5-4D5C-A3F3-D43882A9A169}.Release|Win32.Build.0 = Release|Win32
 		{895C363F-54A5-4D5C-A3F3-D43882A9A169}.StaticRelease|Win32.ActiveCfg = StaticRelease|Win32
 		{895C363F-54A5-4D5C-A3F3-D43882A9A169}.StaticRelease|Win32.Build.0 = StaticRelease|Win32
+		{1C61739D-8269-467C-A1D7-28319DFED3D8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1C61739D-8269-467C-A1D7-28319DFED3D8}.Debug|Win32.Build.0 = Debug|Win32
+		{1C61739D-8269-467C-A1D7-28319DFED3D8}.Release|Win32.ActiveCfg = Release|Win32
+		{1C61739D-8269-467C-A1D7-28319DFED3D8}.Release|Win32.Build.0 = Release|Win32
+		{1C61739D-8269-467C-A1D7-28319DFED3D8}.StaticRelease|Win32.ActiveCfg = Release|Win32
+		{1C61739D-8269-467C-A1D7-28319DFED3D8}.StaticRelease|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

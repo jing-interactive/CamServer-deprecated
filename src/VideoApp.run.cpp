@@ -48,7 +48,7 @@ void VideoApp::run()
 			resize(raw, half_raw, half);
 		timer.profileFunction("cvResize");
 
-		int key = cvWaitKey(1);
+        int key = cv::waitKey(1);
 
 		switch (key)
 		{
@@ -233,7 +233,7 @@ void VideoApp::run()
 		cv::Mat m = param_gui::setting;
 		vDrawText(m, 20,20, g_buffer);
 
-		imshow(PARAM_WINDOW, param_gui::setting);
+        cv::imshow(PARAM_WINDOW, param_gui::setting);
 		timer.profileFunction("show Param Panel");
 
 		timer_total.profileFunction("total"); 

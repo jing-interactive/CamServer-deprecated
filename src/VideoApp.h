@@ -2,12 +2,12 @@
 
 //#define MODE_320X240	//always 320*240
 
-#include "../../_common/OpenCV/OpenCV.h"
-#include "../../_common/OpenCV/cvButtons.h"
-#include "../../_common/OpenCV/BlobTracker.h"
+#include "../_common/OpenCV/OpenCV.h"
+#include "../_common/OpenCV/cvButtons.h"
+#include "../_common/OpenCV/BlobTracker.h"
 
-#include "../../_common/MiniThread.h"
-#include "../../_common/ofxOsc/ofxOsc.h"
+#include "../_common/MiniThread.h"
+#include "../_common/ofxOsc/ofxOsc.h"
 
 #ifdef WIN32 
 #define SLEEP(ms) ::Sleep((ms))

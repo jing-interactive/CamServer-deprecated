@@ -56,7 +56,7 @@ namespace monitor_gui
 				{
 					theApp.selected->x = x;
 					theApp.selected->y = y;
-					vGetPerspectiveMatrix(theApp.warp_matrix, theConfig.corners, theApp.dstQuad);
+                    theApp.warp_matrix = cv::getPerspectiveTransform(theConfig.corners, theApp.dstQuad);
 				}
 			}
 	}
@@ -206,7 +206,6 @@ namespace param_gui
 #endif
 		{ w+=dw, h,  "hull", on_hull, &theConfig.hull_mode},
 //		{ w+=dw, h,  "gray", on_mode, &theConfig.gray_detect_mode},
-//		{ w=13, h+=dh,  "expo", on_expo, &theConfig.auto_explosure},
 #ifdef VIDEO_INPUT_LIB_USED
 		{ w+=dw, h,  "dialog", on_dialog, &minus_one},
 #endif // VIDEO_INPUT_LIB_USED
@@ -222,13 +221,13 @@ namespace param_gui
 	{
 		setting = CV_GRAY;
 		buttons.paintButtons(&(IplImage)setting);
-		rectangle(setting, cvPoint(13,100), cvPoint(387,104), CV_RGB(122,10,10), CV_FILLED);
+		rectangle(setting, cvPoint(13,100), cvPoint(387,104), Scalar(122,10,10), CV_FILLED);
 
 		const int x0 = 13;
 		const int y0 = 70;
 
 		int idx = theConfig.bg_mode;
-		rectangle(setting, cvPoint(x0+dw*idx,y0), cvPoint(x0+dw*idx+_w,y0+_h), CV_RGB(10,10,122), 3);
+		rectangle(setting, cvPoint(x0+dw*idx,y0), cvPoint(x0+dw*idx+_w,y0+_h), Scalar(10,10,122), 3);
 	}
 
 	void init()

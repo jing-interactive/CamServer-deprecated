@@ -7,7 +7,8 @@
 #undef VIDEO_INPUT_LIB_USED
 //////////////////////////////////////////////////////////////////////////
 
-#include <opencv2/core/core.hpp>
+#include <opencv2/core/utility.hpp>
+
 #include <string>
 
 #define		REAL_BG	0		//real time background
@@ -26,6 +27,7 @@ struct AppConfig
 	bool load_from(char* filename);
 	bool save_to(char* filename);
 
+    int breakpt;
 	int bg_mode;
 
 	std::string CLIENT;
@@ -34,7 +36,6 @@ struct AppConfig
 	int tuio_mode;
 	int face_track;
 	int hand_track;
-	int finger_track;
 	int hull_mode;
 	int gray_detect_mode;
 	int minim_window;
@@ -43,7 +44,6 @@ struct AppConfig
 	int paramFlipY;
 	int paramDark;
 	int paramBright;
-	int paramAuto;
 	int paramBlur1;
 	int paramBlur2;
 	int paramNoise;

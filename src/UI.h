@@ -5,7 +5,6 @@
 
 #define PARAM_DARK 255
 #define PARAM_BRIGHT 255
-#define PARAM_AUTO 40
 #define PARAM_BLUR1 80
 #define PARAM_BLUR2 20
 #define PARAM_NOISE 3 

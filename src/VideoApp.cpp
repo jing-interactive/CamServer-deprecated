@@ -65,14 +65,12 @@ void VideoGrabThread::threadedFunction()
 
 VideoApp::~VideoApp()
 {
-	cvReleaseMat(&warp_matrix);
 }
 
 VideoApp::VideoApp()
 {
 	monitorVisible = true; 
 	selected = NULL;
-	warp_matrix = cvCreateMat(3, 3, CV_32FC1);
 
 	to_reset_back = false;
 
@@ -164,7 +162,7 @@ bool VideoApp::init(int argc, char** argv)
 		theConfig.corners[3] = cv::Point2f(0,HalfHeight);
 		theConfig.corners[2] = cv::Point2f(HalfWidth,HalfHeight);
 	}
-	vGetPerspectiveMatrix(warp_matrix, theConfig.corners, dstQuad);
+    warp_matrix = cv::getPerspectiveTransform(theConfig.corners, dstQuad);
 
 	onParamFlip(theConfig.paramFlipX, theConfig.paramFlipY);
 
@@ -210,22 +208,6 @@ void VideoApp::onParamFlip(int fx, int fy)
 			backModel->init(temp);
 		}
 	}
-}
-
-void VideoApp::onParamAuto(int v)
-{	
-	paramMoG.win_size = (v+1)*50; //200;
-	paramMoG.n_gauss = 3; //5;
-	paramMoG.bg_threshold = 0.3; //0.7;
-	paramMoG.std_threshold = 2; //2.5;
-	paramMoG.minArea = 100.f; //15.f;
-	paramMoG.weight_init = 0.01; //0.05;
-	paramMoG.variance_init = 30; //30*30;
-
-	backModel.release();	
-	backModel = new vBackGaussian();
-	//backModel = new vBackFGDStat();
-	onRefreshBack();
 }
 
 #define addFloatX(num) m.addFloatArg(num/_W)

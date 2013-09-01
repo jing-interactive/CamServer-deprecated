@@ -41,8 +41,7 @@ struct VideoApp
 	VideoInput input;
 
 	//the important objects
-	vHaarFinder haar;
-	vFingerDetector finger;
+	HaarFinder haar;
 	vBlobTracker blobTracker;
 	ofxOscSender sender;
 
@@ -54,7 +53,7 @@ struct VideoApp
 	cv::Point2f* selected;
 	cv::Point2f dstQuad[4];
 	vector<vBlob> blobs;
-	CvMat* warp_matrix;
+	cv::Mat warp_matrix;
 
 	//the Mats
 	cv::Mat total;
@@ -72,7 +71,6 @@ struct VideoApp
 	bool monitorVisible;
 
 	cv::Ptr<IBackGround> backModel;
-	CvGaussBGStatModelParams paramMoG;
 
 	int HalfWidth, HalfHeight;
 	bool to_reset_back;
@@ -86,7 +84,6 @@ struct VideoApp
 
 	void onRefreshBack();
 	void onParamFlip(int fx, int fy);
-	void onParamAuto(int v);
 
 	void run();
 
@@ -101,10 +98,10 @@ public:
     void setupOpenglResources();
 
 private:
-    cv::Ptr<cv::GlTexture>  mTexMainWindows[4];
+    cv::Ptr<cv::ogl::Texture2D>  mTexMainWindows[4];
     cv::Rect_<double>       mRoiMainWindows[4];
-    cv::Ptr<cv::GlArrays>   mVboLines;
-    cv::GlCamera            mCam2d;
+    cv::Ptr<cv::ogl::Arrays>   mVboLines;
+    //cv::GlCamera            mCam2d;
 };
 
 extern VideoApp theApp;

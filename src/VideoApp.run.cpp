@@ -2,21 +2,11 @@
 #include "AppConfig.h"
 #include "UI.h"
 #include "MiniTimer.h"
-#include <opencv2/flann/logger.h>
+#include "opencv2/flann/logger.h"
+#include "opencv2/core/opengl.hpp"
 
 using namespace cv;
 using cvflann::Logger;
-
-#ifndef WIN32
-#define VK_BACK 8
-#define VK_RETURN 13
-#define VK_ESCAPE 27
-#define VK_SPACE 32
-#define VK_LEFT 37
-#define VK_UP 38
-#define VK_RIGHT 39
-#define VK_DOWN 40
-#endif
 
 void VideoApp::run()
 {	
@@ -63,7 +53,7 @@ void VideoApp::run()
 				theConfig.corners[3] = cv::Point2f(0,HalfHeight);
 				theConfig.corners[2] = cv::Point2f(HalfWidth,HalfHeight);
 
-				vGetPerspectiveMatrix(warp_matrix, theConfig.corners, dstQuad);
+                warp_matrix = cv::getPerspectiveTransform(theConfig.corners, dstQuad);
 
 				onRefreshBack();
 			}break;
@@ -79,7 +69,7 @@ void VideoApp::run()
 			}break;
 		default:break;
 		}
-		vFlip(cv::Mat(half_raw), g_Fx, g_Fy);
+		vFlip(half_raw, g_Fx, g_Fy);
 		timer.profileFunction("cvFlip");
 
 		if (theConfig.corners[0] == cv::Point2f(0,0) && theConfig.corners[1] == cv::Point2f(HalfWidth,0)
@@ -120,25 +110,25 @@ void VideoApp::run()
 			case REAL_BG:
 				{
 					//only real time background needs take care of flip
-					backModel->init(frame, (void*)&paramMoG);
+					backModel->init(frame);
 					g_prevFx = g_Fx;
 					g_prevFy = g_Fy;
 					frame.copyTo(prevBg);
 				}break;
 			case BLACK_BG:
 				{
-					backModel->init(black_frame, (void*)&paramMoG);
+					backModel->init(black_frame);
 					black_frame.copyTo(prevBg); 
 				}break;
 			case WHITE_BG:
 				{
-					backModel->init(white_frame, (void*)&paramMoG);
+					backModel->init(white_frame);
 					white_frame.copyTo(prevBg);
 				}break;
 			case DIFF_BG:
 				{
 					//copy it in case huge blobs generated
-					backModel->init(frame, (void*)&paramMoG);
+					backModel->init(frame);
 				}break;
 			default:
 				break;
@@ -147,7 +137,7 @@ void VideoApp::run()
 
 		if (theConfig.face_track)
 		{
-			haar.find(&(IplImage)frame, theConfig.paramMinArea);
+			haar.find(frame, theConfig.paramMinArea);
 			timer.profileFunction("haar.find");
 		}
 
@@ -171,22 +161,6 @@ void VideoApp::run()
 		int maxArea = minArea+(theConfig.paramMaxArea)*scale;
 		vFindBlobs(grayBuffer, blobs, minArea ,maxArea, theConfig.hull_mode == 1);
 		timer.profileFunction("vFindBlobs");
-
-		if (theConfig.finger_track)
-		{
-			for (unsigned int i=0;i<blobs.size();i++)
-			{
-				bool ffound=finger.findFingers(blobs[i], 12);
-				//	bool hfound=finger.findHands(blobs[0]);
-				if (ffound)
-				{
-					for (int f=0;f<finger.ppico.size();f++)
-					{	
-						circle(frame, finger.ppico[f], 10, vRandomColor());
-					}
-				}
-			}
-		}
 
 		blobTracker.trackBlobs(blobs);
 		timer.profileFunction("blobTracker");
@@ -251,7 +225,7 @@ void VideoApp::renderMainWindow()
     if (!monitorVisible)
         return;
 
-    mCam2d.setupProjectionMatrix();
+    //mCam2d.setupProjectionMatrix();
     for (int i=0;i<4;i++)
     {
         render(*mTexMainWindows[i], mRoiMainWindows[i]);
@@ -276,7 +250,7 @@ void VideoApp::renderMainWindow()
         lines.push_back(Point3f(0.5f,       0.5f+spac,  0));
     }
     mVboLines->setVertexArray(lines);
-    render(*mVboLines, RenderMode::LINES, CV_BLUE);
+    render(*mVboLines, ogl::LINES, CV_BLUE);
 }
 
 void VideoApp::setupOpenglResources()
@@ -284,7 +258,7 @@ void VideoApp::setupOpenglResources()
     setOpenGlContext(MAIN_WINDOW);
     for (int i=0;i<4;i++)
     {
-        mTexMainWindows[i] = new cv::GlTexture;
+        mTexMainWindows[i] = new ogl::Texture2D;
     }
-    mVboLines = new cv::GlArrays;
+    mVboLines = new ogl::Arrays;
 }

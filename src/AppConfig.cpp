@@ -14,12 +14,12 @@ AppConfig theConfig;
 
 AppConfig::AppConfig():CLIENT("localhost")
 {
+    breakpt = 0;
 	PORT = 3333;
 	fixed_back_mode = TRUE;
 	tuio_mode = TRUE;
 	face_track = FALSE;
 	hand_track = FALSE;
-	finger_track = FALSE;
 	hull_mode = FALSE;
 	gray_detect_mode = TRUE;
 	minim_window = FALSE;
@@ -32,7 +32,6 @@ AppConfig::AppConfig():CLIENT("localhost")
 	paramFlipY = 0;
 	paramDark = 220;
 	paramBright = 40;
-	paramAuto = 8;
 	paramBlur1 = 35;
 	paramBlur2 = 1;
 	paramNoise = 0;
@@ -46,54 +45,33 @@ AppConfig::AppConfig():CLIENT("localhost")
 #endif
 };
 
-char* hack_cam_str[]=
-{
-	"c0","c1","c2","c3","c4","c5","c6","c7","c8","c9"
-};
-
 std::string AppConfig::parse_args(int argc, char** argv)
 {
 	const char *keys =
 	{
-		"{delay||0|delay ms}"
-		"{client||localhost|specify the client ip}"
-		"{port||3333|specify the client port}"
-		"{log||false|write log to file}"
-		//"{minim||false|minim windows mode}"
-		//"{finger||false|enable finger track}"
-//		"{hand||false|enable hand track}"
-//		"{a|aut|false|auto background mode}"
-
-		"{1||0|the input source, could be camera_idx/video/picture}"
-		"{help|h|false|display this help text}"
+        "{@source   | 0         |the input source, could be camera_idx/video/picture}"
+		"{delay     | 0         |delay ms}"
+		"{client    | localhost |specify the client ip}"
+		"{port      | 3333      |specify the client port}"
+		"{log       | false     |write log to file}"
+        "{breakpt   | 0         |memory leak detection}"
+		"{help h    | false     |display this help text}"
 	};
-
-	for (int i=1;i<argc;i++)
-	{
-		if (strlen(argv[i]) == 1 && argv[i][0]=='1')
-		{
-			argv[i] = hack_cam_str[argv[i][0]-'0'];
-		}
-	}
 
 	cv::CommandLineParser args(argc, (const char**)argv, keys);
 	if (args.get<bool>("help"))
-		args.printParams();
+		args.printMessage();
 
 	fixed_back_mode = !args.get<bool>("a");
 	CLIENT = args.get<std::string>("client");
 	log_file = args.get<bool>("log");
 	minim_window = args.get<bool>("minim");
 	delay_for_run = args.get<int>("delay");
-	finger_track = args.get<bool>("finger");
-//	hand_track = args.get<bool>("hand");
 	PORT = args.get<int>("port");
 
-	std::string input_src = args.get<std::string>("1");
-	if (input_src[0] == 'c')
-		return input_src.substr(1);
-	else
-		return input_src;
+    breakpt = args.get<int>("breakpt");
+
+	return args.get<std::string>(0);
 }
 
 bool AppConfig::load_from(char* filename)

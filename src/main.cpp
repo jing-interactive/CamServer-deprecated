@@ -2,37 +2,14 @@
 #include "VideoApp.h"
 #include "AppConfig.h"
 
-#ifdef WIN32
-#pragma comment(lib,"VFW32.lib")
-#pragma comment(lib,"comctl32.lib")
-#pragma comment(lib,"glu32.lib")
-//#ifdef _DEBUG
-//#pragma comment(lib,"IlmImfd.lib")
-//#pragma comment(lib,"libjasperd.lib")
-//#pragma comment(lib,"libjpegd.lib")
-//#pragma comment(lib,"libpngd.lib")
-//#pragma comment(lib,"libtiffd.lib")
-//#pragma comment(lib,"zlibd.lib")
-//#else	//_DEBUG
-#if defined(STAITC_RELEASE)
-#pragma comment(lib,"IlmImf.lib")
-#pragma comment(lib,"libjasper.lib")
-#pragma comment(lib,"libjpeg.lib")
-#pragma comment(lib,"libpng.lib")
-#pragma comment(lib,"libtiff.lib")
-#pragma comment(lib,"zlib.lib")
-#endif	//_DEBUG
-
-#endif	//WIN32
-
 void enableMemleakCheck(int breakpt = 0)
 {
-	#if defined _DEBUG && defined _MSC_VER
+#if defined _DEBUG && defined _MSC_VER
 	#include <crtdbg.h>
 	if (breakpt > 0)
 		_CrtSetBreakAlloc(breakpt);
 	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
-	#endif
+#endif
 }
 
 struct StartThread: public MiniThread
@@ -76,11 +53,12 @@ void say_byebye()
 
 int main(int argc, char** argv )
 {
-	enableMemleakCheck();
-
 	printf("\nCamServer %s  vinjn.z@gmail.com.\n\n", VERSION);
 
 	std::string input_src = theConfig.parse_args(argc, argv);
+    enableMemleakCheck(theConfig.breakpt);
+
+    // HACK to let VideoInput happy
 	argc = 2;
 	argv[1] = (char*)input_src.c_str();
 

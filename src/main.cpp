@@ -51,7 +51,7 @@ void say_byebye()
 	}
 }
 
-int main(int argc, char** argv )
+int main(int argc, char* argv[] )
 {
 	printf("\nCamServer %s  vinjn.z@gmail.com.\n\n", VERSION);
 

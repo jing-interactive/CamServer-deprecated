@@ -2,12 +2,11 @@
 
 //////////////////////////////////////////////////////////////////////////
 #define VERSION "0.7.0 [Viva OpenGL] "
-//#define VERSION_OPENGL_COMES
 #undef FACE_DETECTION_ENABLED
 #undef VIDEO_INPUT_LIB_USED
 //////////////////////////////////////////////////////////////////////////
 
-#include <opencv2/core/utility.hpp>
+#include "opencv2/core/utility.hpp"
 
 #include <string>
 

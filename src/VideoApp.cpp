@@ -19,15 +19,15 @@ int CamServer_WindowCallback(HWND hwnd, UINT uMsg, WPARAM wparam, LPARAM lparam,
 }
 #endif
 
-VideoGrabThread::VideoGrabThread(VideoInput& input):MiniThread("grab"),_input(input)
+VideoGrabThread::VideoGrabThread(VideoInput& input):MiniThread("grab"),input(input)
 {
 	fps = 0;
 }
 
-bool VideoGrabThread::is_dirty()
+bool VideoGrabThread::isDirty()
 {
-	bool ret = _dirty;
-	_dirty = false;
+	bool ret = mDirty;
+	mDirty = false;
 	return ret;
 }
 
@@ -42,9 +42,9 @@ void VideoGrabThread::threadedFunction()
 			return;
 
 		timer.resetStartTime();
-		_input.get_frame();
-		_dirty = true; 
-		if (_input._InputType == VideoInput::From_Video || _input._InputType == VideoInput::From_Image)
+		input.get_frame();
+		mDirty = true; 
+		if (input._InputType == VideoInput::From_Video || input._InputType == VideoInput::From_Image)
 		{
 			unsigned int elapse = timer.getTimeElapsedMS();
 			if (elapse < 40)
@@ -70,7 +70,7 @@ VideoApp::~VideoApp()
 VideoApp::VideoApp()
 {
 	monitorVisible = true; 
-	selected = NULL;
+	selectedCorner = NULL;
 
 	to_reset_back = false;
 

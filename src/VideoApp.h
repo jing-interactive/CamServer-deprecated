@@ -25,13 +25,13 @@ struct VideoGrabThread: public MiniThread
 {
 	int fps;
 
-	VideoInput& _input;
+	VideoInput& input;
 
 	VideoGrabThread(VideoInput& input);
 	void threadedFunction();
-	bool is_dirty();
+	bool isDirty();
 private:
-	bool _dirty;
+	bool mDirty;
 };
 
 struct VideoApp
@@ -50,7 +50,7 @@ struct VideoApp
 	bool app_running;
 	bool input_inited;
 
-	cv::Point2f* selected;
+	cv::Point2f* selectedCorner;
 	cv::Point2f dstQuad[4];
 	vector<vBlob> blobs;
 	cv::Mat warp_matrix;

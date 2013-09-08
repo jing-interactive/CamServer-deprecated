@@ -1,6 +1,7 @@
 #include "AppConfig.h"
 #include <stdio.h>
 
+using namespace std;
 using cv::FileStorage;
 
 #ifndef FALSE
@@ -45,7 +46,7 @@ AppConfig::AppConfig():CLIENT("localhost")
 #endif
 };
 
-std::string AppConfig::parse_args(int argc, char** argv)
+string AppConfig::parse_args(int argc, char** argv)
 {
 	const char *keys =
 	{
@@ -63,7 +64,7 @@ std::string AppConfig::parse_args(int argc, char** argv)
 		args.printMessage();
 
 	fixed_back_mode = !args.get<bool>("a");
-	CLIENT = args.get<std::string>("client");
+	CLIENT = args.get<string>("client");
 	log_file = args.get<bool>("log");
 	minim_window = args.get<bool>("minim");
 	delay_for_run = args.get<int>("delay");
@@ -71,7 +72,7 @@ std::string AppConfig::parse_args(int argc, char** argv)
 
     breakpt = args.get<int>("breakpt");
 
-	return args.get<std::string>(0);
+	return args.get<string>(0);
 }
 
 bool AppConfig::load_from(char* filename)

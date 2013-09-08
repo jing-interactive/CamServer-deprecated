@@ -27,36 +27,37 @@ namespace monitor_gui
 		if (y < 0 || y > 1000) y = 0;
 		else if (y > theApp.HalfHeight ) y = theApp.HalfHeight;
 
-		if(theConfig.fixed_back_mode &&  Event == CV_EVENT_RBUTTONUP)
+        if(theConfig.fixed_back_mode &&  Event == EVENT_RBUTTONUP)
 		{
 			theApp.onRefreshBack();
 			param_gui::on_realbg();			
 		}
 		else
-			if( Event == CV_EVENT_LBUTTONUP || !(flags & CV_EVENT_FLAG_LBUTTON) )
-				theApp.selected = NULL;
-			else	if( Event == CV_EVENT_LBUTTONDOWN )
+			if( Event == EVENT_LBUTTONUP || !(flags & EVENT_FLAG_LBUTTON) )
+				theApp.selectedCorner = NULL;
+			else	if( Event == EVENT_LBUTTONDOWN )
 			{
-				theApp.selected = NULL;
+				theApp.selectedCorner = NULL;
 
                 //todo
 				for (int i=0;i<4;i++)
 				{
 					cv::Point2f* pt = &theConfig.corners[i];
-					if ( abs(pt->x - x) < 15 && abs(pt->y - y) < 15)
+                    const int kThreshold = 15;
+					if ( abs(pt->x - x) < kThreshold && abs(pt->y - y) < kThreshold)
 					{
-						theApp.selected = pt;
+						theApp.selectedCorner = pt;
 						break;
 					}
 				}
 			}
-			else if( Event == CV_EVENT_MOUSEMOVE && (flags & CV_EVENT_FLAG_LBUTTON) )
+			else if( Event == EVENT_MOUSEMOVE && (flags & EVENT_FLAG_LBUTTON) )
 			{
-				if (theApp.selected)
+				if (theApp.selectedCorner)
 				{
-					theApp.selected->x = x;
-					theApp.selected->y = y;
-                    theApp.warp_matrix = cv::getPerspectiveTransform(theConfig.corners, theApp.dstQuad);
+					theApp.selectedCorner->x = x;
+					theApp.selectedCorner->y = y;
+                    theApp.warp_matrix = getPerspectiveTransform(theConfig.corners, theApp.dstQuad);
 				}
 			}
 	}
@@ -73,11 +74,9 @@ namespace monitor_gui
 		if (visible)
 		{
 			namedWindow(MAIN_WINDOW, WINDOW_OPENGL);
-			resizeWindow(MAIN_WINDOW, 640, 480);
+			resizeWindow(MAIN_WINDOW, theApp.total.cols, theApp.total.rows);
             theApp.setupOpenglResources();
-#ifndef VERSION_OPENGL_COMES
 			setMouseCallback(MAIN_WINDOW, onMonitorMouse);
-#endif
             setOpenGlDrawCallback(MAIN_WINDOW, OpenGlDrawCallback);
 			handle = cvGetWindowHandle(MAIN_WINDOW);
 		}
@@ -220,14 +219,14 @@ namespace param_gui
 	void update()
 	{
 		setting = CV_GRAY;
-		buttons.paintButtons(&(IplImage)setting);
-		rectangle(setting, cvPoint(13,100), cvPoint(387,104), Scalar(122,10,10), CV_FILLED);
+		buttons.paintButtons(setting);
+		rectangle(setting, Point(13,100), Point(387,104), Scalar(122,10,10), FILLED);
 
 		const int x0 = 13;
 		const int y0 = 70;
 
 		int idx = theConfig.bg_mode;
-		rectangle(setting, cvPoint(x0+dw*idx,y0), cvPoint(x0+dw*idx+_w,y0+_h), Scalar(10,10,122), 3);
+		rectangle(setting, Point(x0+dw*idx,y0), Point(x0+dw*idx+_w,y0+_h), Scalar(10,10,122), 3);
 	}
 
 	void init()

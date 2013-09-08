@@ -1,4 +1,5 @@
-﻿#include <opencv2/core/core.hpp>
+﻿#include "opencv2/core/core.hpp"
+#include "opencv/highgui.h"
 
 #define MAIN_WINDOW "Monitor"
 #define PARAM_WINDOW "Param Panel"

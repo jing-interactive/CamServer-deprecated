@@ -42,7 +42,7 @@ namespace monitor_gui
                 //todo
 				for (int i=0;i<4;i++)
 				{
-					cv::Point2f* pt = &theConfig.corners[i];
+					cv::Point2f* pt = &theConfig.cornersA[i];
                     const int kThreshold = 15;
 					if ( abs(pt->x - x) < kThreshold && abs(pt->y - y) < kThreshold)
 					{
@@ -57,7 +57,7 @@ namespace monitor_gui
 				{
 					theApp.selectedCorner->x = x;
 					theApp.selectedCorner->y = y;
-                    theApp.warp_matrix = getPerspectiveTransform(theConfig.corners, theApp.dstQuad);
+                    theApp.warp_matrix = getPerspectiveTransform(theConfig.cornersA, theApp.dstQuad);
 				}
 			}
 	}
@@ -131,11 +131,6 @@ namespace param_gui
 		theConfig.face_track = t;
 	}
 
-	void on_dialog(int )
-	{
-		theApp.input.showSettingsDialog();
-	}
-
 	void on_mode(int t)
 	{
 		theConfig.gray_detect_mode = t;
@@ -205,9 +200,6 @@ namespace param_gui
 #endif
 		{ w+=dw, h,  "hull", on_hull, &theConfig.hull_mode},
 //		{ w+=dw, h,  "gray", on_mode, &theConfig.gray_detect_mode},
-#ifdef VIDEO_INPUT_LIB_USED
-		{ w+=dw, h,  "dialog", on_dialog, &minus_one},
-#endif // VIDEO_INPUT_LIB_USED
 		{ w=13, h+=dh,  "now", on_realbg, NULL},
 		{ w+=dw, h,  "white", on_whitebg, NULL},
 		{ w+=dw, h,  "black", on_blackbg, NULL},

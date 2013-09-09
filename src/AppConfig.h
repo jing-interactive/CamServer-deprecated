@@ -52,7 +52,8 @@ struct AppConfig
 
 	bool log_file;
 
-	cv::Point2f corners[4];
+	cv::Point2f cornersA[4];
+    cv::Point2f cornersB[4];
 };
 
 extern AppConfig theConfig;

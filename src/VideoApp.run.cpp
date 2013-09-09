@@ -31,7 +31,7 @@ void VideoApp::run()
 		timer.resetStartTime();
 		timer_total.resetStartTime();
 
-		Mat raw = input._frame; 
+		Mat raw = mInput.mFrame; 
 		if (raw.empty())
 			break;
 
@@ -51,12 +51,12 @@ void VideoApp::run()
 			}break;
 		case VK_BACK:
 			{//reset four corner points
-				theConfig.corners[0] = Point2f(0,0);
-				theConfig.corners[1] = Point2f(HalfWidth,0);
-				theConfig.corners[3] = Point2f(0,HalfHeight);
-				theConfig.corners[2] = Point2f(HalfWidth,HalfHeight);
+				theConfig.cornersA[0] = Point2f(0,0);
+				theConfig.cornersA[1] = Point2f(HalfWidth,0);
+				theConfig.cornersA[3] = Point2f(0,HalfHeight);
+				theConfig.cornersA[2] = Point2f(HalfWidth,HalfHeight);
 
-                warp_matrix = getPerspectiveTransform(theConfig.corners, dstQuad);
+                warp_matrix = getPerspectiveTransform(theConfig.cornersA, dstQuad);
 
 				onRefreshBack();
 			}break;
@@ -75,8 +75,8 @@ void VideoApp::run()
 		vFlip(half_raw, g_Fx, g_Fy);
 		timer.profileFunction("cvFlip");
 
-		if (theConfig.corners[0] == Point2f(0,0) && theConfig.corners[1] == Point2f(HalfWidth,0)
-			&& theConfig.corners[3] == Point2f(0,HalfHeight) && theConfig.corners[2] == Point2f(HalfWidth,HalfHeight)
+		if (theConfig.cornersA[0] == Point2f(0,0) && theConfig.cornersA[1] == Point2f(HalfWidth,0)
+			&& theConfig.cornersA[3] == Point2f(0,HalfHeight) && theConfig.cornersA[2] == Point2f(HalfWidth,HalfHeight)
 			)
 		{
             // if original ROI (region of interest), it saves time
@@ -218,7 +218,7 @@ void VideoApp::run()
 
 	theConfig.save_to(CONFIG_FILE);
 
-    setupOpenglResources();// fix pure virtual function call occurred when built statically
+    //setupOpenglResources();// fix pure virtual function call occurred when built statically
 
     destroyAllWindows();
 }
@@ -282,8 +282,8 @@ void VideoApp::renderMainWindow()
     for (int i=0;i<4;i++)
     {
         //drawStrokedRect(Rect(theConfig.corners[i] - kMarkerSize, theConfig.corners[i] + kMarkerSize));
-        vertices.push_back(theConfig.corners[i]);       colors.push_back(CV_RED);
-        vertices.push_back(theConfig.corners[(i+1)%4]); colors.push_back(CV_RED);
+        vertices.push_back(theConfig.cornersA[i]);       colors.push_back(CV_RED);
+        vertices.push_back(theConfig.cornersA[(i+1)%4]); colors.push_back(CV_RED);
 
         //line(total, theConfig.corners[i], theConfig.corners[(i+1)%4], CV_RGB(255,0,0),2);
         //rectangle(total, theConfig.corners[i] - kMarkerSize, theConfig.corners[i] + kMarkerSize, CV_RGB(255,0,0), CV_FILLED);

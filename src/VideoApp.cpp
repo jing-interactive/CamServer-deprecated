@@ -42,9 +42,9 @@ void VideoGrabThread::threadedFunction()
 			return;
 
 		timer.resetStartTime();
-		input.get_frame();
+		input.getFrame();
 		mDirty = true; 
-		if (input._InputType == VideoInput::From_Video || input._InputType == VideoInput::From_Image)
+		if (input.mInputType == VideoInput::From_Video || input.mInputType == VideoInput::From_Image)
 		{
 			unsigned int elapse = timer.getTimeElapsedMS();
 			if (elapse < 40)
@@ -92,7 +92,7 @@ bool VideoApp::init(int argc, char** argv)
 #endif
 	}
 
-	if (!input.init(argc,argv))
+	if (!mInput.init(argc,argv))
 	{
 		input_inited = true;
 #ifdef WIN32
@@ -100,15 +100,8 @@ bool VideoApp::init(int argc, char** argv)
 #endif
 		return false;
 	}
-#ifdef MODE_320X240
-	if (input._InputType == VideoInput::From_Camera)
-	{
-		if (input._frame->width > 320)
-			input.resize(320, 240);
-	}
-#endif
 	input_inited = true;
-	grab_thread = new VideoGrabThread(input);
+	grab_thread = new VideoGrabThread(mInput);
 #ifdef _DEBUG
 	grab_thread->startThread(true, true);//debug mode is noisy
 #else
@@ -129,8 +122,8 @@ bool VideoApp::init(int argc, char** argv)
 	haar.scale = 2;
 #endif
 	//grab related
-	size = input._size;
-	channels = input._channel;
+	size = mInput.mSize;
+	channels = mInput.mChannel;
 
 	if (size.width < 400)
 	{
@@ -157,12 +150,12 @@ bool VideoApp::init(int argc, char** argv)
 
 	if (!theConfig.load_from(CONFIG_FILE))
 	{
-		theConfig.corners[0] = cv::Point2f(0,0);
-		theConfig.corners[1] = cv::Point2f(HalfWidth,0);
-		theConfig.corners[3] = cv::Point2f(0,HalfHeight);
-		theConfig.corners[2] = cv::Point2f(HalfWidth,HalfHeight);
+		theConfig.cornersA[0] = cv::Point2f(0,0);
+		theConfig.cornersA[1] = cv::Point2f(HalfWidth,0);
+		theConfig.cornersA[3] = cv::Point2f(0,HalfHeight);
+		theConfig.cornersA[2] = cv::Point2f(HalfWidth,HalfHeight);
 	}
-    warp_matrix = cv::getPerspectiveTransform(theConfig.corners, dstQuad);
+    warp_matrix = cv::getPerspectiveTransform(theConfig.cornersA, dstQuad);
 
 	onParamFlip(theConfig.paramFlipX, theConfig.paramFlipY);
 
@@ -334,7 +327,7 @@ void VideoApp::send_tuio_msg()
 	{
 		fseq.setAddress( "/tuio/2Dcur" );
 		fseq.addStringArg( "fseq" );
-		fseq.addIntArg(input._frame_num);
+		fseq.addIntArg(mInput.mFrameNum);
 	}
 
 	int n_blobs = blobTracker.trackedBlobs.size();

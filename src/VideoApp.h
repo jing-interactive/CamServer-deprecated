@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-//#define MODE_320X240	//always 320*240
-
 #include "../_common/OpenCV/OpenCV.h"
 #include "../_common/OpenCV/cvButtons.h"
 #include "../_common/OpenCV/BlobTracker.h"
@@ -38,7 +36,7 @@ struct VideoApp
 {
 	//thread
 	cv::Ptr<VideoGrabThread> grab_thread;
-	VideoInput input;
+    VideoInput mInput;
 
 	//the important objects
 	HaarFinder haar;

@@ -88,10 +88,16 @@ bool AppConfig::load_from(char* filename)
 #define READ_(id, var) fs[id]>>var
 #define READ_FS(var) fs[#var]>>(var)
 
-		READ_("corners0_x",corners[0].x);READ_("corners0_y",corners[0].y);
-		READ_("corners1_x",corners[1].x);READ_("corners1_y",corners[1].y);
-		READ_("corners2_x",corners[2].x);READ_("corners2_y",corners[2].y);
-		READ_("corners3_x",corners[3].x);READ_("corners3_y",corners[3].y);
+		READ_("cornersA0_x",cornersA[0].x);READ_("cornersA0_y",cornersA[0].y);
+		READ_("cornersA1_x",cornersA[1].x);READ_("cornersA1_y",cornersA[1].y);
+		READ_("cornersA2_x",cornersA[2].x);READ_("cornersA2_y",cornersA[2].y);
+		READ_("cornersA3_x",cornersA[3].x);READ_("cornersA3_y",cornersA[3].y);
+
+        READ_("cornersB0_x",cornersB[0].x);READ_("cornersB0_y",cornersB[0].y);
+        READ_("cornersB1_x",cornersB[1].x);READ_("cornersB1_y",cornersB[1].y);
+        READ_("cornersB2_x",cornersB[2].x);READ_("cornersB2_y",cornersB[2].y);
+        READ_("cornersB3_x",cornersB[3].x);READ_("cornersB3_y",cornersB[3].y);
+
 		READ_FS(paramFlipX);
 		READ_FS(paramFlipY);
 		READ_FS(paramDark);
@@ -124,10 +130,16 @@ bool AppConfig::save_to(char* filename)
 #define WRITE_(id, var) fs<<id<<var
 #define WRITE_FS(var) fs<<#var<<(var)
 
-		WRITE_("corners0_x",corners[0].x);WRITE_("corners0_y",corners[0].y);
-		WRITE_("corners1_x",corners[1].x);WRITE_("corners1_y",corners[1].y);
-		WRITE_("corners2_x",corners[2].x);WRITE_("corners2_y",corners[2].y);
-		WRITE_("corners3_x",corners[3].x);WRITE_("corners3_y",corners[3].y);
+        WRITE_("cornersA0_x",cornersA[0].x);WRITE_("cornersA0_y",cornersA[0].y);
+        WRITE_("cornersA1_x",cornersA[1].x);WRITE_("cornersA1_y",cornersA[1].y);
+        WRITE_("cornersA2_x",cornersA[2].x);WRITE_("cornersA2_y",cornersA[2].y);
+        WRITE_("cornersA3_x",cornersA[3].x);WRITE_("cornersA3_y",cornersA[3].y);
+
+        WRITE_("cornersB0_x",cornersB[0].x);WRITE_("cornersB0_y",cornersB[0].y);
+        WRITE_("cornersB1_x",cornersB[1].x);WRITE_("cornersB1_y",cornersB[1].y);
+        WRITE_("cornersB2_x",cornersB[2].x);WRITE_("cornersB2_y",cornersB[2].y);
+        WRITE_("cornersB3_x",cornersB[3].x);WRITE_("cornersB3_y",cornersB[3].y);
+
 		WRITE_FS(paramFlipX);
 		WRITE_FS(paramFlipY);
 		WRITE_FS(paramDark);

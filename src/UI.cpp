@@ -57,14 +57,14 @@ namespace monitor_gui
 				{
 					theApp.selectedCorner->x = x;
 					theApp.selectedCorner->y = y;
-                    theApp.warp_matrix = getPerspectiveTransform(theConfig.cornersA, theApp.dstQuad);
+                    theApp.warpMatrix = getPerspectiveTransform(theConfig.cornersA, theApp.dstQuad);
 				}
 			}
 	}
 
 	void* handle = NULL;
 
-    void OpenGlDrawCallback(void* userdata)
+    void onOpenGLDraw(void* userdata)
     {
         theApp.renderMainWindow();
     }
@@ -77,11 +77,12 @@ namespace monitor_gui
 			resizeWindow(MAIN_WINDOW, theApp.total.cols, theApp.total.rows);
             theApp.setupOpenglResources();
 			setMouseCallback(MAIN_WINDOW, onMonitorMouse);
-            setOpenGlDrawCallback(MAIN_WINDOW, OpenGlDrawCallback);
+            setOpenGlDrawCallback(MAIN_WINDOW, onOpenGLDraw);
 			handle = cvGetWindowHandle(MAIN_WINDOW);
 		}
 		else
 		{
+            setOpenGlDrawCallback(MAIN_WINDOW, NULL);
 			destroyWindow(MAIN_WINDOW);
 		}
 	}
@@ -116,21 +117,6 @@ namespace param_gui
 		theApp.onParamFlip(theConfig.paramFlipX, theConfig.paramFlipY);
 	}
 
-	void on_hull(int t)
-	{
-		theConfig.hull_mode = t;
-	}
-
-	void on_tuio(int t)
-	{
-		theConfig.tuio_mode = t;
-	}
-
-	void on_face(int t)
-	{
-		theConfig.face_track = t;
-	}
-
 	void on_mode(int t)
 	{
 		theConfig.gray_detect_mode = t;
@@ -144,69 +130,59 @@ namespace param_gui
 			theApp.onRefreshBack();//let main loop do it
 		else
 		{
-			theApp.to_reset_back = false;
+			theApp.toResetBackground = false;
 			theApp.backModel->init(theApp.prevBg);
 		}
 	}
 
+    void on_change_bg(int mode)
+    {
+        if (theConfig.bg_mode != mode)
+        {
+            theConfig.bg_mode = mode;
+            show(true);			
+        }
+        theApp.onRefreshBack();		
+    }
+
 	void on_realbg(int t)
 	{
-		if (theConfig.bg_mode != REAL_BG)
-		{
-			theConfig.bg_mode = REAL_BG;
-			show(true);			
-		}
-		theApp.onRefreshBack();		
+		on_change_bg(REAL_BG);	
 	}
 
 	void on_whitebg(int t)
 	{
-		if (theConfig.bg_mode != WHITE_BG)
-		{
-			theConfig.bg_mode = WHITE_BG;
-			show(true);			
-		}
-		theApp.onRefreshBack();
+        on_change_bg(WHITE_BG);	
 	}
 
 	void on_diffbg(int t)
 	{
-		if (theConfig.bg_mode != DIFF_BG)
-		{
-			theConfig.bg_mode = DIFF_BG;
-			show(true);
-		}
-		
-		theApp.onRefreshBack();
+        on_change_bg(DIFF_BG);	
 	}
 
 	void on_blackbg(int t)
 	{
-		if (theConfig.bg_mode != BLACK_BG)
-		{
-			theConfig.bg_mode = BLACK_BG;
-			show(true);
-		}		
-		theApp.onRefreshBack();
+		on_change_bg(BLACK_BG);
 	}
 
-	ButtonInfo btn_infs[]=
+	const ButtonInfo btnInfs[]=
 	{
 		{ w=13, h=35,  "- X -", on_x, &theConfig.paramFlipX},
 		{ w+=dw, h,  "- Y -", on_y, &theConfig.paramFlipY},
-		{ w+=dw, h,  "tuio", on_tuio, &theConfig.tuio_mode},
+		{ w+=dw, h,  "tuio", NULL, &theConfig.tuio_mode},
 #ifdef FACE_DETECTION_ENABLED
-		{ w+=dw, h,  "face", on_face, &theConfig.face_track},
+		{ w+=dw, h,  "face", NULL, &theConfig.face_track},
 #endif
-		{ w+=dw, h,  "hull", on_hull, &theConfig.hull_mode},
+		{ w+=dw, h,  "hull", NULL, &theConfig.hull_mode},
+        { w+=dw, h,  "plot", NULL, &theConfig.scene_plot_mode},
 //		{ w+=dw, h,  "gray", on_mode, &theConfig.gray_detect_mode},
-		{ w=13, h+=dh,  "now", on_realbg, NULL},
-		{ w+=dw, h,  "white", on_whitebg, NULL},
-		{ w+=dw, h,  "black", on_blackbg, NULL},
-		{ w+=dw, h,  "diff", on_diffbg, NULL},
+		{ w=13, h+=dh,  "n)ow", on_realbg, NULL},
+		{ w+=dw, h,  "w)hite", on_whitebg, NULL},
+		{ w+=dw, h,  "b)lack", on_blackbg, NULL},
+		{ w+=dw, h,  "d)iff", on_diffbg, NULL},
 	};
 	
-	int num_btns = sizeof(btn_infs)/sizeof(btn_infs[0]);
+	const int num_btns = sizeof(btnInfs)/sizeof(btnInfs[0]);
 
 	void update()
 	{
@@ -223,21 +199,20 @@ namespace param_gui
 
 	void init()
 	{
-		setting.create(Size(400,120), CV_8UC3);
+		setting.create(Size(400, 120), CV_8UC3);
 		buttons.release();
 
 		for (int i=0;i<num_btns;i++)
 		{
-			ButtonInfo& inf = btn_infs[i];
-			int btn_value = inf.value ? *inf.value : -1;
-			buttons.addButton(PushButton( inf.x, inf.y, _w, _h, btn_value, inf.text, inf.cb ));
+			const ButtonInfo& inf = btnInfs[i];
+			buttons.addButton(PushButton(inf.x, inf.y, _w, _h, inf.value, inf.text, inf.cb));
 		}
 		update();
 	}
 
-	void onParamMouse(int Event,int x,int y,int flags,void* param )
+	void onParamMouse(int event, int x, int y, int flags, void* param )
 	{
-		cvButtonsOnMouse(Event,x,y,flags, param);
+		cvButtonsOnMouse(event, x, y, flags, param);
 		update();
 	}
 

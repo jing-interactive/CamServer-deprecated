@@ -50,31 +50,47 @@ void VideoApp::run()
 				app_running = false;
 			}break;
 		case VK_BACK:
-			{//reset four corner points
-				theConfig.cornersA[0] = Point2f(0,0);
-				theConfig.cornersA[1] = Point2f(HalfWidth,0);
-				theConfig.cornersA[3] = Point2f(0,HalfHeight);
-				theConfig.cornersA[2] = Point2f(HalfWidth,HalfHeight);
+			{
+                resetCorners();
 
-                warp_matrix = getPerspectiveTransform(theConfig.cornersA, dstQuad);
+                // TODO: merge codes
+                warpMatrix = getPerspectiveTransform(theConfig.cornersA, dstQuad);
+                warpMatrix = getPerspectiveTransform(theConfig.cornersB, dstQuad);
 
 				onRefreshBack();
 			}break;
 		case VK_SPACE:
-			{//toggle big window visibility
+			{
+                //toggle big window visibility
 				monitorVisible = !monitorVisible;
 				monitor_gui::show(monitorVisible);
 			}break;
-		case 'b':
+		case 'n':
 			{
-				param_gui::on_realbg(0);
+				param_gui::on_realbg();
 				param_gui::update();
 			}break;
+        case 'b':
+            {
+                param_gui::on_blackbg();
+                param_gui::update();
+            }break;
+        case 'w':
+            {
+                param_gui::on_whitebg();
+                param_gui::update();
+            }break;
+        case 'd':
+            {
+                param_gui::on_diffbg();
+                param_gui::update();
+            }break;
 		default:break;
 		}
 		vFlip(half_raw, g_Fx, g_Fy);
 		timer.profileFunction("cvFlip");
 
+        // TODO: remove?
 		if (theConfig.cornersA[0] == Point2f(0,0) && theConfig.cornersA[1] == Point2f(HalfWidth,0)
 			&& theConfig.cornersA[3] == Point2f(0,HalfHeight) && theConfig.cornersA[2] == Point2f(HalfWidth,HalfHeight)
 			)
@@ -84,9 +100,7 @@ void VideoApp::run()
 		}
 		else
 		{
-            // needs perspective transform
-			warpPerspective(half_raw, frame, Mat(warp_matrix), half);
-//			cvWarpPerspective(half_raw, frame, warp_matrix);
+			warpPerspective(half_raw, frame, warpMatrix, half);
 		}
 		if (grab_thread->isDirty())
 		{ 
@@ -104,9 +118,9 @@ void VideoApp::run()
 		}
 		timer.profileFunction("vPerspectiveTransform");	
 
-		if (to_reset_back)
+		if (toResetBackground)
 		{
-			to_reset_back = false;
+			toResetBackground = false;
 
 			switch (theConfig.bg_mode)
 			{
@@ -276,28 +290,41 @@ void VideoApp::renderMainWindow()
     glOrtho( 0, total.cols, total.rows, 0, -1.0f, 1.0f );
 
     std::vector<Point2f> vertices;
-    std::vector<Scalar> colors;
+    std::vector<Scalar_<BYTE>> colors;
     const Point2f kMarkerSize(5,5);
+
+    const Scalar_<BYTE> kBlue(255, 0, 0);
 
     for (int i=0;i<4;i++)
     {
         //drawStrokedRect(Rect(theConfig.corners[i] - kMarkerSize, theConfig.corners[i] + kMarkerSize));
-        vertices.push_back(theConfig.cornersA[i]);       colors.push_back(CV_RED);
-        vertices.push_back(theConfig.cornersA[(i+1)%4]); colors.push_back(CV_RED);
+        vertices.push_back(theConfig.cornersA[i]);       colors.push_back(kBlue);
+        vertices.push_back(theConfig.cornersA[(i+1)%4]); colors.push_back(kBlue);
 
         //line(total, theConfig.corners[i], theConfig.corners[(i+1)%4], CV_RGB(255,0,0),2);
         //rectangle(total, theConfig.corners[i] - kMarkerSize, theConfig.corners[i] + kMarkerSize, CV_RGB(255,0,0), CV_FILLED);
     }
+
+    for (int i=0;i<4;i++)
+    {
+        //drawStrokedRect(Rect(theConfig.corners[i] - kMarkerSize, theConfig.corners[i] + kMarkerSize));
+        vertices.push_back(theConfig.cornersB[i]);       colors.push_back(kBlue);
+        vertices.push_back(theConfig.cornersB[(i+1)%4]); colors.push_back(kBlue);
+
+        //line(total, theConfig.corners[i], theConfig.corners[(i+1)%4], CV_RGB(255,0,0),2);
+        //rectangle(total, theConfig.corners[i] - kMarkerSize, theConfig.corners[i] + kMarkerSize, CV_RGB(255,0,0), CV_FILLED);
+    }
+
     if (selectedCorner)
     {
         rectangle(total, *selectedCorner - kMarkerSize, *selectedCorner + kMarkerSize, CV_RGB(0,0,255), CV_FILLED);
     }
 
     const float spac = 0.05f * total.rows;
-    vertices.push_back(Point2f(0.5f*total.cols-spac,  0.5f*total.rows));      colors.push_back(CV_BLUE);
-    vertices.push_back(Point2f(0.5f*total.cols+spac,  0.5f*total.rows));      colors.push_back(CV_BLUE);
-    vertices.push_back(Point2f(0.5f*total.cols,       0.5f*total.rows-spac)); colors.push_back(CV_BLUE);
-    vertices.push_back(Point2f(0.5f*total.cols,       0.5f*total.rows+spac)); colors.push_back(CV_BLUE);
+    vertices.push_back(Point2f(0.5f*total.cols-spac,  0.5f*total.rows));      colors.push_back(kBlue);
+    vertices.push_back(Point2f(0.5f*total.cols+spac,  0.5f*total.rows));      colors.push_back(kBlue);
+    vertices.push_back(Point2f(0.5f*total.cols,       0.5f*total.rows-spac)); colors.push_back(kBlue);
+    vertices.push_back(Point2f(0.5f*total.cols,       0.5f*total.rows+spac)); colors.push_back(kBlue);
     
     mVboLines->setVertexArray(vertices);
     mVboLines->setColorArray(colors);

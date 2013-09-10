@@ -63,16 +63,12 @@ void VideoGrabThread::threadedFunction()
 	}
 } 
 
-VideoApp::~VideoApp()
-{
-}
-
 VideoApp::VideoApp()
 {
 	monitorVisible = true; 
 	selectedCorner = NULL;
 
-	to_reset_back = false;
+	toResetBackground = false;
 
 	app_running = true;
 	input_inited = false;
@@ -150,12 +146,10 @@ bool VideoApp::init(int argc, char** argv)
 
 	if (!theConfig.load_from(CONFIG_FILE))
 	{
-		theConfig.cornersA[0] = cv::Point2f(0,0);
-		theConfig.cornersA[1] = cv::Point2f(HalfWidth,0);
-		theConfig.cornersA[3] = cv::Point2f(0,HalfHeight);
-		theConfig.cornersA[2] = cv::Point2f(HalfWidth,HalfHeight);
+        resetCorners();
+
 	}
-    warp_matrix = cv::getPerspectiveTransform(theConfig.cornersA, dstQuad);
+    warpMatrix = cv::getPerspectiveTransform(theConfig.cornersA, dstQuad);
 
 	onParamFlip(theConfig.paramFlipX, theConfig.paramFlipY);
 
@@ -254,6 +248,7 @@ void VideoApp::send_custom_msg()
 			//if (obj.status == statusStill)
 			//	//do send still blobs out
 			//	continue;
+            // TODO: move the drawing parts to opengl
 			Mat m = frame;
 			if (obj.isHole)
 				vPolyLine(m, obj.pts, cv::Scalar(0,0,0), 1);
@@ -264,20 +259,11 @@ void VideoApp::send_custom_msg()
 			vDrawText(m, obj.center.x, obj.center.y, g_buffer, vDefaultColor(obj.id));
 
 			int id = obj.id;
-#if 0
-			int cx = obj.center.x;
-			int cy = obj.center.y;
-			int x = obj.box.x;
-			int y = obj.box.y;
-			int w = obj.box.width;
-			int h = obj.box.height;
-#else
 			int cx = obj.rotBox.center.x;
 			int cy = obj.rotBox.center.y;
 			int w = obj.rotBox.size.width;
 			int h = obj.rotBox.size.height;
 			float angle = obj.angle;
-#endif
 			{
 				ofxOscMessage m;
 				if (obj.isHole)
@@ -365,5 +351,13 @@ void VideoApp::send_tuio_msg()
 
 void VideoApp::onRefreshBack()
 {
-	to_reset_back = true;
+	toResetBackground = true;
+}
+
+void VideoApp::resetCorners()
+{
+    theConfig.cornersA[0] = cv::Point2f(0,0);
+    theConfig.cornersA[1] = cv::Point2f(HalfWidth,0);
+    theConfig.cornersA[3] = cv::Point2f(0,HalfHeight);
+    theConfig.cornersA[2] = cv::Point2f(HalfWidth,HalfHeight);
 }

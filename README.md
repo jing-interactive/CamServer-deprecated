@@ -1,13 +1,9 @@
-﻿CamServer is a lightweight camera based interative system written in C++.  
-The main platform is Windows, but linux and MacOSX are also supported.  
+﻿CamServer is a lightweight camera based multi-touch software written in C++.
 It uses OpenCV and some libraries from OpenFrameworks.  
-Folder /Server contains the main application.   
-Folder /Client contains some processing sketches.  
-Folder /Tutorial contains the source files of the tutorial.  
+Folder /src contains the main application.   
+Folder /samples contains some processing sketches.  
+Folder /samples/Tutorial contains the source files of the tutorial.  
 OSC and TUIO protocol is employed to send reconginzed blob/face information to client softwares.  
-
-The tutorials are provided at [here](http://www.everbox.com/f/bwy7u4c3xDkmKpKMbtTWu7ojqR)
-But it's a little bit outdated.
 
 使用说明
 
@@ -21,6 +17,8 @@ video		视频文件的路径
 
 -client 192.168.1.122	指定客户端的地址，默认为localhost，即本机地址  
 -port 3333	指定客户端的端口，默认为 3333  
--minim		启动时为程序最小化  
 -delay	5	延迟5秒后再运行  
 -log 		在文件中记录运行状况，默认不使用  
+
+TODO:
+1. multi-roi 

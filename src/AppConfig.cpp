@@ -44,6 +44,7 @@ AppConfig::AppConfig():CLIENT("localhost")
 #else
 	log_file = false;
 #endif
+    scene_plot_mode = false;
 };
 
 string AppConfig::parse_args(int argc, char** argv)

@@ -10,10 +10,13 @@
 
 #include <string>
 
-#define		REAL_BG	0		//real time background
-#define		WHITE_BG 1		//white
-#define		BLACK_BG 2		//black
-#define		DIFF_BG	3		//diff 
+enum BackGroundMode
+{
+    REAL_BG,    //real time background
+    WHITE_BG,   //white
+    BLACK_BG,   //black
+    DIFF_BG,    //diff 
+};
 
 #define CONFIG_FILE "CamServer.config.xml"
 
@@ -36,6 +39,7 @@ struct AppConfig
 	int face_track;
 	int hand_track;
 	int hull_mode;
+    int scene_plot_mode;    // for Nike-flex
 	int gray_detect_mode;
 	int minim_window;
 	int delay_for_run; 

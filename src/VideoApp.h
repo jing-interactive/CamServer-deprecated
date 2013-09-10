@@ -51,7 +51,7 @@ struct VideoApp
 	cv::Point2f* selectedCorner;
 	cv::Point2f dstQuad[4];
 	vector<vBlob> blobs;
-	cv::Mat warp_matrix;
+	cv::Mat warpMatrix;
 
 	//the Mats
 	cv::Mat total;
@@ -71,14 +71,15 @@ struct VideoApp
 	cv::Ptr<IBackGround> backModel;
 
 	int HalfWidth, HalfHeight;
-	bool to_reset_back;
+	bool toResetBackground;
 	int g_Fx, g_Fy;
 	int g_prevFx, g_prevFy;
 
 	VideoApp();
-	~VideoApp();
 
 	bool init(int argc, char** argv);
+
+    void resetCorners();
 
 	void onRefreshBack();
 	void onParamFlip(int fx, int fy);

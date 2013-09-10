@@ -4,72 +4,74 @@
 #include "MiniTimer.h"
 #include "opencv2/flann/logger.h"
 #include "opencv2/core/opengl.hpp"
+#include <fstream>
 
 #include <gl/GL.h>
 #pragma comment(lib, "opengl32.lib")
 
+using namespace std;
 using namespace cv;
 using cvflann::Logger;
 
 void VideoApp::run()
 {	
-	MiniTimer timer(theConfig.log_file);
-	MiniTimer timer_total(theConfig.log_file);
-	int _ms_counter = 0;
-	int _frm_counter = 0;
-	int fps=0;
+    MiniTimer timer(theConfig.log_file);
+    MiniTimer timer_total(theConfig.log_file);
+    int _ms_counter = 0;
+    int _frm_counter = 0;
+    int fps=0;
 
-	while (app_running)
-	{
-		if (theConfig.log_file)
+    while (app_running)
+    {
+        if (theConfig.log_file)
         {
-			MiniLog("\n");
+            MiniLog("\n");
             //todo: replace MiniLog with 
             //Logger::info();
         }
 
-		timer.resetStartTime();
-		timer_total.resetStartTime();
+        timer.resetStartTime();
+        timer_total.resetStartTime();
 
-		Mat raw = mInput.mFrame; 
-		if (raw.empty())
-			break;
+        Mat raw = mInput.mFrame; 
+        if (raw.empty())
+            break;
 
-		if (raw.cols == HalfWidth)
-			raw.copyTo(half_raw);
-		else
-			resize(raw, half_raw, half);
-		timer.profileFunction("cvResize");
+        if (raw.cols == subWindowWidth)
+            raw.copyTo(half_raw);
+        else
+            resize(raw, half_raw, half);
+        timer.profileFunction("cvResize");
 
         int key = waitKey(1);
 
-		switch (key)
-		{
-		case VK_ESCAPE:
-			{
-				app_running = false;
-			}break;
-		case VK_BACK:
-			{
+        switch (key)
+        {
+        case VK_ESCAPE:
+            {
+                app_running = false;
+            }break;
+        case VK_BACK:
+            {
                 resetCorners();
 
                 // TODO: merge codes
                 warpMatrix = getPerspectiveTransform(theConfig.cornersA, dstQuad);
                 warpMatrix = getPerspectiveTransform(theConfig.cornersB, dstQuad);
 
-				onRefreshBack();
-			}break;
-		case VK_SPACE:
-			{
+                onRefreshBack();
+            }break;
+        case VK_SPACE:
+            {
                 //toggle big window visibility
-				monitorVisible = !monitorVisible;
-				monitor_gui::show(monitorVisible);
-			}break;
-		case 'n':
-			{
-				param_gui::on_realbg();
-				param_gui::update();
-			}break;
+                monitorVisible = !monitorVisible;
+                monitor_gui::show(monitorVisible);
+            }break;
+        case 'n':
+            {
+                param_gui::on_realbg();
+                param_gui::update();
+            }break;
         case 'b':
             {
                 param_gui::on_blackbg();
@@ -85,116 +87,116 @@ void VideoApp::run()
                 param_gui::on_diffbg();
                 param_gui::update();
             }break;
-		default:break;
-		}
-		vFlip(half_raw, g_Fx, g_Fy);
-		timer.profileFunction("cvFlip");
+        default:break;
+        }
+        vFlip(half_raw, g_Fx, g_Fy);
+        timer.profileFunction("cvFlip");
 
         // TODO: remove?
-		if (theConfig.cornersA[0] == Point2f(0,0) && theConfig.cornersA[1] == Point2f(HalfWidth,0)
-			&& theConfig.cornersA[3] == Point2f(0,HalfHeight) && theConfig.cornersA[2] == Point2f(HalfWidth,HalfHeight)
-			)
-		{
+        if (theConfig.cornersA[0] == Point2f(0,0) && theConfig.cornersA[1] == Point2f(subWindowWidth,0)
+            && theConfig.cornersA[3] == Point2f(0,subWindowHeight) && theConfig.cornersA[2] == Point2f(subWindowWidth,subWindowHeight)
+           )
+        {
             // if original ROI (region of interest), it saves time
-			half_raw.copyTo(frame);
-		}
-		else
-		{
-			warpPerspective(half_raw, frame, warpMatrix, half);
-		}
-		if (grab_thread->isDirty())
-		{ 
-			if (theConfig.bg_mode == DIFF_BG)
-			{
-				//prevFrame->diff_Bg
-				vBackGrayDiff* diff = (vBackGrayDiff*)(IBackGround*)backModel;
-				if (channels == 3)
-					vGrayScale(prevBg, diff->bg);
-				else
-					prevBg.copyTo(diff->bg);
-				//clean frame->prevFrame
-				frame.copyTo(prevBg);
-			}
-		}
-		timer.profileFunction("vPerspectiveTransform");	
+            half_raw.copyTo(frame);
+        }
+        else
+        {
+            warpPerspective(half_raw, frame, warpMatrix, half);
+        }
+        if (grab_thread->isDirty())
+        { 
+            if (theConfig.bg_mode == DIFF_BG)
+            {
+                //prevFrame->diff_Bg
+                vBackGrayDiff* diff = (vBackGrayDiff*)(IBackGround*)backModel;
+                if (channels == 3)
+                    vGrayScale(prevBg, diff->bg);
+                else
+                    prevBg.copyTo(diff->bg);
+                //clean frame->prevFrame
+                frame.copyTo(prevBg);
+            }
+        }
+        timer.profileFunction("vPerspectiveTransform");	
 
-		if (toResetBackground)
-		{
-			toResetBackground = false;
+        if (toResetBackground)
+        {
+            toResetBackground = false;
 
-			switch (theConfig.bg_mode)
-			{
-			case REAL_BG:
-				{
-					//only real time background needs take care of flip
-					backModel->init(frame);
-					g_prevFx = g_Fx;
-					g_prevFy = g_Fy;
-					frame.copyTo(prevBg);
-				}break;
-			case BLACK_BG:
-				{
-					backModel->init(black_frame);
-					black_frame.copyTo(prevBg); 
-				}break;
-			case WHITE_BG:
-				{
-					backModel->init(white_frame);
-					white_frame.copyTo(prevBg);
-				}break;
-			case DIFF_BG:
-				{
-					//copy it in case huge blobs generated
-					backModel->init(frame);
-				}break;
-			default:
-				break;
-			}
- 		}
+            switch (theConfig.bg_mode)
+            {
+            case REAL_BG:
+                {
+                    //only real time background needs take care of flip
+                    backModel->init(frame);
+                    g_prevFx = g_Fx;
+                    g_prevFy = g_Fy;
+                    frame.copyTo(prevBg);
+                }break;
+            case BLACK_BG:
+                {
+                    backModel->init(black_frame);
+                    black_frame.copyTo(prevBg); 
+                }break;
+            case WHITE_BG:
+                {
+                    backModel->init(white_frame);
+                    white_frame.copyTo(prevBg);
+                }break;
+            case DIFF_BG:
+                {
+                    //copy it in case huge blobs generated
+                    backModel->init(frame);
+                }break;
+            default:
+                break;
+            }
+        }
 
-		if (theConfig.face_track)
-		{
-			haar.find(frame, theConfig.paramMinArea);
-			timer.profileFunction("haar.find");
-		}
+        if (theConfig.face_track)
+        {
+            haar.find(frame, theConfig.paramMinArea);
+            timer.profileFunction("haar.find");
+        }
 
-		{
-			backModel->setIntParam(0, theConfig.paramBright);
-			backModel->setIntParam(1, theConfig.paramDark);
-			backModel->update(frame, DETECT_BOTH);
-			fore = backModel->getForeground();
-			back = backModel->getBackground();//for render only
-		}
+        {
+            backModel->setIntParam(0, theConfig.paramBright);
+            backModel->setIntParam(1, theConfig.paramDark);
+            backModel->update(frame, DETECT_BOTH);
+            fore = backModel->getForeground();
+            back = backModel->getBackground();//for render only
+        }
 
-		timer.profileFunction("backModel->update");
-		//fore->blobs
-		vHighPass(fore, grayBuffer, theConfig.paramBlur1, theConfig.paramBlur2);		
-		grayBuffer.copyTo(fore);
+        timer.profileFunction("backModel->update");
+        //fore->blobs
+        vHighPass(fore, grayBuffer, theConfig.paramBlur1, theConfig.paramBlur2);		
+        grayBuffer.copyTo(fore);
 
-		timer.profileFunction("vHighPass");
+        timer.profileFunction("vHighPass");
 
-		const int scale =HalfWidth*HalfHeight/PARAM_MAXAREA;
-		int minArea = (theConfig.paramMinArea)*scale/10;
-		int maxArea = minArea+(theConfig.paramMaxArea)*scale;
-		vFindBlobs(grayBuffer, blobs, minArea ,maxArea, theConfig.hull_mode == 1);
-		timer.profileFunction("vFindBlobs");
+        const int scale =subWindowWidth*subWindowHeight/PARAM_MAXAREA;
+        int minArea = (theConfig.paramMinArea)*scale/10;
+        int maxArea = minArea+(theConfig.paramMaxArea)*scale;
+        vFindBlobs(grayBuffer, blobs, minArea ,maxArea, theConfig.hull_mode == 1);
+        timer.profileFunction("vFindBlobs");
 
-		blobTracker.trackBlobs(blobs);
-		timer.profileFunction("blobTracker");
+        blobTracker.trackBlobs(blobs);
+        timer.profileFunction("blobTracker");
 
-		if (theConfig.tuio_mode)
-		{
-			send_tuio_msg();
-			timer.profileFunction("send_tuio_msg");
-		}
-		else
-		{
-			send_custom_msg();
-			timer.profileFunction("send_osc_msg");
-		}
+        if (theConfig.tuio_mode)
+        {
+            send_tuio_msg();
+            timer.profileFunction("send_tuio_msg");
+        }
+        else
+        {
+            send_custom_msg();
+            timer.profileFunction("send_osc_msg");
+        }
 
-		if (monitorVisible)
-		{
+        if (monitorVisible)
+        {
             setOpenGlContext(MAIN_WINDOW);
 
             mTexMainWindows[0]->copyFrom(half_raw);
@@ -206,31 +208,45 @@ void VideoApp::run()
             // InvalidateRect --> issue WM_PAINT
             // HighGUIProc --> drawGl(window); 
             // VideoApp::renderMainWindow
-		}
+        }
 
-		_frm_counter++;
+        _frm_counter++;
 
-		if ((_ms_counter += timer_total.getTimeElapsedMS()) > 1000)
-		{
-			fps = _frm_counter;
-			_frm_counter = 0;
-			_ms_counter = 0;
-		}
+        if ((_ms_counter += timer_total.getTimeElapsedMS()) > 1000)
+        {
+            fps = _frm_counter;
+            _frm_counter = 0;
+            _ms_counter = 0;
+        }
 
-		sprintf(g_buffer, "FPS {Cam %d Server %d} %d object", grab_thread->fps, fps, blobs.size());
-		if (theConfig.face_track)
-			sprintf(g_buffer, "%s %d face", g_buffer, haar.blobs.size()); 
-		rectangle(param_gui::setting, Point(0,0), Point(400,30), CV_RGB(122,122,122), CV_FILLED);
-		Mat m = param_gui::setting;
-		vDrawText(m, 20,20, g_buffer);
+        sprintf(g_buffer, "FPS {Cam %d Server %d} %d object", grab_thread->fps, fps, blobs.size());
+        if (theConfig.face_track)
+            sprintf(g_buffer, "%s %d face", g_buffer, haar.blobs.size()); 
+        rectangle(param_gui::setting, Point(0,0), Point(400,30), CV_RGB(122,122,122), CV_FILLED);
+        Mat m = param_gui::setting;
+        vDrawText(m, 20,20, g_buffer);
 
         imshow(PARAM_WINDOW, param_gui::setting);
-		timer.profileFunction("show Param Panel");
+        timer.profileFunction("show Param Panel");
 
-		timer_total.profileFunction("total"); 
-	}
+        timer_total.profileFunction("total"); 
+    }
 
-	theConfig.save_to(CONFIG_FILE);
+    theConfig.save_to(CONFIG_FILE);
+
+    if (theConfig.scene_plot_mode)
+    {
+        ofstream ofs("scene.plots");
+        if (ofs)
+        {
+            int nPlots = theConfig.scene_plots.size();
+            ofs << "plots:" << nPlots << endl;
+            for (int i=0; i<nPlots; i++)
+            {
+                ofs << theConfig.scene_plots[i] << endl;
+            }
+        }
+    }
 
     //setupOpenglResources();// fix pure virtual function call occurred when built statically
 
@@ -240,9 +256,9 @@ void VideoApp::run()
 namespace 
 {
     template <typename T>
-    void drawStrokedRect( const Rect_<T> &rect )
+    void drawStrokedRect(const Rect_<T> &rect)
     {
-        static cv::ogl::Arrays vbo;
+        static ogl::Arrays vbo;
         vector<Point_<T>> verts;
         verts.push_back(Point_<T>(rect.x,                 rect.y));
         verts.push_back(Point_<T>(rect.x + rect.width,    rect.y));
@@ -252,28 +268,29 @@ namespace
         render(vbo, ogl::LINES);
     }
 
-    //void drawStrokedEllipse( const Vec2f &center, float radiusX, float radiusY, int numSegments )
-    //{
-    //    // automatically determine the number of segments from the circumference
-    //    if( numSegments <= 0 ) {
-    //        numSegments = (int)math<double>::floor( std::max(radiusX,radiusY) * M_PI * 2 );
-    //    }
-    //    if( numSegments < 2 ) numSegments = 2;
+    template <typename T>
+    void drawStrokedEllipse(const Point_<T> &center, float radiusX, float radiusY, int numSegments)
+    {
+        static ogl::Arrays vbo;
+        // automatically determine the number of segments from the circumference
+        if (numSegments <= 0) 
+        {
+            numSegments = (int)floor(max(radiusX, radiusY) * 3.14159f * 2);
+        }
+        if (numSegments < 2) numSegments = 2;
 
-    //    GLfloat *verts = new float[numSegments*2];
-    //    for( int s = 0; s < numSegments; s++ ) {
-    //        float t = s / (float)numSegments * 2.0f * 3.14159f;
-    //        verts[s*2+0] = center.x + math<float>::cos( t ) * radiusX;
-    //        verts[s*2+1] = center.y + math<float>::sin( t ) * radiusY;
-    //    }
-    //    glEnableClientState( GL_VERTEX_ARRAY );
-    //    glVertexPointer( 2, GL_FLOAT, 0, verts );
-    //    glDrawArrays( GL_LINE_LOOP, 0, numSegments );
-    //    glDisableClientState( GL_VERTEX_ARRAY );
-    //    delete [] verts;
-    //}
-
+        vector<Point_<T>> verts(numSegments);
+        for (int s = 0; s < numSegments; s++) 
+        {
+            float t = s / (float)numSegments * 2.0f * 3.14159f;
+            verts[s].x = center.x + cos(t) * radiusX;
+            verts[s].y = center.y + sin(t) * radiusY;
+        }
+        vbo.setVertexArray(verts);
+        render(vbo, ogl::LINE_LOOP);
+    }
 }
+
 void VideoApp::renderMainWindow()
 {
     if (!monitorVisible)
@@ -285,12 +302,12 @@ void VideoApp::renderMainWindow()
         render(*mTexMainWindows[i], mRoiMainWindows[i]);
     }
 
-    glMatrixMode( GL_PROJECTION );
+    glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho( 0, total.cols, total.rows, 0, -1.0f, 1.0f );
+    glOrtho(0, total.cols, total.rows, 0, -1.0f, 1.0f);
 
-    std::vector<Point2f> vertices;
-    std::vector<Scalar_<BYTE>> colors;
+    vector<Point2f> vertices;
+    vector<Scalar_<BYTE>> colors;
     const Point2f kMarkerSize(5,5);
 
     const Scalar_<BYTE> kBlue(255, 0, 0);
@@ -325,10 +342,23 @@ void VideoApp::renderMainWindow()
     vertices.push_back(Point2f(0.5f*total.cols+spac,  0.5f*total.rows));      colors.push_back(kBlue);
     vertices.push_back(Point2f(0.5f*total.cols,       0.5f*total.rows-spac)); colors.push_back(kBlue);
     vertices.push_back(Point2f(0.5f*total.cols,       0.5f*total.rows+spac)); colors.push_back(kBlue);
-    
+
     mVboLines->setVertexArray(vertices);
     mVboLines->setColorArray(colors);
     render(*mVboLines, ogl::LINES);
+
+    if (theConfig.scene_plot_mode)
+    {
+        int nPlots = theConfig.scene_plots.size();
+        const float kPlotRadius = 3;
+        for (int i=0; i<nPlots; i++)
+        {
+            Point2f pt = theConfig.scene_plots[i];
+            pt.x = subWindowWidth   + pt.x * subWindowWidth;
+            pt.y = 0                + pt.y * subWindowHeight;
+            drawStrokedEllipse(pt, kPlotRadius, kPlotRadius, 10);
+        }
+    }
 }
 
 void VideoApp::setupOpenglResources()

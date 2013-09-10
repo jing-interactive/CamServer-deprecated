@@ -21,75 +21,77 @@
 
 struct VideoGrabThread: public MiniThread
 {
-	int fps;
+    int fps;
 
-	VideoInput& input;
+    VideoInput& input;
 
-	VideoGrabThread(VideoInput& input);
-	void threadedFunction();
-	bool isDirty();
+    VideoGrabThread(VideoInput& input);
+    void threadedFunction();
+    bool isDirty();
 private:
-	bool mDirty;
+    bool mDirty;
 };
 
 struct VideoApp
 {
-	//thread
-	cv::Ptr<VideoGrabThread> grab_thread;
+    //thread
+    cv::Ptr<VideoGrabThread> grab_thread;
     VideoInput mInput;
 
-	//the important objects
-	HaarFinder haar;
-	vBlobTracker blobTracker;
-	ofxOscSender sender;
+    //the important objects
+    HaarFinder haar;
+    vBlobTracker blobTracker;
+    ofxOscSender sender;
 
-	//
-	char g_buffer[256];
-	bool app_running;
-	bool input_inited;
+    //
+    char g_buffer[256];
+    bool app_running;
+    bool input_inited;
 
-	cv::Point2f* selectedCorner;
-	cv::Point2f dstQuad[4];
-	vector<vBlob> blobs;
-	cv::Mat warpMatrix;
+    cv::Point2f* selectedCorner;
+    cv::Point2f dstQuad[4];
+    vector<vBlob> blobs;
+    cv::Mat warpMatrix;
 
-	//the Mats
-	cv::Mat total;
-	cv::Mat frame, black_frame, white_frame;
-	cv::Mat prevBg;
-	cv::Mat half_raw;
-	cv::Mat grayBuffer;
+    //the Mats
+    cv::Mat total;
+    cv::Mat frame, black_frame, white_frame;
+    cv::Mat prevBg;
+    cv::Mat half_raw;
+    cv::Mat grayBuffer;
 
     cv::Mat back;//for render only
     cv::Mat fore;
 
-	cv::Size size;
-	int channels;
-	cv::Size half;
-	bool monitorVisible;
+    cv::Size size;
+    int channels;
+    cv::Size half;
+    bool monitorVisible;
 
-	cv::Ptr<IBackGround> backModel;
+    cv::Ptr<IBackGround> backModel;
 
-	int HalfWidth, HalfHeight;
-	bool toResetBackground;
-	int g_Fx, g_Fy;
-	int g_prevFx, g_prevFy;
+    int subWindowWidth, subWindowHeight;
+    int windowWidth, windowHeight;
 
-	VideoApp();
+    bool toResetBackground;
+    int g_Fx, g_Fy;
+    int g_prevFx, g_prevFy;
 
-	bool init(int argc, char** argv);
+    VideoApp();
+
+    bool init(int argc, char** argv);
 
     void resetCorners();
 
-	void onRefreshBack();
-	void onParamFlip(int fx, int fy);
+    void onRefreshBack();
+    void onParamFlip(int fx, int fy);
 
-	void run();
+    void run();
 
 private:
-	void parse_args(int argc, char** argv);
-	void send_custom_msg();
-	void send_tuio_msg();
+    void parse_args(int argc, char** argv);
+    void send_custom_msg();
+    void send_tuio_msg();
 
     // opengl related
 public:

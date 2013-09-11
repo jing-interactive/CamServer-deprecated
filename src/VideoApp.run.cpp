@@ -240,10 +240,9 @@ void VideoApp::run()
         if (ofs)
         {
             int nPlots = theConfig.scene_plots.size();
-            ofs << "plots:" << nPlots << endl;
             for (int i=0; i<nPlots; i++)
             {
-                ofs << theConfig.scene_plots[i] << endl;
+                ofs << theConfig.scene_plots[i].x << ' ' << theConfig.scene_plots[i].y << '\n';
             }
         }
     }

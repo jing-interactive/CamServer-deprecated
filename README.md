@@ -1,3 +1,5 @@
+#DEPRECATED, for future progress please check https://github.com/vnm-interactive/KinServer
+
 ﻿CamServer is a lightweight camera based multi-touch software written in C++.
 It uses OpenCV and some libraries from OpenFrameworks.  
 Folder /src contains the main application.   

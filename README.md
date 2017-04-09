@@ -1,4 +1,4 @@
-#DEPRECATED, for future progress please check https://github.com/vnm-interactive/KinServer
+#DEPRECATED, for future progress please check https://github.com/jing-interactive/AirTouch
 
 ﻿CamServer is a lightweight camera based multi-touch software written in C++.
 It uses OpenCV and some libraries from OpenFrameworks.  
